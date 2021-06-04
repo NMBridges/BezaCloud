@@ -24,7 +24,7 @@ const createLicenseKeyWindow = () => {
   licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey.html'));
 
   // Open the DevTools.
-  //licenseKeyWindow.webContents.openDevTools();
+  licenseKeyWindow.webContents.openDevTools();
 };
 
 const createLoginWindow = () => {
