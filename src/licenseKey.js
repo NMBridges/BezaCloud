@@ -17,11 +17,11 @@ function keySearched() {
         user: "typaCC",
         password: "sM1L6::@"
     });
-      
+    
     con.connect(function(err) {
         if (err) throw err;
         console.log("Connected!");
     });
-
+    
     // check if license key is valid
 }
