@@ -21,7 +21,7 @@ const createLicenseKeyWindow = () => {
   });
 
   // and load the index.html of the app.
-  licenseKeyWindow.loadFile(path.join(__dirname, 'loginScreen.html'));
+  licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey.html'));
 
   // Open the DevTools.
   //licenseKeyWindow.webContents.openDevTools();
@@ -50,7 +50,6 @@ const createLoginWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createLicenseKeyWindow);
-app.on('ready', createLoginWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

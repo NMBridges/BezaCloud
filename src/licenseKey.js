@@ -1,0 +1,1 @@
+const keyTextBox = document.getElementById('keyTextBox');

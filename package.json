@@ -1,7 +1,7 @@
 {
-  "name": "my-app",
-  "productName": "my-app",
-  "version": "1.0.0",
+  "name": "Mercor Connect",
+  "productName": "Mercor Connect",
+  "version": "0.1",
   "description": "My Electron application description",
   "main": "src/main.js",
   "scripts": {
@@ -16,7 +16,6 @@
     "name": "Nolan",
     "email": "nolanmbridges@gmail.com"
   },
-  "license": "MIT",
   "config": {
     "forge": {
       "packagerConfig": {},
@@ -47,7 +46,8 @@
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.17.0",
     "aws-sdk": "^2.921.0",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "mysql": "^2.18.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.57",
@@ -55,6 +55,6 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.57",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.57",
     "@electron-forge/maker-zip": "^6.0.0-beta.57",
-    "electron": "13.0.1"
+    "electron": "^13.0.1"
   }
 }
