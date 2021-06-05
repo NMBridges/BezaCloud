@@ -15,21 +15,26 @@ keyTextBox.addEventListener("keyup", function(event) {
 
 // Checks that the input license key is valid
 function keySearched() {
-    // Connects to MySQL server
+    // Connects to MySQL server - in future pull this data from s3 bucket
     var con = mysql.createConnection({
         host: "3.221.75.247",
         user: "typaCC",
-        password: "sM1L6::@"
+        password: "sM1L6::@",
+        database: "licensemanager"
     });
     
     con.connect(function(err) {
         if (err) throw err;
         console.log("Connected!");
-    });
 
-    // Gets unique machine ID
-    var machId = machineIdSync({original: true});
-    console.log("MACHINE ID:", machId);
-    
-    // check if license key is valid
+        // Gets unique machine ID
+        var machId = machineIdSync({original: true});
+        console.log("MACHINE ID:", machId);
+
+        // check if license key is valid
+        con.query("SELECT * FROM activationTable", function(err, result) {
+            if(err) throw err;
+            console.log("Result:", result);
+        });
+    });
 }
