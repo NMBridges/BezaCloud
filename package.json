@@ -1,7 +1,7 @@
 {
-  "name": "Mercor Connect",
+  "name": "my-app",
   "productName": "Mercor Connect",
-  "version": "0.1",
+  "version": "1.0.0",
   "description": "Facilitating commmerce one server at a time.",
   "main": "src/main.js",
   "scripts": {
@@ -47,7 +47,8 @@
     "@aws-sdk/client-ec2": "^3.17.0",
     "aws-sdk": "^2.921.0",
     "electron-squirrel-startup": "^1.0.0",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "node-machine-id": "github:automation-stack/node-machine-id"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.57",
