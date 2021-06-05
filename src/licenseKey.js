@@ -32,9 +32,28 @@ function keySearched() {
         console.log("MACHINE ID:", machId);
 
         // check if license key is valid
-        con.query("SELECT * FROM activationTable", function(err, result) {
+        con.query("SELECT * FROM activationTable WHERE licenseKey=?", [keyTextBox.value], function(err, result) {
             if(err) throw err;
-            console.log("Result:", result);
+            if(result.length == 0) {
+                // license key does not exist
+                // cannot proceed
+                console.log("Invalid license key.");
+            } else if(result[0]['hardwareId'] != null && result[0]['hardwareId'] != machId) {
+                // license key is registered on another device
+                // cannot proceed
+                console.log("License key is registered on another device.");
+            } else if(result[0]['hardwareId'] == machId) {
+                // license key is registered by the current device
+                // proceed
+                console.log("License key is valid.");
+            } else {
+                // license key is valid and unused
+                // register this license key for this device and proceed
+                con.query("UPDATE activationTable SET hardwareId =? WHERE licenseKey =?", [machId, keyTextBox.value], function(err2, result2) {
+                    if(err2) throw err2;
+                    console.log("License key registered successfully.");
+                });
+            }
         });
     });
 }
