@@ -6,7 +6,7 @@ closeBtn.onclick = closeClicked;
 
 var validLicenseKey = false;
 
-import { machineIdSync } from "../node_modules/node-machine-id/index.js";
+const { machineIdSync } = require("../node_modules/node-machine-id/index.js");
 var mysql = require('mysql');
 
 // Checks for 'return' on license key text box

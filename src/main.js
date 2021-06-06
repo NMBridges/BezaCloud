@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const { tryLicenseKey, cachedLicenseKey } = require("./mercor.js");
 
 let licenseKeyWindow;
 let loginWindow;
@@ -42,19 +43,30 @@ function createWindows() {
   loginWindow.loadFile(path.join(__dirname, 'loginScreen.html'));
   //loginWindow.webContents.openDevTools();
 
-  // Hides all windows except licenseKeyWindow
+  // Hides all windows
   loginWindow.hide();
 
-  /**
-   * Have a helper js script that checks if there is
-   * an existing license and if it is valid, then 
-   * decide which window it needs to show
-   */
+  // Shows license key window when ready to show
+  licenseKeyWindow.hide();
+  licenseKeyWindow.once('ready-to-show', () => {
+    licenseKeyWindow.show();
+  })
 
+  // Checks if there is a valid key on the hard drive. If so, it shows the login window.
+  // If not, it shows the license key window.
+  const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
+    console.log("License key result for " + cachedLicenseKey() + ":", exists);
+    if(exists) {
+      licenseKeyWindow.hide();
+      loginWindow.show();
+    } else {
 
-
+    }
+  });
+  
+  // When license key window closes (not hides), it closes the application
   licenseKeyWindow.on('close', () => {
-    loginWindow.show();
+    app.quit();
   });
 }
 

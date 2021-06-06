@@ -48,6 +48,7 @@
     "aws-sdk": "^2.921.0",
     "electron-squirrel-startup": "^1.0.0",
     "mysql": "^2.18.1",
+    "mysql-await": "^2.1.8",
     "node-machine-id": "github:automation-stack/node-machine-id"
   },
   "devDependencies": {
