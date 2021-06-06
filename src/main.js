@@ -1,14 +1,19 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
+let licenseKeyWindow;
+let loginWindow;
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
 }
 
-const createLicenseKeyWindow = () => {
-  // Create the browser window.
-  const licenseKeyWindow = new BrowserWindow({
+function createWindows() {
+  /**
+   *  License key window
+   */
+  licenseKeyWindow = new BrowserWindow({
     width: 600,
     height: 400,
     frame: false,
@@ -19,17 +24,13 @@ const createLicenseKeyWindow = () => {
       enableRemoteModule: true
     }
   });
-
-  // and load the index.html of the app.
   licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey.html'));
-
-  // Open the DevTools.
   licenseKeyWindow.webContents.openDevTools();
-};
 
-const createLoginWindow = () => {
-  // Create the browser window.
-  const loginWindow = new BrowserWindow({
+  /**
+   *  Login window
+   */
+  loginWindow = new BrowserWindow({
     width: 600,
     height: 400,
     webPreferences: {
@@ -38,18 +39,29 @@ const createLoginWindow = () => {
       enableRemoteModule: true
     }
   });
-
-  // and load the index.html of the app.
   loginWindow.loadFile(path.join(__dirname, 'loginScreen.html'));
-
-  // Open the DevTools.
   //loginWindow.webContents.openDevTools();
-};
+
+  // Hides all windows except licenseKeyWindow
+  loginWindow.hide();
+
+  /**
+   * Have a helper js script that checks if there is
+   * an existing license and if it is valid, then 
+   * decide which window it needs to show
+   */
+
+
+
+  licenseKeyWindow.on('close', () => {
+    loginWindow.show();
+  });
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createLicenseKeyWindow);
+app.on('ready', createWindows);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

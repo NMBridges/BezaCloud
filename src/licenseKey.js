@@ -1,6 +1,10 @@
 const keyTextBox = document.getElementById('keyTextBox');
 const returnBtn = document.getElementById('returnBtn');
+const closeBtn = document.getElementById('closeBtn');
 returnBtn.onclick = keySearched;
+closeBtn.onclick = closeClicked;
+
+var validLicenseKey = false;
 
 import { machineIdSync } from "../node_modules/node-machine-id/index.js";
 var mysql = require('mysql');
@@ -56,4 +60,10 @@ function keySearched() {
             }
         });
     });
+}
+
+function closeClicked() {
+    const remote = require('electron').remote;
+    let w = remote.getCurrentWindow();
+    w.close();
 }
