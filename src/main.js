@@ -58,15 +58,19 @@ function createWindows() {
     console.log("License key result for " + cachedLicenseKey() + ":", exists);
     if(exists) {
       licenseKeyWindow.hide();
-      loginWindow.show();
     } else {
-
+      
     }
   });
   
   // When license key window closes (not hides), it closes the application
   licenseKeyWindow.on('close', () => {
     app.quit();
+  });
+
+  // When license key window hides (not closes), it opens the login window
+  licenseKeyWindow.on('hide', () => {
+    loginWindow.show();
   });
 }
 
