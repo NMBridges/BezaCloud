@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const { tryLicenseKey, cachedLicenseKey } = require("./mercor.js");
+const { tryLicenseKey, cachedLicenseKey, createMercorConnectDir, updateKeyCache } = require("./mercor.js");
 
 let licenseKeyWindow;
 let loginWindow;
@@ -50,7 +50,9 @@ function createWindows() {
   licenseKeyWindow.hide();
   licenseKeyWindow.once('ready-to-show', () => {
     licenseKeyWindow.show();
-  })
+  });
+
+  createMercorConnectDir();
 
   // Checks if there is a valid key on the hard drive. If so, it shows the login window.
   // If not, it shows the license key window.
@@ -70,6 +72,7 @@ function createWindows() {
 
   // When license key window hides (not closes), it opens the login window
   licenseKeyWindow.on('hide', () => {
+    // DOES NOT WORK ON MAC OR WHEN PROGRAM GOES IN BACKGROUND
     loginWindow.show();
   });
 }

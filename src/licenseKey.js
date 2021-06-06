@@ -8,6 +8,7 @@ var validLicenseKey = false;
 
 const { machineIdSync } = require("../node_modules/node-machine-id/index.js");
 var mysql = require('mysql');
+const { updateKeyCache } = require("./mercor.js");
 
 // Checks for 'return' on license key text box
 keyTextBox.addEventListener("keyup", function(event) {
@@ -19,6 +20,7 @@ keyTextBox.addEventListener("keyup", function(event) {
 
 // Checks that the input license key is valid
 function keySearched() {
+    updateKeyCache(keyTextBox.value);
     // Connects to MySQL server - in future pull this data from s3 bucket
     var con = mysql.createConnection({
         host: "3.221.75.247",

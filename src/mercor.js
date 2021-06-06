@@ -6,7 +6,10 @@ var mysql = require('mysql-await');
 // Returns the cached license key from the user's file system
 function cachedLicenseKey() {
     var cachedKey = "";
-    var keyDir = homeDir + "\\.aws\\licenseKey.txt";
+    if(!fs.existsSync(homeDir + "/MercorConnect/licenseKey.txt")) {
+        return "";
+    }
+    var keyDir = homeDir + "/MercorConnect/licenseKey.txt";
     try {
         cachedKey = fs.readFileSync(keyDir, 'utf-8');
         cachedKey = cachedKey.substr(4).trim();
@@ -70,4 +73,23 @@ async function tryLicenseKey(inputKey) {
     return keyIsValid;
 }
 
-module.exports = { cachedLicenseKey, tryLicenseKey };
+// Ensures that there is a directory to store cache data
+function createMercorConnectDir() {
+    if(!fs.existsSync(homeDir + "/MercorConnect")) {
+        fs.mkdirSync(homeDir + "/MercorConnect");
+    }
+    if(!fs.existsSync(homeDir + "/MercorConnect/licenseKey.txt")) {
+        fs.appendFileSync(homeDir + "/MercorConnect/licenseKey.txt", "key=");
+    }
+    // add other sections as needed
+}
+
+function updateKeyCache(newKey) {
+    if(!fs.existsSync(homeDir + "/MercorConnect/licenseKey.txt")) {
+        fs.appendFileSync(homeDir + "/MercorConnect/licenseKey.txt", "key=" + newKey);
+    } else {
+        fs.writeFileSync(homeDir + "/MercorConnect/licenseKey.txt", "key=" + newKey);
+    }
+}
+
+module.exports = { cachedLicenseKey, tryLicenseKey, createMercorConnectDir, updateKeyCache };
