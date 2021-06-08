@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require('electron');
+const EventEmitter = require('events');
 const path = require('path');
 const { tryLicenseKey, cachedLicenseKey, createMercorConnectDir, updateKeyCache } = require("./mercor.js");
 
@@ -40,7 +41,7 @@ function createWindows() {
       enableRemoteModule: true
     }
   });
-  loginWindow.loadFile(path.join(__dirname, 'loginScreen.html'));
+  loginWindow.loadFile(path.join(__dirname, 'login.html'));
   //loginWindow.webContents.openDevTools();
 
   // Hides all windows
@@ -51,22 +52,46 @@ function createWindows() {
 
   createMercorConnectDir();
 
-  // Checks if there is a valid key on the hard drive. If so, it shows the login window.
-  // If not, it shows the license key window.
+  // Automatically checks if there is a valid key on the hard drive. If so, it
+  // shows the login window. If not, it shows the license key window and waits
+  // for manual user input.
   const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
     console.log("License key result for " + cachedLicenseKey() + ":", exists);
     if(exists) {
       licenseKeyWindow.hide();
       loginWindow.show();
-    } else {
-      
     }
   });
+
+
+  // ------------------------------      licenseKeyWindow     ----------------------------------------// 
   
   // When license key window closes (not hides), it closes the application
   licenseKeyWindow.on('close', () => {
     app.quit();
   });
+
+  // When the license key is input manually, it will validate the key (like above)
+  licenseKeyWindow.on('licenseKeySearched', () => {
+    const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
+      console.log("License key result for " + cachedLicenseKey() + ":", exists);
+      if(exists) {
+        licenseKeyWindow.hide();
+        loginWindow.show();
+      }
+    });
+  });
+  // ---------------------------------------------------------------------------------------------------//
+
+
+  // --------------------------------      loginWindow      --------------------------------------------//
+
+  // When login window closes (not hides), it closes the application
+  loginWindow.on('close', () => {
+    app.quit();
+  });
+
+  // ---------------------------------------------------------------------------------------------------//
 }
 
 // This method will be called when Electron has finished

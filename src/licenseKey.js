@@ -21,7 +21,10 @@ keyTextBox.addEventListener("keyup", function(event) {
 // Checks that the input license key is valid
 function keySearched() {
     updateKeyCache(keyTextBox.value);
-    tryLicenseKey(keyTextBox.value);
+    
+    const remote = require('electron').remote;
+    let w = remote.getCurrentWindow();
+    w.emit('licenseKeySearched');
 }
 
 function closeClicked() {

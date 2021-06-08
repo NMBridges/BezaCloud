@@ -1,5 +1,3 @@
-const createInstanceBtn = document.getElementById('createInstanceBtn');
-
 const {
     CreateTagsCommand,
     RunInstancesCommand
@@ -45,5 +43,3 @@ const createInstance = async () => {
         console.log("Error", err);
     }
 };
-
-createInstanceBtn.onclick = createInstance;
