@@ -14,10 +14,10 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 }
 
 function createWindows() {
-  /**
-   *  License key window
-   */
-  licenseKeyWindow = new BrowserWindow({
+  
+  // ------------------------------      licenseKeyWindow     ----------------------------------------// 
+  
+   licenseKeyWindow = new BrowserWindow({
     width: 600,
     height: 400,
     frame: false,
@@ -31,43 +31,6 @@ function createWindows() {
   licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey.html'));
   //licenseKeyWindow.webContents.openDevTools();
 
-  /**
-   *  Login window
-   */
-  loginWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true
-    }
-  });
-  loginWindow.loadFile(path.join(__dirname, 'login.html'));
-  //loginWindow.webContents.openDevTools();
-
-  // Hides all windows
-  loginWindow.hide();
-
-  // Shows license key window when ready to show
-  licenseKeyWindow.show();
-
-  createMercorConnectDir();
-
-  // Automatically checks if there is a valid key on the hard drive. If so, it
-  // shows the login window. If not, it shows the license key window and waits
-  // for manual user input.
-  const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
-    console.log("License key result for " + cachedLicenseKey() + ":", exists);
-    if(exists) {
-      licenseKeyWindow.hide();
-      loginWindow.show();
-    }
-  });
-
-
-  // ------------------------------      licenseKeyWindow     ----------------------------------------// 
-  
   // When license key window closes (not hides), it closes the application
   licenseKeyWindow.on('close', () => {
     app.quit();
@@ -88,12 +51,44 @@ function createWindows() {
 
   // --------------------------------      loginWindow      --------------------------------------------//
 
+   loginWindow = new BrowserWindow({
+    width: 600,
+    height: 400,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+  loginWindow.loadFile(path.join(__dirname, 'login.html'));
+  //loginWindow.webContents.openDevTools();
+
   // When login window closes (not hides), it closes the application
   loginWindow.on('close', () => {
     app.quit();
   });
 
   // ---------------------------------------------------------------------------------------------------//
+
+  // Hides all windows
+  loginWindow.hide();
+
+  // Shows license key window
+  licenseKeyWindow.show();
+
+  // Creates cache directory if it does not already exist
+  createMercorConnectDir();
+
+  // Automatically checks if there is a valid key on the hard drive. If so, it
+  // shows the login window. If not, it shows the license key window and waits
+  // for manual user input.
+  const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
+    console.log("License key result for " + cachedLicenseKey() + ":", exists);
+    if(exists) {
+      licenseKeyWindow.hide();
+      loginWindow.show();
+    }
+  });
 }
 
 // This method will be called when Electron has finished
