@@ -1,7 +1,9 @@
 const { app, BrowserWindow } = require('electron');
 const EventEmitter = require('events');
 const path = require('path');
-const { tryLicenseKey, cachedLicenseKey, createMercorConnectDir, updateKeyCache } = require("./mercor.js");
+const {
+  tryLicenseKey, cachedLicenseKey, createMercorConnectDir,
+} = require("./mercor.js");
 
 let licenseKeyWindow;
 let loginWindow;
@@ -27,7 +29,7 @@ function createWindows() {
     }
   });
   licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey.html'));
-  licenseKeyWindow.webContents.openDevTools();
+  //licenseKeyWindow.webContents.openDevTools();
 
   /**
    *  Login window

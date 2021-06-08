@@ -19,6 +19,21 @@ function cachedLicenseKey() {
     return cachedKey;
 }
 
+// Returns the cached AWS config
+function cachedAwsConfig() {
+    return fs.readFileSync(require('path').dirname(__dirname) + "/config.json", 'utf-8');
+}
+
+// Updates the cached AWS config
+function updateAwsConfigCache(newConfig) {
+    const configPath = require('path').dirname(__dirname) + "/config.json";
+    if(!fs.existsSync(configPath)) {
+        fs.appendFileSync(configPath, newConfig);
+    } else {
+        fs.writeFileSync(configPath, newConfig);
+    }
+}
+
 // Returns the IP, user, pass, and database of the SQL server from an s3 bucket
 // to be implemented
 function getSqlServer() {
@@ -92,4 +107,7 @@ function updateKeyCache(newKey) {
     }
 }
 
-module.exports = { cachedLicenseKey, tryLicenseKey, createMercorConnectDir, updateKeyCache };
+module.exports = { 
+    cachedLicenseKey, tryLicenseKey, createMercorConnectDir, updateKeyCache,
+    cachedAwsConfig, updateAwsConfigCache
+};
