@@ -47,10 +47,7 @@ function createWindows() {
   loginWindow.hide();
 
   // Shows license key window when ready to show
-  licenseKeyWindow.hide();
-  licenseKeyWindow.once('ready-to-show', () => {
-    licenseKeyWindow.show();
-  });
+  licenseKeyWindow.show();
 
   createMercorConnectDir();
 
@@ -60,6 +57,7 @@ function createWindows() {
     console.log("License key result for " + cachedLicenseKey() + ":", exists);
     if(exists) {
       licenseKeyWindow.hide();
+      loginWindow.show();
     } else {
       
     }
@@ -68,12 +66,6 @@ function createWindows() {
   // When license key window closes (not hides), it closes the application
   licenseKeyWindow.on('close', () => {
     app.quit();
-  });
-
-  // When license key window hides (not closes), it opens the login window
-  licenseKeyWindow.on('hide', () => {
-    // DOES NOT WORK ON MAC OR WHEN PROGRAM GOES IN BACKGROUND
-    loginWindow.show();
   });
 }
 
