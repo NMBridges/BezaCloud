@@ -13,6 +13,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
   app.quit();
 }
 
+// The main logic function that controls interaction between windows
 function createWindows() {
   
   // ------------------------------      licenseKeyWindow     ----------------------------------------// 
