@@ -55,6 +55,7 @@ function createWindows() {
    loginWindow = new BrowserWindow({
     width: 600,
     height: 400,
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -62,7 +63,7 @@ function createWindows() {
     }
   });
   loginWindow.loadFile(path.join(__dirname, 'login.html'));
-  //loginWindow.webContents.openDevTools();
+  loginWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   loginWindow.on('close', () => {

@@ -8,12 +8,14 @@ accessKeyIdField.onfocus = autofillTextboxes;
 accessKeyIdField.focus();
 
 const { cachedAwsConfig, updateAwsConfigCache } = require("./mercor.js");
+const { connectionTest } = require("./apiCaller.js");
 
 function loginClicked() {
     const jsonObj = JSON.parse(cachedAwsConfig());
     jsonObj['accessKeyId'] = accessKeyIdField.value;
     jsonObj['secretAccessKey'] = secretAccessKeyField.value;
     updateAwsConfigCache(JSON.stringify(jsonObj));
+    connectionTest();
 }
 
 function autofillTextboxes() {

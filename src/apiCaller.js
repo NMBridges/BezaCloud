@@ -1,8 +1,11 @@
 const {
     CreateTagsCommand,
-    RunInstancesCommand
+    RunInstancesCommand,
+    EC2Client,
+    DescribeInstancesCommand,
 } = require("@aws-sdk/client-ec2");
-import { ec2Client } from "./libs/ec2Client.js";
+//import { ec2Client } from "./libs/ec2Client.js";
+const ec2Client = new EC2Client({ region: "us-east-1" }); // replace with a pull region from cache
 
 // Set the parameters
 const instanceParams = {
@@ -11,6 +14,18 @@ const instanceParams = {
     KeyName: "chargeAWS-discord", //KEY_PAIR_NAME
     MinCount: 1,
     MaxCount: 1,
+};
+
+// Tests to see if the AWS credentials are valid
+const connectionTest = async () => {
+    try {
+        const data = await ec2Client.send(new DescribeInstancesCommand({}));
+        console.log("Login successful", JSON.stringify(data));
+        return true;
+    } catch(err) {
+        console.log("Error", err);
+        return false;
+    }
 };
 
 const createInstance = async () => {
@@ -43,3 +58,5 @@ const createInstance = async () => {
         console.log("Error", err);
     }
 };
+
+module.exports = { connectionTest };

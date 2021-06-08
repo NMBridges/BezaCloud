@@ -1,1 +1,2 @@
 - Pull License Key IP server
+- Pull AMI types
