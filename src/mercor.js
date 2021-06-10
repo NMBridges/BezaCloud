@@ -19,18 +19,54 @@ function cachedLicenseKey() {
     return cachedKey;
 }
 
-// Returns the cached AWS config
-function cachedAwsConfig() {
-    return fs.readFileSync(require('path').dirname(__dirname) + "/config.json", 'utf-8');
+// Returns the cached AWS credentials
+function cachedAwsCredentials() {
+    // if(process.platform == 'win32') { } - perhaps separate by platform
+    // in the future.
+    
+    // Loads the raw file, reads it line by line, and returns the proper strings
+    var raw = fs.readFileSync(homeDir + "/.aws/credentials", 'utf-8');
+    
+    var lines = [];
+    var tempStr = "";
+    
+    for(var q = 0; q < raw.length; q++) {
+        var character = raw.substring(q, q + 1);
+        if(character != " " && character != "" && character != "\r" && character != "\n") {
+            tempStr += character;
+        } else {
+            if(tempStr != "") {
+                lines.push(tempStr);
+                tempStr = "";
+            }
+        }
+    }
+    
+    if(tempStr != "") {
+        lines.push(tempStr);
+        tempStr = "";
+    }
+
+    var akId = "";
+    if(lines[1].substring(0, 18) == "aws_access_key_id=") {
+        akId = lines[1].substring(18);
+    }
+
+    var sak = "";
+    if(lines[2].substring(0, 22) == "aws_secret_access_key=") {
+        sak = lines[2].substring(22);
+    }
+
+    return { akId, sak };
 }
 
-// Updates the cached AWS config
-function updateAwsConfigCache(newConfig) {
-    const configPath = require('path').dirname(__dirname) + "/config.json";
-    if(!fs.existsSync(configPath)) {
-        fs.appendFileSync(configPath, newConfig);
+// Updates the cached AWS credentials
+function updateAwsCredentialsCache(newCreds) {
+    const credPath = homeDir + "/.aws/credentials";
+    if(!fs.existsSync(credPath)) {
+        fs.appendFileSync(credPath, newCreds);
     } else {
-        fs.writeFileSync(configPath, newConfig);
+        fs.writeFileSync(credPath, newCreds);
     }
 }
 
@@ -99,6 +135,7 @@ function createMercorConnectDir() {
     // add other sections as needed
 }
 
+// Updates the license key cache
 function updateKeyCache(newKey) {
     if(!fs.existsSync(homeDir + "/MercorConnect/licenseKey.txt")) {
         fs.appendFileSync(homeDir + "/MercorConnect/licenseKey.txt", "key=" + newKey);
@@ -109,5 +146,5 @@ function updateKeyCache(newKey) {
 
 module.exports = { 
     cachedLicenseKey, tryLicenseKey, createMercorConnectDir, updateKeyCache,
-    cachedAwsConfig, updateAwsConfigCache
+    cachedAwsCredentials, updateAwsCredentialsCache
 };

@@ -7,23 +7,36 @@ exitBtn.onclick = exitClicked;
 accessKeyIdField.onfocus = autofillTextboxes;
 accessKeyIdField.focus();
 
-const { cachedAwsConfig, updateAwsConfigCache } = require("./mercor.js");
+// Supplemental functions
+const { cachedAwsCredentials, updateAwsCredentialsCache } = require("./mercor.js");
 const { connectionTest } = require("./apiCaller.js");
 
+// Checks if the AWS credentials are valid. Logs in if so
 function loginClicked() {
-    const jsonObj = JSON.parse(cachedAwsConfig());
-    jsonObj['accessKeyId'] = accessKeyIdField.value;
-    jsonObj['secretAccessKey'] = secretAccessKeyField.value;
-    updateAwsConfigCache(JSON.stringify(jsonObj));
-    connectionTest();
+    var credObj = cachedAwsCredentials();
+    credObj['akId'] = accessKeyIdField.value;
+    credObj['sak'] = secretAccessKeyField.value;
+    const out = "[default]\naws_access_key_id=" + credObj['akId'] + "\naws_secret_access_key=" + credObj['sak'];
+    updateAwsCredentialsCache(out);
+    connectionTest().then( function(valid) {
+        if(valid) {
+            console.log("Logged in");
+            // log in
+        } else {
+            console.log("Login failed");
+            // display incorrect credentials message
+        }
+    });
 }
 
+// Fills the textboxes with past login info
 function autofillTextboxes() {
-    const jsonObj = JSON.parse(cachedAwsConfig());
-    accessKeyIdField.value = jsonObj['accessKeyId'];
-    secretAccessKeyField.value = jsonObj['secretAccessKey'];
+    const credObj = cachedAwsCredentials();
+    accessKeyIdField.value = credObj['akId'];
+    secretAccessKeyField.value = credObj['sak'];
 }
 
+// Closes the window
 function exitClicked() {
     const remote = require('electron').remote;
     let w = remote.getCurrentWindow();

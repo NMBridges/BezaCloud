@@ -27,6 +27,7 @@ function keySearched() {
     w.emit('licenseKeySearched');
 }
 
+// Closes the window
 function closeClicked() {
     const remote = require('electron').remote;
     let w = remote.getCurrentWindow();

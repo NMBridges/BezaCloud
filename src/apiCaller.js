@@ -4,8 +4,7 @@ const {
     EC2Client,
     DescribeInstancesCommand,
 } = require("@aws-sdk/client-ec2");
-//import { ec2Client } from "./libs/ec2Client.js";
-const ec2Client = new EC2Client({ region: "us-east-1" }); // replace with a pull region from cache
+const ec2Client = new EC2Client({ region: "us-east-1"});
 
 // Set the parameters
 const instanceParams = {
@@ -20,14 +19,15 @@ const instanceParams = {
 const connectionTest = async () => {
     try {
         const data = await ec2Client.send(new DescribeInstancesCommand({}));
-        console.log("Login successful", JSON.stringify(data));
+        console.log("Login successful");
         return true;
     } catch(err) {
-        console.log("Error", err);
+        console.log("Error loggin in", err);
         return false;
     }
 };
 
+// Creates an instance
 const createInstance = async () => {
     try {
         const data = await ec2Client.send(new RunInstancesCommand(instanceParams));
