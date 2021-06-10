@@ -74,9 +74,7 @@ function createWindows() {
 
   // Hides all windows
   loginWindow.hide();
-
-  // Shows license key window
-  licenseKeyWindow.show();
+  licenseKeyWindow.hide();
 
   // Creates cache directory if it does not already exist
   createMercorConnectDir();
@@ -89,6 +87,8 @@ function createWindows() {
     if(exists) {
       licenseKeyWindow.hide();
       loginWindow.show();
+    } else {
+      licenseKeyWindow.show();
     }
   });
 }
