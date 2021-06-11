@@ -4,7 +4,7 @@ const {
     EC2Client,
     DescribeInstancesCommand,
 } = require("@aws-sdk/client-ec2");
-const ec2Client = new EC2Client({ region: "us-east-1"});
+var ec2Client = new EC2Client({ region: "us-east-1"});
 
 // Set the parameters
 const instanceParams = {
@@ -18,6 +18,7 @@ const instanceParams = {
 // Tests to see if the AWS credentials are valid
 const connectionTest = async () => {
     try {
+        ec2Client = new EC2Client({ region: "us-east-1"});
         const data = await ec2Client.send(new DescribeInstancesCommand({}));
         console.log("Login successful");
         return true;

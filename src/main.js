@@ -64,7 +64,9 @@ function createWindows() {
     }
   });
   loginWindow.loadFile(path.join(__dirname, 'login.html'));
-  loginWindow.webContents.openDevTools();
+  //loginWindow.webContents.openDevTools();
+
+  loginWindow.setResizable(false);
 
   // When login window closes (not hides), it closes the application
   loginWindow.on('close', () => {

@@ -13,10 +13,7 @@ const { connectionTest } = require("./apiCaller.js");
 
 // Checks if the AWS credentials are valid. Logs in if so
 function loginClicked() {
-    var credObj = cachedAwsCredentials();
-    credObj['akId'] = accessKeyIdField.value;
-    credObj['sak'] = secretAccessKeyField.value;
-    const out = "[default]\naws_access_key_id=" + credObj['akId'] + "\naws_secret_access_key=" + credObj['sak'];
+    const out = "[default]\naws_access_key_id=" + accessKeyIdField.value + "\naws_secret_access_key=" + secretAccessKeyField.value;
     updateAwsCredentialsCache(out);
     connectionTest().then( function(valid) {
         if(valid) {
@@ -29,6 +26,15 @@ function loginClicked() {
         } else {
             console.log("Login failed");
             // display incorrect credentials message
+            const textBox1 = document.getElementById('accessKeyIdField');
+            const textBox2 = document.getElementById('secretAccessKeyField');
+            textBox1.classList.add("shake");
+            textBox2.classList.add("shake");
+
+            setTimeout(() => {
+                textBox1.classList.remove("shake");
+                textBox2.classList.remove("shake");
+            }, 500);
         }
     });
 }
