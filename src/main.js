@@ -7,6 +7,7 @@ const {
 
 let licenseKeyWindow;
 let loginWindow;
+let primaryWindow;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -70,11 +71,40 @@ function createWindows() {
     app.quit();
   });
 
+  loginWindow.on('loginSuccessful', () => {
+    loginWindow.hide();
+    primaryWindow.show();
+  });
+
+  // ---------------------------------------------------------------------------------------------------//
+
+
+  // --------------------------------      primaryWindow      ------------------------------------------//
+
+  primaryWindow = new BrowserWindow({
+    width: 600,
+    height: 400,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+  primaryWindow.loadFile(path.join(__dirname, 'primary.html'));
+  //primaryWindow.webContents.openDevTools();
+
+  // When login window closes (not hides), it closes the application
+  primaryWindow.on('close', () => {
+    app.quit();
+  });
+
   // ---------------------------------------------------------------------------------------------------//
 
   // Hides all windows
   loginWindow.hide();
   licenseKeyWindow.hide();
+  primaryWindow.hide();
 
   // Creates cache directory if it does not already exist
   createMercorConnectDir();

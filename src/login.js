@@ -22,6 +22,10 @@ function loginClicked() {
         if(valid) {
             console.log("Logged in");
             // log in
+            
+            const remote = require('electron').remote;
+            let w = remote.getCurrentWindow();
+            w.emit('loginSuccessful');
         } else {
             console.log("Login failed");
             // display incorrect credentials message
