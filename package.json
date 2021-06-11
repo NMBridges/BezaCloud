@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "mercor-connect",
   "productName": "Mercor Connect",
   "version": "1.0.0",
   "description": "Facilitating commmerce one server at a time.",
@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "dist": "electron-builder"
   },
   "keywords": [],
   "author": {
@@ -57,6 +58,20 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.57",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.57",
     "@electron-forge/maker-zip": "^6.0.0-beta.57",
-    "electron": "^13.0.1"
+    "electron": "^13.0.1",
+    "electron-builder": "^22.10.5"
+  },
+  "build": {
+    "appId": "com.mercor.mercorconnect",
+    "productName": "Mercor Connect",
+    "target": "NSIS",
+    "directories": {
+      "buildResources": "resources",
+      "output": "build"
+    },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false
+    }
   }
 }
