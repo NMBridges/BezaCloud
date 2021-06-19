@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const EventEmitter = require('events');
 const path = require('path');
 const {
-  tryLicenseKey, cachedLicenseKey, createMercorConnectDir,
+  tryLicenseKey, cachedLicenseKey, createAwsDir,
 } = require("./mercor.js");
 
 let licenseKeyWindow;
@@ -109,7 +109,7 @@ function createWindows() {
   primaryWindow.hide();
 
   // Creates cache directory if it does not already exist
-  createMercorConnectDir();
+  createAwsDir();
 
   // Automatically checks if there is a valid key on the hard drive. If so, it
   // shows the login window. If not, it shows the license key window and waits

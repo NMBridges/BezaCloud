@@ -4,8 +4,6 @@ const closeBtn = document.getElementById('closeBtn');
 returnBtn.onclick = keySearched;
 closeBtn.onclick = closeClicked;
 
-var validLicenseKey = false;
-
 const { machineIdSync } = require("../node_modules/node-machine-id/index.js");
 var mysql = require('mysql');
 const { updateKeyCache, tryLicenseKey } = require("./mercor.js");
@@ -18,7 +16,9 @@ keyTextBox.addEventListener("keyup", function(event) {
     }
 });
 
-// Checks that the input license key is valid
+/**
+ * Checks that the input license key is valid
+ */
 function keySearched() {
     updateKeyCache(keyTextBox.value);
     
@@ -27,7 +27,9 @@ function keySearched() {
     w.emit('licenseKeySearched');
 }
 
-// Closes the window
+/**
+ * Closes the window when 'close' is clicked.
+ */
 function closeClicked() {
     const remote = require('electron').remote;
     let w = remote.getCurrentWindow();

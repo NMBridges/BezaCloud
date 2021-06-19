@@ -15,7 +15,9 @@ const instanceParams = {
     MaxCount: 1,
 };
 
-// Tests to see if the AWS credentials are valid
+/**
+ * Tests to see if the AWS credentials are valid
+ */
 const connectionTest = async () => {
     try {
         ec2Client = new EC2Client({ region: "us-east-1"});
@@ -28,7 +30,9 @@ const connectionTest = async () => {
     }
 };
 
-// Creates an instance
+/**
+ * Creates an AWS instance.
+ */
 const createInstance = async () => {
     try {
         const data = await ec2Client.send(new RunInstancesCommand(instanceParams));

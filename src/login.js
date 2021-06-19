@@ -11,7 +11,9 @@ accessKeyIdField.focus();
 const { cachedAwsCredentials, updateAwsCredentialsCache } = require("./mercor.js");
 const { connectionTest } = require("./apiCaller.js");
 
-// Checks if the AWS credentials are valid. Logs in if so
+/**
+ * Checks if the AWS credentials are valid. Logs in if so.
+ */
 function loginClicked() {
     const out = "[default]\naws_access_key_id=" + accessKeyIdField.value + "\naws_secret_access_key=" + secretAccessKeyField.value;
     updateAwsCredentialsCache(out);
@@ -39,14 +41,18 @@ function loginClicked() {
     });
 }
 
-// Fills the textboxes with past login info
+/**
+ * Fills the textboxes with past login info.
+ */
 function autofillTextboxes() {
     const credObj = cachedAwsCredentials();
     accessKeyIdField.value = credObj['akId'];
     secretAccessKeyField.value = credObj['sak'];
 }
 
-// Closes the window
+/**
+ * Closes the window when 'exit' is clicked.
+ */
 function exitClicked() {
     const remote = require('electron').remote;
     let w = remote.getCurrentWindow();
