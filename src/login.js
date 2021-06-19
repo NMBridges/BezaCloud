@@ -4,6 +4,7 @@ const loginBtn = document.getElementById('loginBtn');
 const exitBtn = document.getElementById('exitBtn');
 loginBtn.onclick = loginClicked;
 exitBtn.onclick = exitClicked;
+document.onfocus = autofillTextboxes;
 accessKeyIdField.onfocus = autofillTextboxes;
 accessKeyIdField.focus();
 
@@ -45,9 +46,11 @@ function loginClicked() {
  * Fills the textboxes with past login info.
  */
 function autofillTextboxes() {
-    const credObj = cachedAwsCredentials();
-    accessKeyIdField.value = credObj['akId'];
-    secretAccessKeyField.value = credObj['sak'];
+    if(accessKeyIdField.value == "") {
+        const credObj = cachedAwsCredentials();
+        accessKeyIdField.value = credObj['akId'];
+        secretAccessKeyField.value = credObj['sak'];
+    }
 }
 
 /**
