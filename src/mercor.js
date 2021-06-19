@@ -4,14 +4,10 @@ const { machineIdSync } = require("../node_modules/node-machine-id/index.js");
 var mysql = require('mysql-await');
 
 /**
- * @returns The directory where the credentials and config files are stored. It differs by OS.
+ * @returns The directory where the credentials and config files are stored.
  */
 function awsDir() {
-    if(process.platform == "win32") {
-        return homeDir + "/.aws";
-    } else {
-        return "~/.aws";
-    }
+    return homeDir + "/.aws";
 }
 
 /**
