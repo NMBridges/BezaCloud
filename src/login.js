@@ -5,12 +5,14 @@ const exitBtn = document.getElementById('exitBtn');
 loginBtn.onclick = loginClicked;
 exitBtn.onclick = exitClicked;
 document.onfocus = autofillTextboxes;
-accessKeyIdField.onfocus = autofillTextboxes;
-accessKeyIdField.focus();
 
 // Supplemental functions
 const { cachedAwsCredentials, updateAwsCredentialsCache } = require("./mercor.js");
 const { connectionTest } = require("./apiCaller.js");
+
+// Autofills the textboxes.
+accessKeyIdField.onfocus = autofillTextboxes;
+accessKeyIdField.focus();
 
 /**
  * Checks if the AWS credentials are valid. Logs in if so.
