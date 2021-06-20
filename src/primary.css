@@ -1,6 +1,88 @@
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    margin: auto;
-    max-width: 38rem;
-    padding: 2rem;
-  }
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: auto;
+}
+
+.menu {
+  grid-area: menuBar;
+  background-color: red;
+  width: 50px;
+  position: relative;
+}
+.header {
+  grid-area: headerBar;
+  background-color: green;
+  height: 50px;
+  position: relative;
+  margin: 0;
+}
+#primaryBody {
+  grid-area: primaryBody;
+  background-color: blue;
+  margin: 0;
+}
+.grid-container-1 {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-areas:
+    'menuBar content';
+  grid-gap: 0px;
+  background-color: #2196F3;
+  grid-template-columns: 50px auto;
+}
+.grid-container-2 {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-area: content;
+  grid-template-areas:
+    'headerBar'
+    'primaryBody';
+  grid-gap: 0px;
+  background-color: #2196F3;
+  grid-template-rows: 50px auto;
+}
+#dashboardButton {
+  background-color: #2196F3;
+  width: 100%;
+  height: 50px;
+  border: 0 solid black;
+}
+#serversButton {
+  background-color: teal;
+  width: 100%;
+  height: 50px;
+  border: 0 solid black;
+}
+#tasksButton {
+  background-color: maroon;
+  width: 100%;
+  height: 50px;
+  border: 0 solid black;
+}
+#optionsButton {
+  background-color: yellow;
+  width: 100%;
+  height: 50px;
+  border: 0 solid black;
+}
+#signOutButton {
+  background-color: yellow;
+  width: 100%;
+  height: 50px;
+  border: 0 solid black;
+  bottom: 0;
+  left:0;
+  position: absolute;
+  vertical-align: bottom;
+}
+#mainPageLabel {
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  font-size: 25px;
+  padding-left: 15px;
+  line-height: 50px;
+  text-align: center;
+}

@@ -3,11 +3,44 @@ const fs = require('fs');
 const { machineIdSync } = require("../node_modules/node-machine-id/index.js");
 var mysql = require('mysql-await');
 
+/** @type {string} The color theme of Mercor Connect. */
+var theme = "Mercor";
+/** @type {string} The current page that Mercor Connect is on. */
+var page = "Dashboard";
+
 /**
  * @returns The directory where the credentials and config files are stored.
  */
 function awsDir() {
     return homeDir + "/.aws";
+}
+
+/**
+ * @returns The color theme.
+ */
+function getTheme() {
+    return theme;
+}
+
+/**
+ * @returns The current page.
+ */
+function getPage() {
+    return page;
+}
+
+/**
+ *  @param {string} newTheme The new color theme.
+ */
+function setTheme(newTheme) {
+    theme = newTheme;
+}
+
+/**
+ *  @param {string} newPage The new page.
+ */
+function setPage(newPage) {
+    page = newPage;
 }
 
 /**
@@ -165,7 +198,206 @@ function updateKeyCache(newKey) {
     }
 }
 
+/**
+ * @param {number} r The red value.
+ * @param {number} g The green value.
+ * @param {number} b The blue value.
+ * @returns A hexadecimal value for that RGB set.
+ */
+function hex(r, g, b) {
+    return "#" + ((r > 15) ? r.toString(16) : ("0" + r.toString(16))) + ((g > 15) ? g.toString(16) : ("0" + g.toString(16))) + ((b > 15) ? b.toString(16) : ("0" + b.toString(16)));
+}
+
+/** Colors class that controls which colors are used based on the theme. */
+class Colors {
+    static textPrimary() {
+        if (theme == "Dark") {
+            return hex(255,255,255);
+        } else if (theme == "Mercor") {
+            return hex(255,255,255);
+        }
+        return "D90166";
+    }
+    static menuTextPrimary() {
+        if (theme == "Dark") {
+            return hex(255,255,255);
+        } else if (theme == "Mercor") {
+            return hex(255,255,255);
+        }
+        return "D90166";
+    }
+    static textSecondary() {
+        if (theme == "Dark") {
+            return hex(192,192,192);
+        } else if (theme == "Mercor") {
+            return hex(225,225,225);
+        }
+        return "D90166";
+    }
+    static backgroundPrimary() {
+        if (theme == "Dark") {
+            return hex(35,47,63);
+        } else if (theme == "Mercor") {
+            return hex(97,81,245);
+        }
+        return "D90166";
+    }
+    static mainBorderColor() {
+        if (theme == "Dark") {
+            return hex(32,43,58);
+        } else if (theme == "Mercor") {
+            return hex(101,85,250);
+        }
+        return "D90166";
+    }
+    static backgroundSecondary() {
+        if (theme == "Dark") {
+            return hex(247, 150, 37);
+        } else if (theme == "Mercor") {
+            return hex(128, 132, 246);
+        }
+        return "D90166";
+    }
+    static topBarColor() {
+        if (theme == "Dark") {
+            return hex(255,255,255);
+        } else if (theme == "Mercor") {
+            return hex(255,255,255);
+        }
+        return "D90166";
+    }
+    static chartColor() {
+        if (theme == "Dark") {
+            return hex(247,150,37);
+        } else if (theme == "Mercor") {
+            return hex(255,255,255);
+        }
+        return "D90166";
+    }
+    static helpLinkColor() {
+        if (theme == "Dark") {
+            return hex(247,150,37);
+        } else if (theme == "Mercor") {
+            return hex(225,225,225);
+        }
+        return "D90166";
+    }
+    static backgroundPrimaryAccent() {
+        if (theme == "Dark") {
+            return hex(45,57,74);
+        } else if (theme == "Mercor") {
+            return hex(102,86,255);
+        }
+        return "D90166";
+    }
+    static backgroundSecondaryMouseHover() {
+        if (theme == "Dark") {
+            return hex(222,121,35);
+        } else if (theme == "Mercor") {
+            return hex(138,142,255);
+        }
+        return "D90166";
+    }
+    static backgroundSecondarySelected() {
+        if (theme == "Dark") {
+            return hex(202,111,33);
+        } else if (theme == "Mercor") {
+            return hex(148,152,255);
+        }
+        return "D90166";
+    }
+    static backgroundSecondaryToggleMenuBackground() {
+        if (theme == "Dark") {
+            return hex(255,165,40);
+        } else if (theme == "Mercor") {
+            return hex(45,45,45);
+        }
+        return "D90166";
+    }
+    static awsLink() {
+        if (theme == "Dark") {
+            return hex(158,163,247);
+        } else if (theme == "Mercor") {
+            return hex(247,150,37);
+        }
+        return "D90166";
+    }
+    static loginColor() {
+        if (theme == "Dark") {
+            return hex(247,150,37);
+        } else if (theme == "Mercor") {
+            return hex(97,81,245);
+        }
+        return "D90166";
+    }
+    static loginSecondary() {
+        if (theme == "Dark") {
+            return hex(35,47,63);
+        } else if (theme == "Mercor") {
+            return hex(158,163,247);
+        }
+        return "D90166";
+    }
+    static loginLabelPrimary() {
+        if (theme == "Dark") {
+            return hex(255,255,255);
+        } else if (theme == "Mercor") {
+            return hex(255,255,255);
+        }
+        return "D90166";
+    }
+    static loginLabelSecondary() {
+        if (theme == "Dark") {
+            return hex(255,255,255);
+        } else if (theme == "Mercor") {
+            return hex(35,225,35);
+        }
+        return "D90166";
+    }
+    static cellTile1() {
+        if (theme == "Dark") {
+            return hex(35,47,63);
+        } else if (theme == "Mercor") {
+            return hex(97,81,245);
+        }
+        return "D90166";
+    }
+    static cellTile2() {
+        if (theme == "Dark") {
+            return hex(37,49,65);
+        } else if (theme == "Mercor") {
+            return hex(101,85,249);
+        }
+        return "D90166";
+    }
+    static cellTile3() {
+        if (theme == "Dark") {
+            return hex(36,48,64);
+        } else if (theme == "Mercor") {
+            return hex(99,83,247);
+        }
+        return "D90166";
+    }
+    static cellTile4() {
+        if (theme == "Dark") {
+            return hex(38,50,66);
+        } else if (theme == "Mercor") {
+            return hex(103,87,251);
+        }
+        return "D90166";
+    }
+    static cellTileHighlight() {
+        if (theme == "Dark") {
+            return hex(50,60,70);
+        } else if (theme == "Mercor") {
+            return hex(109,93,255);
+        }
+        return "D90166";
+    }
+}
+
 module.exports = { 
     cachedLicenseKey, tryLicenseKey, createAwsDir, updateKeyCache,
-    cachedAwsCredentials, updateAwsCredentialsCache
+    cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
+    getTheme, getPage, setTheme, setPage
 };

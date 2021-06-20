@@ -9,8 +9,22 @@
     <script type="module" defer src="primary.js"></script>
   </head>
   <body>
-    <h1 id="topBarText">Dashboard</h1>
-    <hr />
-
+    <div class="grid-container-1">
+      <div class="menu" id="menuBar">
+        <button id="dashboardButton">D</button>
+        <button id="serversButton">S</button>
+        <button id="tasksButton">T</button>
+        <button id="optionsButton">O</button>
+        <button id="signOutButton">S</button>
+      </div>
+      <div class="grid-container-2">
+        <div class="header" id="headerBar">
+          <label id="mainPageLabel">Dashboard</label>
+        </div>
+        <div id="primaryBody">
+          <iframe src="dashboard.html" id="dash"></iframe>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
