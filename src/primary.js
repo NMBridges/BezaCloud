@@ -16,15 +16,6 @@ var dash = document.getElementById("dash");
 
 window.addEventListener('load', () => {
     /**
-     * Loads JS to subwindows.
-     */
-    function loadJS() {
-        //dash.appendChild(dashScript);
-    }
-
-    loadJS();
-
-    /**
      * Updates the CSS style colors for the page based on the color theme.
      */
     function updateColors() {
@@ -45,10 +36,7 @@ window.addEventListener('load', () => {
         headerBar.style.backgroundColor = Colors.backgroundPrimaryAccent();
 
         // Update subwindows
-        dash.hidden = true;
-        dash.hidden = false;
-        const bbb =  dash.contentWindow;
-        bbb.updateDashColors();
+        dash.contentWindow.updateColors();
     }
 
     updateColors();
