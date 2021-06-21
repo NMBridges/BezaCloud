@@ -1,7 +1,10 @@
+@import url(assets/fonts/fonts.css);
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Segoe UI", sans-serif;
   margin: auto;
-  font-weight:230;
+  font-weight:300;
+  font-style: normal;
 }
 
 .menu {

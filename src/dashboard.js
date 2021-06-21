@@ -18,22 +18,51 @@ window.addEventListener('load', function() {
     
 });
 
+// ----------------------- dailyButton functions ----------------------------- //
+
 dailyButton.addEventListener('mouseenter', function() {
     dailyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
 });
 
 dailyButton.addEventListener('mouseleave', function() {
-    dailyButton.style.backgroundColor = Colors.backgroundPrimary();
+    if(spendingView == "daily") {
+        dailyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    } else {
+        dailyButton.style.backgroundColor = Colors.backgroundPrimary();
+    }
 });
+
+dailyButton.addEventListener('click', function() {
+    spendingView = "daily";
+    updateColors();
+});
+
+// --------------------------------------------------------------------------- //
+
+// ----------------------- monthlyButton functions --------------------------- //
 
 monthlyButton.addEventListener('mouseenter', function() {
     monthlyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
 });
 
 monthlyButton.addEventListener('mouseleave', function() {
-    monthlyButton.style.backgroundColor = Colors.backgroundPrimary();
+    if(spendingView == "monthly") {
+        monthlyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    } else {
+        monthlyButton.style.backgroundColor = Colors.backgroundPrimary();
+    }
 });
 
+monthlyButton.addEventListener('click', function() {
+    spendingView = "monthly";
+    updateColors();
+});
+
+// --------------------------------------------------------------------------- //
+
+/**
+ * Updates the colors of the dashboard elements in accordance with the color theme.
+ */
 function updateColors() {
     mainGridContainer.style.backgroundColor = Colors.backgroundPrimary();
     yearlySpendings.style.color = Colors.textPrimary();
