@@ -1,6 +1,61 @@
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeui.ttf);
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeuib.ttf);
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeuii.ttf);
+    font-weight: normal;
+    font-style: italic;
+}
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeuil.ttf);
+    font-weight: 200;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeuisl.ttf);
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeuili.ttf);
+    font-weight: 200;
+    font-style: italic;
+}
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeuisb.ttf);
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeuisbi.ttf);
+    font-weight: 600;
+    font-style: italic;
+}
+@font-face {
+    font-family: "Segoe UI";
+    src: url(assets/fonts/segoeuisli.ttf);
+    font-weight: 300;
+    font-style: italic;
+}
+
 body {
-    font-family: "Lucida Sans Unicode", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-weight: 230;
+    font-family: "Segoe UI", sans-serif;
+    font-weight: 200;
     background-color: brown;
     margin: 0;
 }
@@ -18,7 +73,7 @@ body {
         .topLeftGridContainer {
             grid-area: topLeftGrid;
             width: calc(100% - 25px);
-            height: calc(100% - 20px);
+            height: 80px;
             margin-left: 10px;
             margin-top: 10px;
             padding-left: 10px;
@@ -30,6 +85,7 @@ body {
             #yearlySpendings {
                 width: 100%;
                 font-size:40px;
+                line-height:45px;
             }
             #yearlySpendingsLabel {
                 width: 100%;
@@ -39,7 +95,7 @@ body {
         .topRightGridContainer {
             grid-area: topRightGrid;
             width: calc(100% - 25px);
-            height: calc(100% - 20px);
+            height: 80px;
             margin-left: 5px;
             margin-top: 10px;
             padding-left: 10px;
@@ -51,6 +107,7 @@ body {
             #monthlySpendings {
                 width: 100%;
                 font-size:40px;
+                line-height:45px;
             }
             #monthlySpendingsLabel {
                 width: 100%;
@@ -81,8 +138,10 @@ body {
                     background-color: purple;
                     border: 0px solid white;
                     border-radius: 8px;
+                    font-family: "Segoe UI";
+                    font-style: normal;
                     font-size: 20px;
-                    font-weight: 230;
+                    font-weight: 200;
                 }
                 #monthlyButton {
                     width: 180px;
@@ -92,9 +151,11 @@ body {
                     margin-left:0px;
                     background-color: purple;
                     border: 0px solid white;
-                    font-size: 20px;
-                    font-weight: 130;
                     border-radius: 8px;
+                    font-family: "Segoe UI";
+                    font-style: normal;
+                    font-size: 20px;
+                    font-weight: 200;
                 }
             .chartContainer {
                 width: 100%;
