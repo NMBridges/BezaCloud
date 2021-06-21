@@ -12,7 +12,18 @@ var headerBar = document.getElementById("headerBar");
 var mainPageLabel = document.getElementById("mainPageLabel");
 var primaryBody = document.getElementById("primaryBody");
 
+var dash = document.getElementById("dash");
+
 window.addEventListener('load', () => {
+    /**
+     * Loads JS to subwindows.
+     */
+    function loadJS() {
+        //dash.appendChild(dashScript);
+    }
+
+    loadJS();
+
     /**
      * Updates the CSS style colors for the page based on the color theme.
      */
@@ -34,7 +45,10 @@ window.addEventListener('load', () => {
         headerBar.style.backgroundColor = Colors.backgroundPrimaryAccent();
 
         // Update subwindows
-
+        dash.hidden = true;
+        dash.hidden = false;
+        const bbb =  dash.contentWindow;
+        bbb.updateDashColors();
     }
 
     updateColors();

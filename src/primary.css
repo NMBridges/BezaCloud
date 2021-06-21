@@ -50,7 +50,6 @@ body {
   border: 0 solid black;
 }
 #serversButton {
-  background-color: teal;
   width: 100%;
   height: 50px;
   border: 0 solid black;
@@ -85,4 +84,8 @@ body {
   padding-left: 15px;
   line-height: 50px;
   text-align: center;
+}
+#dash {
+  width: 100%;
+  height: 100%;
 }
