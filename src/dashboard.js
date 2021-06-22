@@ -9,14 +9,41 @@ var monthlySpendings = document.getElementById("monthlySpendings");
 var monthlySpendingsLabel = document.getElementById("monthlySpendingsLabel");
 var dailyButton = document.getElementById("dailyButton");
 var monthlyButton = document.getElementById("monthlyButton");
+var barChart = document.getElementById("barChart");
 
 var spendingView = "daily";
 
 window.addEventListener('load', function() {
 
-
+    loadChart();
     
 });
+
+/**
+ * Loads the chart with the appropriate spending information.
+ */
+function loadChart() {
+    // Clears the old chart of any children
+    barChart.textContent = '';
+
+    const newLength = 30;
+    barChart.style = "--cols:" + newLength + ";";
+    for(var counter = 0; counter < newLength; counter++) {
+        addChildToChart(Math.random(), counter + 1);
+    }
+}
+
+/**
+ * Appends a new bar to the bar chart.
+ * @param {number} height The height, or value, of the new bar on the chart.
+ * @param {number} index The column index of the new bar, used for placement.
+ */
+function addChildToChart(height, index) {
+    var newChild = document.createElement('newChild');
+    newChild.style = "--col:" + index + ";--hei:" + height + ";";
+    newChild.className = "bar";
+    barChart.appendChild(newChild);
+}
 
 // ----------------------- dailyButton functions ----------------------------- //
 

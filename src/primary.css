@@ -6,6 +6,10 @@ body {
   font-weight:300;
   font-style: normal;
 }
+::-webkit-scrollbar {
+    width: 0px;
+    display: none;
+}
 
 .menu {
   grid-area: menuBar;

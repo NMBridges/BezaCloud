@@ -114,22 +114,25 @@ body {
             .chart {
                 width: calc(100% - 20px);
                 height: calc(100% - 25px);
-                align-items: center;
                 grid-area: chartArea;
                 margin-left:5px;
                 margin-top:10px;
                 margin-bottom:5px;
                 display: grid;
                 grid-gap: 0px;
-                padding-left: 10px;
+                padding-left: 20px;
                 padding-top: 10px;
-                grid-template-columns: repeat(var(--cols), calc((100% - 10px) / var(--cols)));
+                grid-template-columns: repeat(var(--cols), calc((100% - 30px) / var(--cols)));
             }
                 .bar {
                     grid-row: 1;
                     grid-column: var(--col);
-                    width: calc(100% - 20px);
-                    height: 20%;
-                    margin: 10px;
+                    width: 60%;
+                    text-align: center;
+                    height: calc(var(--hei) * (100% - 60px));
+                    margin-bottom: 30px;
+                    margin-left: 20%;
+                    margin-right: 20%;
+                    margin-top: auto;
                     background-color: white;
                 }
