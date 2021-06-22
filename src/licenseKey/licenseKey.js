@@ -4,9 +4,9 @@ const closeBtn = document.getElementById('closeBtn');
 returnBtn.onclick = keySearched;
 closeBtn.onclick = closeClicked;
 
-const { machineIdSync } = require("../node_modules/node-machine-id/index.js");
+const { machineIdSync } = require("node-machine-id/index.js");
 var mysql = require('mysql');
-const { updateKeyCache, tryLicenseKey } = require("./mercor.js");
+const { updateKeyCache, tryLicenseKey } = require("../mercor.js");
 
 // Checks for 'return' on license key text box
 keyTextBox.addEventListener("keyup", function(event) {

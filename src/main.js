@@ -30,7 +30,7 @@ function createWindows() {
       enableRemoteModule: true
     }
   });
-  licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey.html'));
+  licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey/licenseKey.html'));
   //licenseKeyWindow.webContents.openDevTools();
 
   // When license key window closes (not hides), it closes the application
@@ -63,7 +63,7 @@ function createWindows() {
       enableRemoteModule: true
     }
   });
-  loginWindow.loadFile(path.join(__dirname, 'login.html'));
+  loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
   //loginWindow.webContents.openDevTools();
 
   loginWindow.setResizable(false);
@@ -95,7 +95,7 @@ function createWindows() {
       enableRemoteModule: true
     }
   });
-  primaryWindow.loadFile(path.join(__dirname, 'primary.html'));
+  primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
   //primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application

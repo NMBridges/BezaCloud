@@ -4,7 +4,7 @@ const { machineIdSync } = require("node-machine-id/index.js");
 var mysql = require('mysql-await');
 
 /** @type {string} The color theme of Mercor Connect. */
-var theme = "Mercor";
+var theme = "Dark";
 /** @type {string} The current page that Mercor Connect is on. */
 var page = "Dashboard";
 

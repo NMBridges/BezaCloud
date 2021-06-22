@@ -7,8 +7,8 @@ exitBtn.onclick = exitClicked;
 document.onfocus = autofillTextboxes;
 
 // Supplemental functions
-const { cachedAwsCredentials, updateAwsCredentialsCache } = require("./mercor.js");
-const { connectionTest } = require("./apiCaller.js");
+const { cachedAwsCredentials, updateAwsCredentialsCache } = require("../mercor.js");
+const { connectionTest } = require("../apiCaller.js");
 
 // Autofills the textboxes.
 accessKeyIdField.onfocus = autofillTextboxes;

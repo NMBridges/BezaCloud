@@ -1,5 +1,5 @@
 // Supplemental functions
-const { hex, Colors, getTheme, setTheme, getPage, setPage } = require("./mercor.js");
+const { hex, Colors, getTheme, setTheme, getPage, setPage } = require("../mercor.js");
 
 // Document items
 var dashboardButton = document.getElementById("dashboardButton");
@@ -8,16 +8,14 @@ var tasksButton = document.getElementById("tasksButton");
 var optionsButton = document.getElementById("optionsButton");
 var signOutButton = document.getElementById("signOutButton");
 var menuBar = document.getElementById("menuBar");
-var headerBar = document.getElementById("headerBar");
-var mainPageLabel = document.getElementById("mainPageLabel");
-var primaryBody = document.getElementById("primaryBody");
 
 var dash = document.getElementById("dash");
+var serv = document.getElementById("serv");
+var task = document.getElementById("task");
+var opti = document.getElementById("opti");
 
 window.addEventListener('load', () => {
-    
-
-    updateColors();
+    to("Dashboard");
 
     
 
@@ -57,9 +55,6 @@ function updateColors() {
 
     menuBar.style.backgroundColor = Colors.backgroundSecondary();
 
-    mainPageLabel.style.color = Colors.textPrimary();
-    headerBar.style.backgroundColor = Colors.backgroundPrimaryAccent();
-
     // Update subwindows
     dash.contentWindow.updateColors();
 }
@@ -85,11 +80,7 @@ dashboardButton.addEventListener('mouseleave', function() {
 /** Goes to the Dashboard page */
 dashboardButton.addEventListener('click', function() {
     if(getPage() != "Dashboard") {
-        setPage("Dashboard");
-        // change page to dashboard
-
-
-        updateColors();
+        to("Dashboard");
     }
 });
 
@@ -116,11 +107,7 @@ serversButton.addEventListener('mouseleave', function() {
 /** Goes to the Servers page */
 serversButton.addEventListener('click', function() {
     if(getPage() != "Servers") {
-        setPage("Servers");
-        // change page to Servers
-
-        
-        updateColors();
+        to("Servers");
     }
 });
 
@@ -147,11 +134,7 @@ tasksButton.addEventListener('mouseleave', function() {
 /** Goes to the Tasks page */
 tasksButton.addEventListener('click', function() {
     if(getPage() != "Tasks") {
-        setPage("Tasks");
-        // change page to Tasks
-
-        
-        updateColors();
+        to("Tasks");
     }
 });
 
@@ -178,12 +161,40 @@ optionsButton.addEventListener('mouseleave', function() {
 /** Goes to the Options page */
 optionsButton.addEventListener('click', function() {
     if(getPage() != "Options") {
-        setPage("Options");
-        // change page to Options
-
-        
-        updateColors();
+        to("Options");
     }
 });
 
 // ---------------------------------------------------------------------------------- //
+
+/**
+ * Performs necessary operations to transition from one page to another.
+ * @param {string} page The page to transition to.
+ */
+function to(page) {
+    setPage(page);
+
+    // Hides each iframe if it is not the desired page.
+    if(page == "Dashboard") {
+        dash.hidden = false;
+    } else {
+        dash.hidden = true;
+    }
+    if(page == "Servers") {
+        serv.hidden = false;
+    } else {
+        serv.hidden = true;
+    }
+    if(page == "Tasks") {
+        task.hidden = false;
+    } else {
+        task.hidden = true;
+    }
+    if(page == "Options") {
+        opti.hidden = false;
+    } else {
+        opti.hidden = true;
+    }
+
+    updateColors();
+}

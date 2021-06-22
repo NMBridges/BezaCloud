@@ -1,5 +1,5 @@
 // Supplemental functions
-const { hex, Colors } = parent.require("./mercor.js");
+const { hex, Colors } = parent.require("../mercor.js");
 
 // Document items
 var mainGridContainer = document.getElementById("mainGridContainer");
@@ -10,6 +10,8 @@ var monthlySpendingsLabel = document.getElementById("monthlySpendingsLabel");
 var dailyButton = document.getElementById("dailyButton");
 var monthlyButton = document.getElementById("monthlyButton");
 var barChart = document.getElementById("barChart");
+var mainPageLabel = document.getElementById("mainPageLabel");
+var headerBar = document.getElementById("headerBar");
 
 var spendingView = "daily";
 
@@ -96,6 +98,7 @@ function updateColors() {
     yearlySpendingsLabel.style.color = Colors.textSecondary();
     monthlySpendings.style.color = Colors.textPrimary();
     monthlySpendingsLabel.style.color = Colors.textSecondary();
+    
     if(spendingView == "daily") {
         dailyButton.style.color = Colors.textPrimary();
         dailyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
@@ -108,4 +111,10 @@ function updateColors() {
         monthlyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
     }
 
+    mainPageLabel.style.color = Colors.textPrimary();
+    headerBar.style.backgroundColor = Colors.backgroundPrimaryAccent();
+
+    for(var count = 0; count < barChart.children.length; count++) {
+        barChart.children[count].style.backgroundColor = Colors.chartColor();
+    }
 }
