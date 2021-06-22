@@ -1,6 +1,6 @@
 const homeDir = require('os').homedir();
 const fs = require('fs');
-const { machineIdSync } = require("../node_modules/node-machine-id/index.js");
+const { machineIdSync } = require("node-machine-id/index.js");
 var mysql = require('mysql-await');
 
 /** @type {string} The color theme of Mercor Connect. */
