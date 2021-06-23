@@ -1,1 +1,200 @@
 @import url(../assets/fonts/fonts.css);
+
+body {
+    min-width: 800px;
+    min-height: 600px;
+    font-family: "Segoe UI", sans-serif;
+    margin: auto;
+    font-weight:300;
+    font-style: normal;
+}
+    .mainGridContainer {
+        width:100%;
+        min-height:100%;
+        display: grid;
+        grid-template-rows: 50px auto;
+        grid-gap: 0px;
+        margin: 0px;
+        grid-template-areas:
+            'topBar'
+            'primaryBody';
+    }
+        #topBar {
+            grid-area: topBar;
+            width: 100%;
+            height: 100%;
+            background-color: aqua;
+            display: grid;
+            grid-gap: 0px;
+            grid-template-columns: auto auto 50px 50px;
+            grid-template-areas:
+                'mainLabel regionLabel refresh newServer';
+        }
+            #mainPageLabel {
+                grid-area: mainLabel;
+                display: inline-block;
+                line-height: 50px;
+                font-size: 25px;
+                margin-left: 15px;
+                color: white;
+            }
+            #regionLabel {
+                grid-area: regionLabel;
+                display: inline-block;
+                line-height: 50px;
+                font-size: 20px;
+                margin-left: 15px;
+                color: #999999;
+                margin-right: 15px;
+                text-align: right;
+            }
+            #refreshButton {
+                grid-area: refresh;
+                display: inline-block;
+                width: 50px;
+                height: 100%;
+                color: white;
+                border: 0px solid black;
+                margin: 0px;
+            }
+            #newServerButton {
+                grid-area: newServer;
+                display: inline-block;
+                width: 50px;
+                height: 99%;
+                color: white;
+                border: 0px solid black;
+                margin: 0px;
+                font-size: 35px;
+            }
+        #primaryBody {
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
+            grid-area: primaryBody;
+            display: grid;
+            padding: 5px;
+            grid-gap: 0px;
+            grid-template-columns: 33% 33% 34%;
+            grid-template-rows: 252px;
+        }
+            .tile {
+                width: calc(100% - 32px);
+                height: 220px;
+                background-color: black;
+                border-radius: 10px;
+                border: 1px solid gray;
+                margin:5px;
+                padding: 10px;
+                text-overflow: ellipsis;
+                position: relative;
+            }
+                .serverName {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    max-width: 80%;
+                    font-size: 25px;
+                    color: white;
+                    font-weight: 600;
+                    line-height: 30px;
+                    height: 35px;
+                }
+                .statusIcon {
+                    position: absolute;
+                    top: 17px;
+                    right: 17px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 10px;
+                    background-color: green;
+                }
+                .serverId {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    font-size: 15px;
+                    line-height: 20px;
+                    color: gray;
+                    font-weight: 200;
+                }
+                .serverIPv4 {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    font-size: 15px;
+                    line-height: 20px;
+                    color: gray;
+                    font-weight: 200;
+                }
+                .specsLabel {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    margin-top: 10px;
+                    max-width: 80%;
+                    font-size: 20px;
+                    line-height: 25px;
+                    height: 25px;
+                    color: white;
+                    font-weight: normal;
+                }
+                .serverCPU {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    font-size: 15px;
+                    margin-top: 5px;
+                    line-height: 20px;
+                    color: gray;
+                    font-weight: 200;
+                }
+                .serverRAM {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    font-size: 15px;
+                    line-height: 20px;
+                    color: gray;
+                    font-weight: 200;
+                }
+                .serverStorage {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    font-size: 15px;
+                    line-height: 20px;
+                    color: gray;
+                    font-weight: 200;
+                }
+                .connectButton {
+                    position:absolute;
+                    left: 10px;
+                    bottom: 10px;
+                    width: calc(50% - 12px);
+                    height: 35px;
+                    line-height: 15px;
+                    border: 1px solid gray;
+                    background-color: gray;
+                    color:gray;
+                    border-radius: 5px;
+                    font-family: "Segoe UI", sans-serif;
+                    font-size: 15px;
+                    font-style: normal;
+                    font-weight: 200;
+                }
+                .modifyButton {
+                    position:absolute;
+                    right: 10px;
+                    bottom: 10px;
+                    width: calc(50% - 12px);
+                    height: 35px;
+                    line-height: 15px;
+                    border: 1px solid gray;
+                    background-color: gray;
+                    color: gray;
+                    border-radius: 5px;
+                    font-family: "Segoe UI", sans-serif;
+                    font-size: 15px;
+                    font-style: normal;
+                    font-weight: 200;
+                }
