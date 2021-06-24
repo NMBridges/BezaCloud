@@ -96,7 +96,7 @@ function createWindows() {
     }
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
-  //primaryWindow.webContents.openDevTools();
+  primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {

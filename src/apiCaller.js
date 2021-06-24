@@ -31,6 +31,20 @@ const connectionTest = async () => {
 };
 
 /**
+ * Retrieves instance data.
+ */
+const getInstances = async () => {
+    try {
+        ec2Client = new EC2Client({ region: "us-east-1" });
+        const data = await ec2Client.send(new DescribeInstancesCommand({}));
+        return data;
+    } catch {
+        console.log("Error");
+        return "ERROR";
+    }
+}
+
+/**
  * Creates an AWS instance.
  */
 const createInstance = async () => {
@@ -64,4 +78,31 @@ const createInstance = async () => {
     }
 };
 
-module.exports = { connectionTest };
+/**
+ * Class that stores the necessary information for each AWS server instance.
+ */
+class Server {
+    /**
+     * Constructs a new Server object.
+     * @param {string} name The name of the server.
+     * @param {string} id The ID of the server.
+     * @param {string} ipv4 The public IPv4 of the server.
+     * @param {string} password The decoded password of the server.
+     * @param {string} status The server state.
+     * @param {string} cpu The CPU details for the server.
+     * @param {string} memory The RAM details for the server.
+     * @param {string} storage The storage details for the server.
+     */
+    constructor(name, id, ipv4, password, status, cpu, memory, storage) {
+        this.name = name;
+        this.id = id;
+        this.ipv4 = ipv4;
+        this.password = password;
+        this.status = status;
+        this.cpu = cpu;
+        this.memory = memory;
+        this.storage = storage;
+    }
+}
+
+module.exports = { connectionTest, getInstances, Server };

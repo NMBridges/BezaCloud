@@ -41,7 +41,7 @@ function loadChart() {
  * @param {number} index The column index of the new bar, used for placement.
  */
 function addChildToChart(height, index) {
-    var newChild = document.createElement('newChild');
+    var newChild = document.createElement('div');
     newChild.style = "--col:" + index + ";--hei:" + height + ";";
     newChild.className = "bar";
     barChart.appendChild(newChild);
