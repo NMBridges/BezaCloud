@@ -2,7 +2,9 @@
 const { Colors, createRdpFile, openRdpFile } = parent.require("../mercor.js");
 const { 
     getInstances, startInstance, stopInstance, 
-    terminateInstance, rebootInstance, Server
+    terminateInstance, rebootInstance, Server,
+    createKeyPair, getKeyPassword, getInstancePasswordData,
+    createInstance
 } = parent.require("../apiCaller.js");
 
 // Document items
@@ -41,8 +43,12 @@ function connect(index) {
 
     }
 
-    createRdpFile(ipv4);
-    openRdpFile();
+    getInstancePasswordData(server.id).then(function(result) {
+        //console.log(result);
+    });
+
+    //createRdpFile(ipv4);
+    //openRdpFile();
 
     console.log(decodedPassword);
 }
@@ -66,6 +72,7 @@ function loadServers() {
                     getInstanceId(srv),
                     (getIPv4(srv) != undefined) ? getIPv4(srv) : "",
                     getPassword(srv),
+                    getKey(srv),
                     getStatus(srv),
                     (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
                     (newSpecs.length > 2) ? newSpecs[1] : "",
@@ -234,20 +241,24 @@ function addTile(index) {
         if(newPowerButton.value == "active") {
             if(server.status == "stopped") {
                 // Turn server on.
-                if(startInstance(servers[parseInt(newPowerButton.id)].id)) {
-                    // Good to go
-                    setTimeout(loadServers, 1500);
-                } else {
-                    // Error starting server
-                }
+                startInstance(servers[parseInt(newPowerButton.id)].id).then(function(started) {
+                    if(started) { 
+                        // Good to go
+                        loadServers();
+                    } else {
+                        // Error starting server
+                    }
+                });
             } else if(server.status == "running") {
                 // Turn server off.
-                if(stopInstance(servers[parseInt(newPowerButton.id)].id)) {
-                    // Good to go
-                    setTimeout(loadServers, 1500);
-                } else {
-                    // Error stopping server
-                }
+                stopInstance(servers[parseInt(newPowerButton.id)].id).then(function(stopped) {
+                    if(stopped) { 
+                        // Good to go
+                        loadServers();
+                    } else {
+                        // Error stopping server
+                    }
+                });
             }
         }
     });
@@ -273,12 +284,14 @@ function addTile(index) {
         if(newRebootButton.value == "active") {
             // Reboot server.
             if(server.status == "running") {
-                if(rebootInstance(servers[parseInt(newRebootButton.id)].id)) {
-                    // Good to go
-                    setTimeout(loadServers, 1500);
-                } else {
-                    // Error rebooting server
-                }
+                rebootInstance(servers[parseInt(newRebootButton.id)].id).then( function(rebooted) {
+                    if(rebooted) {
+                        // Good to go
+                        loadServers();
+                    } else {
+                        // Error rebooting server
+                    }
+                });
             }
         }
     });
@@ -302,12 +315,14 @@ function addTile(index) {
         // If the button is active, proceed.
         if(newTerminateButton.value == "active") {
             // Terminate server.
-            if(terminateInstance(servers[parseInt(newRebootButton.id)].id)) {
-                // Good to go
-                setTimeout(loadServers, 1500);
-            } else {
-                // Error rebooting server
-            }
+            terminateInstance(servers[parseInt(newRebootButton.id)].id).then(function(terminated) {
+                if(terminated) {
+                    // Good to go
+                    loadServers();
+                } else {
+                    // Error rebooting server
+                }
+            });
         }
     });
     newModifyArea.appendChild(newTerminateButton);
@@ -385,6 +400,19 @@ function getPassword(json) {
 }
 
 /**
+ * Returns the key of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getKey(json) {
+    for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+        if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Pair") {
+            return json["Instances"][0]["Tags"][tagIndex]["Value"];
+        }
+    }
+    return "";
+}
+
+/**
  * Returns the CPU type of the server instance, given the instance JSON.
  * @param {JSON} json The instance JSON object.
  */
@@ -435,6 +463,18 @@ refreshButton.addEventListener('mouseleave', function() {
 
 newServerButton.addEventListener('click', function() {
     // New server window popup.
+    createKeyPair().then(function(key) {
+        if(key != "ERROR") {
+            createInstance(
+                "ami-071fe6e60c8fdb961",
+                "t2.micro",
+                "2 NEWEST OF THEM ALL",
+                key
+            ).then(function(instanceId) {
+                // done
+            });
+        }
+    });
 });
 
 newServerButton.addEventListener('mouseenter', function() {
