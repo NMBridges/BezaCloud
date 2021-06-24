@@ -2,6 +2,8 @@ const homeDir = require('os').homedir();
 const fs = require('fs');
 const { machineIdSync } = require("node-machine-id/index.js");
 var mysql = require('mysql-await');
+const { Address } = require('@aws-sdk/client-ec2');
+const { exec, spawn } = require('child_process');
 
 /** @type {string} The color theme of Mercor Connect. */
 var theme = "Dark";
@@ -198,6 +200,31 @@ function updateKeyCache(newKey) {
     }
 }
 
+/** 
+ * Creates an .rdp file.
+ */ 
+function createRdpFile(address) {
+    const newFile = "full address:s:" + address + "\nusername:s:Administrator";
+    if(!fs.existsSync(awsDir() + "/server.rdp")) {
+        fs.appendFileSync(awsDir() + "/server.rdp", newFile);
+    } else {
+        fs.writeFileSync(awsDir() + "/server.rdp", newFile);
+    }
+}
+
+/** 
+ * Opens the .rdp file.
+ */ 
+function openRdpFile() {
+    if(!fs.existsSync(awsDir() + "/server.rdp")) {
+        console.log("Error RDP file does not exist.")
+        return false;
+    } else {
+        exec("open " + awsDir() + "/server.rdp");
+        return true;
+    }
+}
+
 /**
  * @param {number} r The red value.
  * @param {number} g The green value.
@@ -231,6 +258,14 @@ class Colors {
             return hex(192,192,192);
         } else if (theme == "Mercor") {
             return hex(225,225,225);
+        }
+        return "D90166";
+    }
+    static textTertiary() {
+        if (theme == "Dark") {
+            return hex(152,152,152);
+        } else if (theme == "Mercor") {
+            return hex(170,170,170);
         }
         return "D90166";
     }
@@ -399,5 +434,5 @@ class Colors {
 module.exports = { 
     cachedLicenseKey, tryLicenseKey, createAwsDir, updateKeyCache,
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
-    getTheme, getPage, setTheme, setPage
+    getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile
 };

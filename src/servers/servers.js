@@ -1,6 +1,9 @@
 // Supplemental functions
-const { Colors } = parent.require("../mercor.js");
-const { getInstances, Server } = parent.require("../apiCaller.js");
+const { Colors, createRdpFile, openRdpFile } = parent.require("../mercor.js");
+const { 
+    getInstances, startInstance, stopInstance, 
+    terminateInstance, rebootInstance, Server
+} = parent.require("../apiCaller.js");
 
 // Document items
 var topBar = document.getElementById("topBar");
@@ -21,6 +24,30 @@ window.addEventListener('load', function() {
 
 });
 
+// ---------------------------- Server Connecting Functions ------------------------- //
+
+/**
+ * Connects to a server, given the index of the server within the 'servers' array.
+ * @param {number} index The index of 'servers' that holds the server to connect to.
+ */
+function connect(index) {
+    const server = servers[index];
+    const encodedPassword = server.password;
+    const decodedPassword = atob(encodedPassword);
+    const ipv4 = server.ipv4;
+
+    // Add password popup.
+    if(decodedPassword == "") {
+
+    }
+
+    createRdpFile(ipv4);
+    openRdpFile();
+
+    console.log(decodedPassword);
+}
+
+// ---------------------------------------------------------------------------------- //
 
 // ------------------------------ Server Loading Functions -------------------------- //
 
@@ -38,7 +65,7 @@ function loadServers() {
                     getName(srv),
                     getInstanceId(srv),
                     (getIPv4(srv) != undefined) ? getIPv4(srv) : "",
-                    (getPassword(srv)), // make this decoded in future
+                    getPassword(srv),
                     getStatus(srv),
                     (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
                     (newSpecs.length > 2) ? newSpecs[1] : "",
@@ -66,7 +93,7 @@ function loadServers() {
         
         // Adds new tiles
         for(var counter = 0; counter < servers.length; counter++) {
-            addTile(servers[counter]);
+            addTile(counter);
         }
 
         // Updates the colors of the new tiles
@@ -76,26 +103,32 @@ function loadServers() {
 
 /**
  * Adds a tile to the background with the appropriate server details.
- * @param {Server} server The server to add a tile for.
+ * @param {number} index The index of the server in 'servers' to add.
  */
-function addTile(server) {
+function addTile(index) {
+    const server = servers[index];
+    // The main tile block.
     var newTile = document.createElement('div');
     newTile.className = "tile";
 
+    // The server name descriptor element.
     var newName = document.createElement('div');
     newName.className = "serverName";
     newName.textContent = server.name;
     newTile.appendChild(newName);
 
+    // The server ID descriptor element.
     var newId = document.createElement('div');
     newId.className = "serverId";
     newId.textContent = "ID: " + server.id;
     newTile.appendChild(newId);
 
+    // The server status icon.
     var newStatus = document.createElement('div');
     newStatus.className = "statusIcon";
     newTile.appendChild(newStatus);
 
+    // The server IP address descriptor element.
     if(server.ipv4 != "") {
         var newIp = document.createElement('div');
         newIp.className = "serverIPv4";
@@ -103,16 +136,19 @@ function addTile(server) {
         newTile.appendChild(newIp);
     }
 
+    // The server specifications label element.
     var newSpecsLabel = document.createElement('div');
     newSpecsLabel.className = "specsLabel";
     newSpecsLabel.textContent = "Specifications";
     newTile.appendChild(newSpecsLabel);
 
+    // The server CPU descriptor element.
     var newCpu = document.createElement('div');
     newCpu.className = "serverCPU";
     newCpu.textContent = "CPU: " + server.cpu;
     newTile.appendChild(newCpu);
 
+    // The server RAM descriptor element.
     if(server.memory != "") {
         var newMemory = document.createElement('div');
         newMemory.className = "serverRAM";
@@ -120,6 +156,7 @@ function addTile(server) {
         newTile.appendChild(newMemory);
     }
 
+    // The server storage descriptor element.
     if(server.storage != "") {
         var newStorage = document.createElement('div');
         newStorage.className = "serverStorage";
@@ -127,34 +164,168 @@ function addTile(server) {
         newTile.appendChild(newStorage);
     }
 
+    // The server connection button.
     var newConnButton = document.createElement('button');
     newConnButton.className = "connectButton";
     newConnButton.textContent = "Connect";
+    newConnButton.id = "" + index;
+    newConnButton.addEventListener('mouseenter', function() {
+        // If button is active, proceed.
+        if(newConnButton.value == "active") {
+            newConnButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newConnButton.addEventListener('mouseleave', function() {
+        newConnButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newConnButton.addEventListener('click', function() {
+        // Connect to server.
+        // If button is active, proceed.
+        if(newConnButton.value == "active") {
+            connect(parseInt(newConnButton.id));
+        }
+    });
     newTile.appendChild(newConnButton);
 
+    // The modify server button.
     var newModifyButton = document.createElement('button');
     newModifyButton.className = "modifyButton";
     newModifyButton.textContent = "Modify";
+    newModifyButton.addEventListener('mouseenter', function() {
+        // If button is active, proceed.
+        if(newModifyButton.value == "active") {
+            newModifyButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newModifyButton.addEventListener('mouseleave', function() {
+        newModifyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
     newTile.appendChild(newModifyButton);
 
+    // The popup area that contains the modification buttons.
     var newModifyArea = document.createElement('div');
     newModifyArea.className = "modifyArea";
-    newModifyArea.hidden = false;
+    newModifyArea.hidden = true;
+    newModifyButton.addEventListener('click', function() {
+        if(newModifyButton.value == "active") {
+            newModifyArea.hidden = !newModifyArea.hidden;
+        }
+    });
 
+    // The toggle power button.
     var newPowerButton = document.createElement('div');
     newPowerButton.className = "powerButton";
     newPowerButton.textContent = "Start";
+    if(server.status == "running") {
+        newPowerButton.textContent = "Stop";
+    }
+    newPowerButton.id = "" + index;
+    newPowerButton.addEventListener('mouseenter', function() {
+        // If the button is active, proceed.
+        if(newPowerButton.value == "active") {
+            newPowerButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newPowerButton.addEventListener('mouseleave', function() {
+        newPowerButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newPowerButton.addEventListener('click', function() {
+        // If the button is active, proceed.
+        if(newPowerButton.value == "active") {
+            if(server.status == "stopped") {
+                // Turn server on.
+                if(startInstance(servers[parseInt(newPowerButton.id)].id)) {
+                    // Good to go
+                    setTimeout(loadServers, 1500);
+                } else {
+                    // Error starting server
+                }
+            } else if(server.status == "running") {
+                // Turn server off.
+                if(stopInstance(servers[parseInt(newPowerButton.id)].id)) {
+                    // Good to go
+                    setTimeout(loadServers, 1500);
+                } else {
+                    // Error stopping server
+                }
+            }
+        }
+    });
     newModifyArea.appendChild(newPowerButton);
 
+    // The reboot server button.
     var newRebootButton = document.createElement('div');
     newRebootButton.className = "rebootButton";
     newRebootButton.textContent = "Reboot";
+    newRebootButton.id = "" + index;
+    newRebootButton.value
+    newRebootButton.addEventListener('mouseenter', function() {
+        // If the button is active, proceed.
+        if(newRebootButton.value == "active") {
+            newRebootButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newRebootButton.addEventListener('mouseleave', function() {
+        newRebootButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newRebootButton.addEventListener('click', function() {
+        // If the button is active, proceed.
+        if(newRebootButton.value == "active") {
+            // Reboot server.
+            if(server.status == "running") {
+                if(rebootInstance(servers[parseInt(newRebootButton.id)].id)) {
+                    // Good to go
+                    setTimeout(loadServers, 1500);
+                } else {
+                    // Error rebooting server
+                }
+            }
+        }
+    });
     newModifyArea.appendChild(newRebootButton);
 
+    // The permadelete server button.
     var newTerminateButton = document.createElement('div');
     newTerminateButton.className = "terminateButton";
-    newTerminateButton.textContent = "Terminate";
+    newTerminateButton.textContent = "Permadelete";
+    newTerminateButton.id = "" + index;
+    newTerminateButton.addEventListener('mouseenter', function() {
+        // If the button is active, proceed.
+        if(newTerminateButton.value == "active") {
+            newTerminateButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newTerminateButton.addEventListener('mouseleave', function() {
+        newTerminateButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newTerminateButton.addEventListener('click', function() {
+        // If the button is active, proceed.
+        if(newTerminateButton.value == "active") {
+            // Terminate server.
+            if(terminateInstance(servers[parseInt(newRebootButton.id)].id)) {
+                // Good to go
+                setTimeout(loadServers, 1500);
+            } else {
+                // Error rebooting server
+            }
+        }
+    });
     newModifyArea.appendChild(newTerminateButton);
+
+    newPowerButton.value = "inactive";
+    newRebootButton.value = "inactive";
+    newTerminateButton.value = "inactive";
+    newConnButton.value = "inactive";
+    newModifyButton.value = "inactive";
+    if(server.status == "running" || server.status == "stopped") {
+        newPowerButton.value = "active";
+        newRebootButton.value = "active";
+        newTerminateButton.value = "active";
+        newModifyButton.value = "active";
+        if(server.status == "running") {
+            newConnButton.value = "active";
+        }
+    }
 
     newTile.appendChild(newModifyArea);
     primaryBody.appendChild(newTile);
@@ -250,6 +421,30 @@ refreshButton.addEventListener('click', function() {
     loadServers();
 });
 
+refreshButton.addEventListener('mouseenter', function() {
+    refreshButton.style.backgroundColor = Colors.backgroundPrimary();
+});
+
+refreshButton.addEventListener('mouseleave', function() {
+    refreshButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+});
+
+// ---------------------------------------------------------------------------------- //
+
+// ---------------------------- newServerButton functions --------------------------- //
+
+newServerButton.addEventListener('click', function() {
+    // New server window popup.
+});
+
+newServerButton.addEventListener('mouseenter', function() {
+    newServerButton.style.backgroundColor = Colors.backgroundPrimary();
+});
+
+newServerButton.addEventListener('mouseleave', function() {
+    newServerButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+});
+
 // ---------------------------------------------------------------------------------- //
 
 /**
@@ -276,17 +471,29 @@ function updateColors() {
         var connectButtons = document.getElementsByClassName("connectButton");
         for(var count = 0; count < connectButtons.length; count++) {
             connectButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // In future, make this depend on whether the server is active.
-            connectButtons[count].style.color = Colors.textSecondary();
-            connectButtons[count].style.borderColor = Colors.textSecondary();
+            // Enable if server is fully running.
+            const state = servers[count].status.toLowerCase();
+            if(state == "running") {
+                connectButtons[count].style.color = Colors.textSecondary();
+                connectButtons[count].style.borderColor = Colors.textSecondary();
+            } else {
+                connectButtons[count].style.color = Colors.textTertiary();
+                connectButtons[count].style.borderColor = Colors.textTertiary();
+            }
         }
 
         var modifyButtons = document.getElementsByClassName("modifyButton");
         for(var count = 0; count < modifyButtons.length; count++) {
             modifyButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // In future, make this depend on whether the server is active.
-            modifyButtons[count].style.color = Colors.textSecondary();
-            modifyButtons[count].style.borderColor = Colors.textSecondary();
+            // Enable if server is fully running or stopped.
+            const state = servers[count].status.toLowerCase();
+            if(state == "running" || state == "stopped") {
+                modifyButtons[count].style.color = Colors.textSecondary();
+                modifyButtons[count].style.borderColor = Colors.textSecondary();
+            } else {
+                modifyButtons[count].style.color = Colors.textTertiary();
+                modifyButtons[count].style.borderColor = Colors.textTertiary();
+            }
         }
 
         var serverNames = document.getElementsByClassName("serverName");
@@ -346,19 +553,37 @@ function updateColors() {
         var powerButtons = document.getElementsByClassName("powerButton");
         for(var count = 0; count < powerButtons.length; count++) {
             powerButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            powerButtons[count].style.color = Colors.textSecondary();
+            // Enable if state is fully running or stopped.
+            const state = servers[count].status.toLowerCase();
+            if(state == "running" || state == "stopped") {
+                powerButtons[count].style.color = Colors.textSecondary();
+            } else {
+                powerButtons[count].style.color = Colors.textTertiary();
+            }
         }
 
         var rebootButtons = document.getElementsByClassName("rebootButton");
         for(var count = 0; count < rebootButtons.length; count++) {
             rebootButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            rebootButtons[count].style.color = Colors.textSecondary();
+            // Enable if server is fully running or stopped.
+            const state = servers[count].status.toLowerCase();
+            if(state == "running" || state == "stopped") {
+                rebootButtons[count].style.color = Colors.textSecondary();
+            } else {
+                rebootButtons[count].style.color = Colors.textTertiary();
+            }
         }
 
         var terminateButtons = document.getElementsByClassName("terminateButton");
         for(var count = 0; count < terminateButtons.length; count++) {
             terminateButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            terminateButtons[count].style.color = "#cc3333";
+            // Enable if server is fully running or stopped.
+            const state = servers[count].status.toLowerCase();
+            if(state == "running" || state == "stopped") {
+                terminateButtons[count].style.color = "#cc3333";
+            } else {
+                terminateButtons[count].style.color = "#882222";
+            }
         }
     }
 }

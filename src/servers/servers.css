@@ -201,7 +201,7 @@ body {
                 }
                 .modifyArea {
                     position: absolute;
-                    width: calc(50% - 13px);
+                    width: calc(50% - 14px);
                     height: 105px;
                     bottom: 44px;
                     right: 10px;
