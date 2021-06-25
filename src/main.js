@@ -17,7 +17,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 
 // The main logic function that controls interaction between windows
 function createWindows() {
-
+  // Installs the AWS CLI if it is not already installed.
   installAwsCli();
   
   // ------------------------------      licenseKeyWindow     ----------------------------------------// 

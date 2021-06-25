@@ -38,10 +38,10 @@ const installAwsCli = async () => {
                 exec("msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi", function(err) {
                     if(err != null) {
                         console.log("Success installing AWS CLI");
-                        return true;
+                        return;
                     } else {
                         console.log("Error installing AWS CLI");
-                        return false;
+                        return;
                     }
                 });
             } else if(process.platform == "darwin") {
@@ -50,15 +50,15 @@ const installAwsCli = async () => {
                     exec("sudo installer -pkg AWSCLIV2.pkg -target /", function(err) {
                         if(err == null) {
                             console.log("Success installing AWS CLI");
-                            return false;
+                            return;
                         } else {
                             console.log("Error installing AWS CLI");
-                            return true;
+                            return;
                         }
                     });
                 } else {
                     console.log("Error installing AWS CLI");
-                    return true;
+                    return;
                 }
             }
         }
