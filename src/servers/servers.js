@@ -57,12 +57,14 @@ function connect(index) {
             // as the server does not have an attached key pair. You must provide the password manually.
             console.log("It appears that this server was not made using Mercor Connect or an error occurred, " +
                     "as the server does not have an attached key pair. You must provide the password manually.");
+            overlay(false);
         } else {
             getInstancePasswordData(server.id).then(function(result) {
                 if(pemFileExists(server.key)) {
                     if(result == "") {
                         // Server is not available yet
                         console.log("Server is not available yet.");
+                        overlay(false);
                     } else {
                         // Decode password data
                         const decryptCmd = "aws ec2 get-password-data --instance-id " + server.id + " --priv-launch-key " + awsDir() + "/" + server.key + ".pem";
@@ -84,12 +86,15 @@ function connect(index) {
                                 const e = execSync(cmd1);
                                 const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
                                 exec(cmd2);
+                                overlay(false);
                                 // Should be running Remote Desktop
                             } else {
                                 // Mac functions
+                                overlay(false);
                             }
                         } else {
                             console.log("There was an error retrieving the password.");
+                            overlay(false);
                         }
                     }
                 } else {
@@ -97,6 +102,7 @@ function connect(index) {
                     // the .pem file associated with the server's key pair has been deleted.
                     console.log("It appears that this server was not created with Mercor Connect or " +
                     "the .pem file associated with the server's key pair has been deleted.");
+                    overlay(false);
                 }
             });
         }
@@ -105,6 +111,7 @@ function connect(index) {
         const e = execSync(cmd1);
         const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
         exec(cmd2);
+        overlay(false);
         // Should run Remote Desktop
     }
 
@@ -147,9 +154,11 @@ function newServer(name, ami, cpu) {
                             if(key != "ERROR") {
                                 createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                     // done
+                                    overlay(false);
                                 });
                             } else {
                                 // Error
+                                overlay(false);
                             }
                         });
                     } else {
@@ -162,13 +171,16 @@ function newServer(name, ami, cpu) {
                                     if(key != "ERROR") {
                                         createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                             // done
+                                            overlay(false);
                                         });
                                     } else {
                                         // Error
+                                        overlay(false);
                                     }
                                 });
                             } else {
                                 // Error
+                                overlay(false);
                             }
                         });
                     }
@@ -176,6 +188,7 @@ function newServer(name, ami, cpu) {
             });
         } else {
             // Error
+            overlay(false);
         }
     });
 }
@@ -235,6 +248,7 @@ function loadServers() {
 
         // Updates the colors of the new tiles
         updateColors();
+        overlay(false);
     });
 }
 
@@ -319,6 +333,7 @@ function addTile(index) {
         // Connect to server.
         // If button is active, proceed.
         if(newConnButton.value == "active") {
+            overlay(true);
             connect(parseInt(newConnButton.id));
         }
     });
@@ -344,6 +359,7 @@ function addTile(index) {
     newModifyArea.className = "modifyArea";
     newModifyArea.hidden = true;
     newModifyButton.addEventListener('click', function() {
+        newModifyArea.focus();
         if(newModifyButton.value == "active") {
             newModifyArea.hidden = !newModifyArea.hidden;
         }
@@ -371,6 +387,7 @@ function addTile(index) {
         if(newPowerButton.value == "active") {
             if(server.status == "stopped") {
                 // Turn server on.
+                overlay(true);
                 startInstance(servers[parseInt(newPowerButton.id)].id).then(function(started) {
                     if(started) { 
                         // Good to go
@@ -381,6 +398,7 @@ function addTile(index) {
                 });
             } else if(server.status == "running") {
                 // Turn server off.
+                overlay(true);
                 stopInstance(servers[parseInt(newPowerButton.id)].id).then(function(stopped) {
                     if(stopped) { 
                         // Good to go
@@ -414,6 +432,7 @@ function addTile(index) {
         if(newRebootButton.value == "active") {
             // Reboot server.
             if(server.status == "running") {
+                overlay(true);
                 rebootInstance(servers[parseInt(newRebootButton.id)].id).then( function(rebooted) {
                     if(rebooted) {
                         // Good to go
@@ -445,6 +464,7 @@ function addTile(index) {
         // If the button is active, proceed.
         if(newTerminateButton.value == "active") {
             // Terminate server.
+            overlay(true);
             terminateInstance(servers[parseInt(newRebootButton.id)].id).then(function(terminated) {
                 if(terminated) {
                     // Good to go
@@ -576,6 +596,7 @@ function splitSpecs(str) {
 // ---------------------------- refreshButton functions ----------------------------- //
 
 refreshButton.addEventListener('click', function() {
+    overlay(true);
     loadServers();
 });
 
@@ -602,6 +623,25 @@ newServerButton.addEventListener('mouseenter', function() {
 newServerButton.addEventListener('mouseleave', function() {
     newServerButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
 });
+
+// ---------------------------------------------------------------------------------- //
+
+// ----------------------------- miscellaneous functions ---------------------------- //
+
+/**
+ * Turns the overlay on or off.
+ * @param {boolean} to Boolean representing turning the overlay on (true) or off (false)
+ */
+function overlay(to) {
+    if(to) {
+        document.getElementById("overlay").style.display = "block";
+    } else {
+        document.getElementById("overlay").style.display = "none";
+    }
+    const contenta = overlay.innerHTML;
+    document.getElementById("overlay").innerHTML = contenta;
+    document.getElementById("overlay").focus();
+}
 
 // ---------------------------------------------------------------------------------- //
 
