@@ -3,9 +3,14 @@ const { Colors, createRdpFile, openRdpFile } = parent.require("../mercor.js");
 const { 
     getInstances, startInstance, stopInstance, 
     terminateInstance, rebootInstance, Server,
-    createKeyPair, getKeyPassword, getInstancePasswordData,
-    createInstance
+    createKeyPair, getInstancePasswordData,
+    createInstance, getSecurityGroups, 
+    getDefaultVpcId, createMercorSecurityGroup,
+    getMercorSecurityGroupId, pemFileExists,
+    addTags
 } = parent.require("../apiCaller.js");
+const { exec, execSync } = parent.require('child_process');
+const homeDir = parent.require('os').homedir();
 
 // Document items
 var topBar = document.getElementById("topBar");
@@ -19,6 +24,13 @@ var primaryBody = document.getElementById("primaryBody");
  * @type {Server[]} The servers belonging to the currently loaded region.
  */
 var servers = [];
+
+/**
+ * @returns The directory where the credentials and config files are stored.
+ */
+ function awsDir() {
+    return homeDir + "/.aws";
+}
 
 window.addEventListener('load', function() {
     loadServers();
@@ -40,17 +52,132 @@ function connect(index) {
 
     // Add password popup.
     if(decodedPassword == "") {
+        if(server.key == undefined) {
+            // It appears that this server was not made using Mercor Connect or an error occurred,
+            // as the server does not have an attached key pair. You must provide the password manually.
+            console.log("It appears that this server was not made using Mercor Connect or an error occurred, " +
+                    "as the server does not have an attached key pair. You must provide the password manually.");
+        } else {
+            getInstancePasswordData(server.id).then(function(result) {
+                if(pemFileExists(server.key)) {
+                    if(result == "") {
+                        // Server is not available yet
+                        console.log("Server is not available yet.");
+                    } else {
+                        // Decode password data
+                        const decryptCmd = "aws ec2 get-password-data --instance-id " + server.id + " --priv-launch-key " + awsDir() + "/" + server.key + ".pem";
+                        const stdout = execSync(decryptCmd).toString();
+                        const out = JSON.parse(stdout);
+                        if("PasswordData" in out) {
+                            const newPassword = out['PasswordData'];
+                            console.log(newPassword);
+                            // Add new encoded password tag
+                            if(addTags(server.id, "Cert", btoa(newPassword))) {
+                                // Successfully added tags
+                            } else {
+                                // Oh well, try again next time.
+                            }
 
+                            // Run Microsoft Remote Desktop
+                            if(parent.process.platform == 'win32') {
+                                const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
+                                const e = execSync(cmd1);
+                                const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
+                                exec(cmd2);
+                                // Should be running Remote Desktop
+                            } else {
+                                // Mac functions
+                            }
+                        } else {
+                            console.log("There was an error retrieving the password.");
+                        }
+                    }
+                } else {
+                    // It appears that this server was not created with Mercor Connect or
+                    // the .pem file associated with the server's key pair has been deleted.
+                    console.log("It appears that this server was not created with Mercor Connect or " +
+                    "the .pem file associated with the server's key pair has been deleted.");
+                }
+            });
+        }
+    } else {
+        const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + decodedPassword + "\"";
+        const e = execSync(cmd1);
+        const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
+        exec(cmd2);
+        // Should run Remote Desktop
     }
-
-    getInstancePasswordData(server.id).then(function(result) {
-        //console.log(result);
-    });
 
     //createRdpFile(ipv4);
     //openRdpFile();
 
     console.log(decodedPassword);
+}
+
+/**
+ * Returns where or not the server has been prepared by Mercor.
+ * @param {number} index The index of the server in the 'servers' array.
+ */
+function isMercor(index) {
+
+}
+
+// ---------------------------------------------------------------------------------- //
+
+// ----------------------------- Server Creating Functions -------------------------- //
+
+/**
+ * Creates a server based on the specified parameters.
+ * @param {string} name The name of the server.
+ * @param {string} ami The AMI ID to base the server on.
+ * @param {string} cpu The CPU type.
+ * @param {string} keyPair The key pair to use when creating the server.
+ */
+function newServer(name, ami, cpu) {
+    // Gets region's default VPC
+    getDefaultVpcId().then(function(vpcId) {
+        if(vpcId != "ERROR") {
+            getSecurityGroups().then(function(secGroups) {
+                if(secGroups[0] != "ERROR") {
+                    // Checks if Mercor security group exists in the region
+                    var secGroupId = getMercorSecurityGroupId(secGroups);
+                    if(secGroupId != "NONE") {
+                        // Continue as is
+                        createKeyPair().then(function(key) {
+                            if(key != "ERROR") {
+                                createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
+                                    // done
+                                });
+                            } else {
+                                // Error
+                            }
+                        });
+                    } else {
+                        // If not, creates one
+                        createMercorSecurityGroup(vpcId).then(function(newId) {
+                            secGroupId = newId;
+                            if(secGroupId != "ERROR") {
+                                // Continue
+                                createKeyPair().then(function(key) {
+                                    if(key != "ERROR") {
+                                        createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
+                                            // done
+                                        });
+                                    } else {
+                                        // Error
+                                    }
+                                });
+                            } else {
+                                // Error
+                            }
+                        });
+                    }
+                } 
+            });
+        } else {
+            // Error
+        }
+    });
 }
 
 // ---------------------------------------------------------------------------------- //
@@ -80,6 +207,9 @@ function loadServers() {
                 ));
             }
         }
+
+        console.log(data['Reservations']);
+        console.log(servers);
 
         // Sorts the servers on the dashboard according to their status.
         // Running servers appear first.
@@ -405,8 +535,8 @@ function getPassword(json) {
  */
 function getKey(json) {
     for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-        if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Pair") {
-            return json["Instances"][0]["Tags"][tagIndex]["Value"];
+        if("KeyName" in json["Instances"][0]) {
+            return json["Instances"][0]["KeyName"];
         }
     }
     return "";
@@ -462,19 +592,7 @@ refreshButton.addEventListener('mouseleave', function() {
 // ---------------------------- newServerButton functions --------------------------- //
 
 newServerButton.addEventListener('click', function() {
-    // New server window popup.
-    createKeyPair().then(function(key) {
-        if(key != "ERROR") {
-            createInstance(
-                "ami-071fe6e60c8fdb961",
-                "t2.micro",
-                "2 NEWEST OF THEM ALL",
-                key
-            ).then(function(instanceId) {
-                // done
-            });
-        }
-    });
+    newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro", "chargeAWS-discord");
 });
 
 newServerButton.addEventListener('mouseenter', function() {

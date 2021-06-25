@@ -3,7 +3,7 @@ const fs = require('fs');
 const { machineIdSync } = require("node-machine-id/index.js");
 var mysql = require('mysql-await');
 const { Address } = require('@aws-sdk/client-ec2');
-const { exec, spawn } = require('child_process');
+const { exec, execSync } = require('child_process');
 
 /** @type {string} The color theme of Mercor Connect. */
 var theme = "Dark";
@@ -15,6 +15,55 @@ var page = "Dashboard";
  */
 function awsDir() {
     return homeDir + "/.aws";
+}
+
+/**
+ * Returns whether or not the user has the AWS CLI installed.
+ */
+const hasAwsCliInstalled = async () => {
+    const { err } = execSync("aws --version");
+    if(err != null) {
+        console.log("AWS CLI not installed");
+        return false;
+    } else {
+        console.log("AWS CLI installed");
+        return true;
+    }
+}
+
+const installAwsCli = async () => {
+    hasAwsCliInstalled().then(function(result) {
+        if(!result) {
+            if(process.platform == "win32") {
+                exec("msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi", function(err) {
+                    if(err != null) {
+                        console.log("Success installing AWS CLI");
+                        return true;
+                    } else {
+                        console.log("Error installing AWS CLI");
+                        return false;
+                    }
+                });
+            } else if(process.platform == "darwin") {
+                const { err } = execSync("curl \"https://awscli.amazonaws.com/AWSCLIV2.pkg\" -o \"AWSCLIV2.pkg\"");
+                if(err == null) {
+                    exec("sudo installer -pkg AWSCLIV2.pkg -target /", function(err) {
+                        if(err == null) {
+                            console.log("Success installing AWS CLI");
+                            return false;
+                        } else {
+                            console.log("Error installing AWS CLI");
+                            return true;
+                        }
+                    });
+                } else {
+                    console.log("Error installing AWS CLI");
+                    return true;
+                }
+            }
+        }
+    });
+    
 }
 
 /**
@@ -434,5 +483,6 @@ class Colors {
 module.exports = { 
     cachedLicenseKey, tryLicenseKey, createAwsDir, updateKeyCache,
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
-    getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile
+    getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
+    installAwsCli
 };

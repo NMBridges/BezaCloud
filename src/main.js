@@ -3,6 +3,7 @@ const EventEmitter = require('events');
 const path = require('path');
 const {
   tryLicenseKey, cachedLicenseKey, createAwsDir,
+  installAwsCli
 } = require("./mercor.js");
 
 let licenseKeyWindow;
@@ -16,6 +17,8 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 
 // The main logic function that controls interaction between windows
 function createWindows() {
+
+  installAwsCli();
   
   // ------------------------------      licenseKeyWindow     ----------------------------------------// 
   

@@ -10,6 +10,11 @@ const {
     CreateKeyPairCommand,
     DescribeKeyPairsCommand,
     GetPasswordDataCommand,
+    DescribeSecurityGroupsCommand,
+    CreateSecurityGroupCommand,
+    DescribeVpcsCommand,
+    AuthorizeSecurityGroupIngressCommand,
+    IpPermission,
 } = require("@aws-sdk/client-ec2");
 var ec2Client = new EC2Client({ region: "us-east-1"});
 const fs = require('fs');
@@ -133,23 +138,92 @@ function genRandom(len) {
     return output;
 }
 
-/** 
- * Creates an .pem file.
- * @param {string} key
- * @param {string} text
- */ 
-function createPemFile(key, text) {
-    if(!fs.existsSync(awsDir() + "/" + key + ".pem")) {
-        fs.appendFileSync(awsDir() + "/" + key + ".pem", text);
-    } else {
-        fs.writeFileSync(awsDir() + "/" + key + ".pem", text);
+/**
+ * @returns The default VPC of the user in that region.
+ */
+const getDefaultVpcId = async () => {
+    try {
+        ec2Client = new EC2Client({ region: "us-east-1" });
+        const data = await ec2Client.send(new DescribeVpcsCommand({}));
+        for(var index = 0; index < data.Vpcs.length; index++) {
+            if(data.Vpcs[index].IsDefault) {     
+                console.log("Successfully retrieved default VPC ID", data.Vpcs[index].VpcId)
+                return data.Vpcs[index].VpcId;
+            }
+        }
+        console.log("Error retrieving VPC IDs");
+        return "ERROR";
+    } catch(err) {
+        console.log("Error retrieving VPC IDs", err);
+        return "ERROR";
+    }
+}
+
+/**
+ * Returns the user's security groups.
+ */
+const getSecurityGroups = async () => {
+    try {
+        ec2Client = new EC2Client({ region: "us-east-1" });
+        const data = await ec2Client.send(new DescribeSecurityGroupsCommand({}));
+        console.log("Successfully retrieved security groups", data.SecurityGroups)
+        return data.SecurityGroups;
+    } catch(err) {
+        console.log("Error retrieving security groups", err);
+        return ["ERROR"];
+    }
+}
+
+/**
+ * Returns whether or not the account has a security group named "mercorSecGroup."
+ * @param {SecGroups[]} secGroups The account's security groups.
+ * @returns 
+ */
+function getMercorSecurityGroupId(secGroups) {
+    for(var index = 0; index < secGroups.length; index++) {
+        if(secGroups[index].GroupName == "mercorSecGroup") {
+            console.log("Mercor security group exists", secGroups[index]);
+            return secGroups[index].GroupId;
+        }
+    }
+    return "NONE";
+}
+
+/**
+ * Creates a new security group called "mercorSecGroup"
+ */
+const createMercorSecurityGroup = async (vpcId) => {
+    try {
+        ec2Client = new EC2Client({ region: "us-east-1" });
+        const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "mercorSecGroup", Description: "absolutely free", VpcId: vpcId}));
+
+        try {
+            const data2 = await ec2Client.send(new AuthorizeSecurityGroupIngressCommand({
+                GroupName: "mercorSecGroup",
+                GroupId: data.GroupId,
+                IpPermissions: [{
+                    IpProtocol: "-1",
+                    FromPort: -1,
+                    ToPort: -1,
+                    IpRanges: [{"CidrIp":"0.0.0.0/0"}]
+                }]
+            }));
+            console.log("Successfully created security group", data2);
+            return data.groupId;
+        } catch(err) {
+            console.log("Error creating security group", err);
+            return "ERROR";
+        }
+    } catch(err) {
+        console.log("Error creating security group", err);
+        return "ERROR";
     }
 }
 
 /**
  * Creates a key pair and returns the automatically generated key.
  */
-const createKeyPair = async () => {
+const createKeyPair = async (key) => {
     try {
         ec2Client = new EC2Client({ region: "us-east-1" });
         const keyName = genRandom(16);
@@ -164,26 +238,26 @@ const createKeyPair = async () => {
     }
 };
 
-/**
- * Returns the password for the inputted key.
- * @param {string} key The key for the key pair.
- */
-const getKeyPassword = async (key) => {
-    try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
-        const data = await ec2Client.send(new DescribeKeyPairsCommand({}));
-        if(key in data) {
-            console.log("Successfully retrieved key pair", keyName);
-            return data[key];
-        } else {
-            console.log("Error retrieving key pair1", data);
-            return "ERROR";
-        }
-    } catch {
-        console.log("Error retrieving key pair2");
-        return "ERROR";
+/** 
+ * Creates an .pem file.
+ * @param {string} key
+ * @param {string} text
+ */ 
+function createPemFile(key, text) {
+    if(!fs.existsSync(awsDir() + "/" + key + ".pem")) {
+        fs.appendFileSync(awsDir() + "/" + key + ".pem", text);
+    } else {
+        fs.writeFileSync(awsDir() + "/" + key + ".pem", text);
     }
-};
+}
+
+/** 
+ * Returns where a .pem file with the specified key exists.
+ * @param {string} key
+ */ 
+function pemFileExists(key) {
+    return fs.existsSync(awsDir() + "/" + key + ".pem");
+}
 
 /**
  * Gets the password of the recently-created server.
@@ -194,9 +268,7 @@ const getKeyPassword = async (key) => {
 const getInstancePasswordData = async (instanceId) => {
     try {
         ec2Client = new EC2Client({ region: "us-east-1" });
-        
         const data = await ec2Client.send(new GetPasswordDataCommand({InstanceId: instanceId}));
-        
         console.log("Successfully retrieved password data", data);
         return data;
     } catch(err) {
@@ -205,10 +277,31 @@ const getInstancePasswordData = async (instanceId) => {
     }
 };
 
+const addTags = async (instanceId, tag, value) => {
+    try {
+        ec2Client = new EC2Client({ region: "us-east-1" });
+        const tagParams = {
+            Resources: [instanceId],
+            Tags: [
+                {
+                    Key: tag,
+                    Value: value,
+                },
+            ],
+        };
+        const data = await ec2Client.send(new CreateTagsCommand(tagParams));
+        console.log("Instance tagged");
+        return true;
+    } catch (err) {
+        console.log("Error tagging instance", err);
+        return false;
+    }
+};
+
 /**
  * Creates an AWS instance.
  */
-const createInstance = async (ami, cpu, name, key) => {
+const createInstance = async (ami, cpu, name, key, secGroupId) => {
     try {
         ec2Client = new EC2Client({ region: "us-east-1" });
 
@@ -216,10 +309,10 @@ const createInstance = async (ami, cpu, name, key) => {
         const instanceParams = {
             ImageId: ami,
             InstanceType: cpu,
-            KeyName: key, //KEY_PAIR_NAME
+            KeyName: key,
             MinCount: 1,
             MaxCount: 1,
-            SecurityGroupIds: ["sg-00d89e15ff70fee79"],
+            SecurityGroupIds: [secGroupId],
         };
 
         const data = await ec2Client.send(new RunInstancesCommand(instanceParams));
@@ -286,6 +379,7 @@ module.exports =
 { 
     Server, connectionTest, getInstances, startInstance, 
     stopInstance, rebootInstance, terminateInstance, 
-    createKeyPair, getKeyPassword, getInstancePasswordData,
-    createInstance
+    createKeyPair, getInstancePasswordData, createInstance,
+    getSecurityGroups, getMercorSecurityGroupId, getDefaultVpcId,
+    createMercorSecurityGroup, pemFileExists, addTags
 };
