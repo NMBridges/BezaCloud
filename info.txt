@@ -1,0 +1,7 @@
+- Servers created with Mercor Connect may take up to 10 minutes to be able to access
+- Servers created with Mercor Connect can only be opened through Mercor Connect for
+  the first time on the device they were created on. After it has been connected to
+  once, it will be available for connection on all your devices with Mercor Connect.
+- Mercor Connect may not be able to connect to certain servers if they were created
+  outside of Mercor Connect. It may be necessary for you to manually input the password
+  a single time, and then Mercor Connect will be able to connect to it any time after.
