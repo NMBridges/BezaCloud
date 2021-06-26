@@ -2,8 +2,9 @@
 - Pull AMI types
 - Fix bug when no tags, not even names
 
-GetPasswordData shouldn't be used
-all this shit doesn't work
+Fix button copy and continue
+
+
 
 
 //Server Name [editable]

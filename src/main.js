@@ -19,7 +19,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 function createWindows() {
   // Installs the AWS CLI if it is not already installed.
   installAwsCli();
-  
+
   // ------------------------------      licenseKeyWindow     ----------------------------------------// 
   
    licenseKeyWindow = new BrowserWindow({

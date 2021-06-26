@@ -21,14 +21,15 @@ function awsDir() {
  * Returns whether or not the user has the AWS CLI installed.
  */
 const hasAwsCliInstalled = async () => {
-    const { err } = execSync("aws --version");
-    if(err != null) {
-        console.log("AWS CLI not installed");
-        return false;
-    } else {
-        console.log("AWS CLI installed");
-        return true;
-    }
+    exec("aws --version", function(err) {
+        if(err != null) {
+            console.log("AWS CLI not installed");
+            return false;
+        } else {
+            console.log("AWS CLI installed");
+            return true;
+        }
+    });
 }
 
 const installAwsCli = async () => {
@@ -44,26 +45,28 @@ const installAwsCli = async () => {
                         return;
                     }
                 });
-            } else if(process.platform == "darwin") {
-                const { err } = execSync("curl \"https://awscli.amazonaws.com/AWSCLIV2.pkg\" -o \"AWSCLIV2.pkg\"");
-                if(err == null) {
-                    exec("sudo installer -pkg AWSCLIV2.pkg -target /", function(err) {
-                        if(err == null) {
-                            console.log("Success installing AWS CLI");
-                            return;
-                        } else {
-                            console.log("Error installing AWS CLI");
-                            return;
-                        }
-                    });
-                } else {
-                    console.log("Error installing AWS CLI");
-                    return;
-                }
+            } else {
+                exec("curl \"https://awscli.amazonaws.com/AWSCLIV2.pkg\" -o \"AWSCLIV2.pkg\"", function(err) {
+                    if(err == null) {
+                        // Prompt user with instructions of running the following command
+                        /*exec("sudo installer -pkg AWSCLIV2.pkg -target /", function(err) {
+                            if(err == null) {
+                                console.log("Success installing AWS CLI");
+                                return;
+                            } else {
+                                console.log("Error installing AWS CLI");
+                                return;
+                            }
+                        });*/
+                        return;
+                    } else {
+                        console.log("Error installing AWS CLI");
+                        return;
+                    }
+                });
             }
         }
     });
-    
 }
 
 /**

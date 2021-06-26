@@ -1,5 +1,7 @@
 // Supplemental functions
-const { Colors, createRdpFile, openRdpFile } = parent.require("../mercor.js");
+const { 
+    Colors, createRdpFile, openRdpFile, setPopupData
+} = parent.require("../mercor.js");
 const { 
     getInstances, startInstance, stopInstance, 
     terminateInstance, rebootInstance, Server,
@@ -10,6 +12,7 @@ const {
     addTags
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
+const { clipboard } = parent.require('electron');
 const homeDir = parent.require('os').homedir();
 
 // Document items
@@ -19,6 +22,7 @@ var regionLabel = document.getElementById("regionLabel");
 var refreshButton = document.getElementById("refreshButton");
 var newServerButton = document.getElementById("newServerButton");
 var primaryBody = document.getElementById("primaryBody");
+var infoButton = document.getElementById("infoButton");
 
 /**
  * @type {Server[]} The servers belonging to the currently loaded region.
@@ -34,6 +38,7 @@ var servers = [];
 
 window.addEventListener('load', function() {
     loadServers();
+
 
 
 });
@@ -107,17 +112,24 @@ function connect(index) {
             });
         }
     } else {
-        const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + decodedPassword + "\"";
-        const e = execSync(cmd1);
-        const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-        exec(cmd2);
-        overlay(false);
-        // Should run Remote Desktop
+        // Run Microsoft Remote Desktop
+        if(parent.process.platform == 'win32') {
+            const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + decodedPassword + "\"";
+            const e = execSync(cmd1);
+            const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
+            exec(cmd2);
+            // Should be running Remote Desktop
+            overlay(false);
+        } else {
+            // Mac
+            overlay(false);
+            infoOverlay(true, "The password to your server is", decodedPassword, "Copy and Continue");
+            const cmd1 = "touch " + awsDir() + "/server.rdp";
+            const e1 = execSync(cmd1);
+            const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/server.rdp";
+            const e2 = execSync(cmd2);
+        }
     }
-
-    //createRdpFile(ipv4);
-    //openRdpFile();
-
     console.log(decodedPassword);
 }
 
@@ -632,16 +644,59 @@ newServerButton.addEventListener('mouseleave', function() {
  * Turns the overlay on or off.
  * @param {boolean} to Boolean representing turning the overlay on (true) or off (false)
  */
-function overlay(to) {
+ function overlay(to) {
     if(to) {
         document.getElementById("overlay").style.display = "block";
     } else {
         document.getElementById("overlay").style.display = "none";
     }
-    const contenta = overlay.innerHTML;
+    const contenta = document.getElementById("overlay").innerHTML;
     document.getElementById("overlay").innerHTML = contenta;
     document.getElementById("overlay").focus();
 }
+
+/**
+ * Turns the infoOverlay on or off.
+ * @param {boolean} to Boolean representing turning the infoOverlay on (true) or off (false)
+ * @param {string} headerText The header text of the info overlay.
+ * @param {string} bodyText The body text of the info overlay.
+ * @param {string} buttonText The button's text of the info overlay.
+ */
+function infoOverlay(to, headerText, bodyText, buttonText) {
+    if(to) {
+        document.getElementById("infoHeader").textContent = headerText;
+        document.getElementById("infoBody").textContent = bodyText;
+        if(buttonText == "") {
+            infoButton.style.display = "none";
+        } else {
+            infoButton.style.display = "inline-block";
+            infoButton.textContent = buttonText;
+        }
+        document.getElementById("infoOverlay").style.display = "block";
+    } else {
+        document.getElementById("infoOverlay").style.display = "none";
+    }
+
+    const contenta = document.getElementById("infoOverlay").innerHTML;
+    document.getElementById("infoOverlay").innerHTML = contenta;
+    document.getElementById("infoOverlay").focus();
+}
+
+infoButton.addEventListener('', function() {
+    infoButton.addEventListener('click', function() {
+        if(info.textContent == "Copy and Continue") {
+            clipboard.writeText(document.getElementById("infoBody").textContent);
+            const cmd3 = "open " + awsDir() + "/server.rdp";
+            exec(cmd3);
+            infoOverlay(false, "", "", "");
+        }
+    });
+    
+    infoButton.addEventListener('mouseenter', function() {
+        console.log("bruhh");
+    });
+
+});
 
 // ---------------------------------------------------------------------------------- //
 
@@ -783,5 +838,11 @@ function updateColors() {
                 terminateButtons[count].style.color = "#882222";
             }
         }
+
+        document.getElementById("infoBox").style.backgroundColor = Colors.backgroundPrimary();
+        document.getElementById("infoHeader").style.color = Colors.textPrimary();
+        document.getElementById("infoBody").style.color = Colors.textSecondary();
+        infoButton.style.color = Colors.textSecondary();
+        infoButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
     }
 }

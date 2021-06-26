@@ -14,6 +14,9 @@ var serv = document.getElementById("serv");
 var task = document.getElementById("task");
 var opti = document.getElementById("opti");
 
+var popupHeader = "";
+var popupBody = "";
+
 window.addEventListener('load', () => {
     to("Dashboard");
 
