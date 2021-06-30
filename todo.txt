@@ -4,29 +4,9 @@
 
 Fix button copy and continue
 
-
-
-
-//Server Name [editable]
-//Server ID
-//Server IPv4 Public DNS
-Server CPU type
-//Server Status [hoverable]
-//Server Passsword [on click of 'Connect']
-Server Specs
-//Connect to Server
-//Start Server
-//Reboot Server
-//Stop Server
-//Terminate Server
-
-Server Name           Server Status
-Server ID
-Server IPv4 Public DNS
-
-[Specifications]
-4 core CPU (c5d.xlarge)
-8 GB RAM
-100 GB SSD
-
-Connect             Modify Status
+Servers overlays
+    When there is no password, must be manual
+    When there is a password and it is on Mac
+    When the user wants to make a new server
+    When the user tries to connect to a server
+        too soon

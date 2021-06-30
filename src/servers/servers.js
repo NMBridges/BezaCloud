@@ -22,7 +22,8 @@ var regionLabel = document.getElementById("regionLabel");
 var refreshButton = document.getElementById("refreshButton");
 var newServerButton = document.getElementById("newServerButton");
 var primaryBody = document.getElementById("primaryBody");
-var infoButton = document.getElementById("infoButton");
+var overlay = document.getElementById("overlay");
+var showPass = document.getElementById("showPass");
 
 /**
  * @type {Server[]} The servers belonging to the currently loaded region.
@@ -36,12 +37,12 @@ var servers = [];
     return homeDir + "/.aws";
 }
 
-window.addEventListener('load', function() {
+window.onload = function() {
     loadServers();
 
 
 
-});
+};
 
 // ---------------------------- Server Connecting Functions ------------------------- //
 
@@ -62,14 +63,14 @@ function connect(index) {
             // as the server does not have an attached key pair. You must provide the password manually.
             console.log("It appears that this server was not made using Mercor Connect or an error occurred, " +
                     "as the server does not have an attached key pair. You must provide the password manually.");
-            overlay(false);
+            displayOverlay(true, "error");
         } else {
             getInstancePasswordData(server.id).then(function(result) {
                 if(pemFileExists(server.key)) {
                     if(result == "") {
                         // Server is not available yet
                         console.log("Server is not available yet.");
-                        overlay(false);
+                        displayOverlay(true, "error");
                     } else {
                         // Decode password data
                         const decryptCmd = "aws ec2 get-password-data --instance-id " + server.id + " --priv-launch-key " + awsDir() + "/" + server.key + ".pem";
@@ -91,15 +92,15 @@ function connect(index) {
                                 const e = execSync(cmd1);
                                 const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
                                 exec(cmd2);
-                                overlay(false);
+                                displayOverlay(false, "");
                                 // Should be running Remote Desktop
                             } else {
                                 // Mac functions
-                                overlay(false);
+                                displayOverlay(false, "");
                             }
                         } else {
                             console.log("There was an error retrieving the password.");
-                            overlay(false);
+                            displayOverlay(true, "error");
                         }
                     }
                 } else {
@@ -107,23 +108,24 @@ function connect(index) {
                     // the .pem file associated with the server's key pair has been deleted.
                     console.log("It appears that this server was not created with Mercor Connect or " +
                     "the .pem file associated with the server's key pair has been deleted.");
-                    overlay(false);
+                    displayOverlay(true, "error");
                 }
             });
         }
     } else {
         // Run Microsoft Remote Desktop
         if(parent.process.platform == 'win32') {
+            // Windows
             const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + decodedPassword + "\"";
             const e = execSync(cmd1);
             const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
             exec(cmd2);
             // Should be running Remote Desktop
-            overlay(false);
+            displayOverlay(false, "");
         } else {
             // Mac
-            overlay(false);
-            infoOverlay(true, "The password to your server is", decodedPassword, "Copy and Continue");
+            displayOverlay(true, "showPassword");
+            //updateInfoOverlay(true, "The password to your server is", decodedPassword, "Copy and Continue");
             const cmd1 = "touch " + awsDir() + "/server.rdp";
             const e1 = execSync(cmd1);
             const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/server.rdp";
@@ -166,11 +168,11 @@ function newServer(name, ami, cpu) {
                             if(key != "ERROR") {
                                 createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                     // done
-                                    overlay(false);
+                                    displayOverlay(false, "");
                                 });
                             } else {
                                 // Error
-                                overlay(false);
+                                displayOverlay(true, "error");
                             }
                         });
                     } else {
@@ -183,16 +185,16 @@ function newServer(name, ami, cpu) {
                                     if(key != "ERROR") {
                                         createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                             // done
-                                            overlay(false);
+                                            displayOverlay(false, "");
                                         });
                                     } else {
                                         // Error
-                                        overlay(false);
+                                        displayOverlay(true, "error");
                                     }
                                 });
                             } else {
                                 // Error
-                                overlay(false);
+                                displayOverlay(true, "error");
                             }
                         });
                     }
@@ -200,7 +202,7 @@ function newServer(name, ami, cpu) {
             });
         } else {
             // Error
-            overlay(false);
+            displayOverlay(true, "error");
         }
     });
 }
@@ -260,7 +262,7 @@ function loadServers() {
 
         // Updates the colors of the new tiles
         updateColors();
-        overlay(false);
+        displayOverlay(false, "");
     });
 }
 
@@ -345,7 +347,7 @@ function addTile(index) {
         // Connect to server.
         // If button is active, proceed.
         if(newConnButton.value == "active") {
-            overlay(true);
+            displayOverlay(true, "");
             connect(parseInt(newConnButton.id));
         }
     });
@@ -399,7 +401,7 @@ function addTile(index) {
         if(newPowerButton.value == "active") {
             if(server.status == "stopped") {
                 // Turn server on.
-                overlay(true);
+                displayOverlay(true, "");
                 startInstance(servers[parseInt(newPowerButton.id)].id).then(function(started) {
                     if(started) { 
                         // Good to go
@@ -410,7 +412,7 @@ function addTile(index) {
                 });
             } else if(server.status == "running") {
                 // Turn server off.
-                overlay(true);
+                displayOverlay(true, "");
                 stopInstance(servers[parseInt(newPowerButton.id)].id).then(function(stopped) {
                     if(stopped) { 
                         // Good to go
@@ -444,7 +446,7 @@ function addTile(index) {
         if(newRebootButton.value == "active") {
             // Reboot server.
             if(server.status == "running") {
-                overlay(true);
+                displayOverlay(true, "");
                 rebootInstance(servers[parseInt(newRebootButton.id)].id).then( function(rebooted) {
                     if(rebooted) {
                         // Good to go
@@ -476,7 +478,7 @@ function addTile(index) {
         // If the button is active, proceed.
         if(newTerminateButton.value == "active") {
             // Terminate server.
-            overlay(true);
+            displayOverlay(true, "");
             terminateInstance(servers[parseInt(newRebootButton.id)].id).then(function(terminated) {
                 if(terminated) {
                     // Good to go
@@ -608,7 +610,7 @@ function splitSpecs(str) {
 // ---------------------------- refreshButton functions ----------------------------- //
 
 refreshButton.addEventListener('click', function() {
-    overlay(true);
+    displayOverlay(true, "");
     loadServers();
 });
 
@@ -643,16 +645,25 @@ newServerButton.addEventListener('mouseleave', function() {
 /**
  * Turns the overlay on or off.
  * @param {boolean} to Boolean representing turning the overlay on (true) or off (false)
+ * @param {string} page String representing the page to show or hide.
  */
- function overlay(to) {
+ function displayOverlay(to, page) {
     if(to) {
-        document.getElementById("overlay").style.display = "block";
+        overlay.hidden = false;
+        
+        if(page == "showPassword") {
+            showPass.hidden = false;
+        } else {
+            showPass.hidden = true;
+        }
     } else {
-        document.getElementById("overlay").style.display = "none";
+        overlay.hidden = true;
     }
-    const contenta = document.getElementById("overlay").innerHTML;
-    document.getElementById("overlay").innerHTML = contenta;
-    document.getElementById("overlay").focus();
+    const contenta = overlay.innerHTML;
+    overlay.innerHTML = contenta;
+    overlay.focus();
+
+    updateColors();
 }
 
 /**
@@ -662,41 +673,43 @@ newServerButton.addEventListener('mouseleave', function() {
  * @param {string} bodyText The body text of the info overlay.
  * @param {string} buttonText The button's text of the info overlay.
  */
-function infoOverlay(to, headerText, bodyText, buttonText) {
+function updateInfoOverlay(to, headerText, bodyText, buttonText) {
     if(to) {
-        document.getElementById("infoHeader").textContent = headerText;
+        /*document.getElementById("infoHeader").textContent = headerText;
         document.getElementById("infoBody").textContent = bodyText;
         if(buttonText == "") {
             infoButton.style.display = "none";
         } else {
-            infoButton.style.display = "inline-block";
+            infoButton.style.display = "block";
             infoButton.textContent = buttonText;
-        }
-        document.getElementById("infoOverlay").style.display = "block";
+
+            addELs();
+        }*/
+        
+        //showPass.hidden = false;
     } else {
-        document.getElementById("infoOverlay").style.display = "none";
+        //showPass.hidden = true;
     }
 
-    const contenta = document.getElementById("infoOverlay").innerHTML;
-    document.getElementById("infoOverlay").innerHTML = contenta;
-    document.getElementById("infoOverlay").focus();
+    /*const contenta = showPass.innerHTML;
+    showPass.innerHTML = contenta;
+    showPass.focus();*/
 }
 
-infoButton.addEventListener('', function() {
-    infoButton.addEventListener('click', function() {
+function addELs() {
+    infoButton.addEventListener('click', function(ev) {
         if(info.textContent == "Copy and Continue") {
             clipboard.writeText(document.getElementById("infoBody").textContent);
             const cmd3 = "open " + awsDir() + "/server.rdp";
             exec(cmd3);
-            infoOverlay(false, "", "", "");
+            displayOverlay(false, "");
         }
     });
-    
-    infoButton.addEventListener('mouseenter', function() {
+
+    infoButton.addEventListener('mouseenter', function(ev) {
         console.log("bruhh");
     });
-
-});
+}
 
 // ---------------------------------------------------------------------------------- //
 
@@ -838,11 +851,8 @@ function updateColors() {
                 terminateButtons[count].style.color = "#882222";
             }
         }
-
-        document.getElementById("infoBox").style.backgroundColor = Colors.backgroundPrimary();
-        document.getElementById("infoHeader").style.color = Colors.textPrimary();
-        document.getElementById("infoBody").style.color = Colors.textSecondary();
-        infoButton.style.color = Colors.textSecondary();
-        infoButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
     }
+    
+    console.log(showPass.contentWindow);
+    showPass.contentWindow.updateColors();
 }
