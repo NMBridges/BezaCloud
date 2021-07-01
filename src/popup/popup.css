@@ -1,4 +1,4 @@
-@import url(../../assets/fonts/fonts.css);
+@import url(../assets/fonts/fonts.css);
 
 body {
     font-family: "Segoe UI", sans-serif;
@@ -10,15 +10,16 @@ body {
 }
     #boundingBox {
         background-color: red;
-        margin-left: 20%;
-        margin-right: 20%;
-        margin-top: 10%;
-        margin-bottom: 10%;
+        height: 100%;
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 0px;
+        margin-bottom: 0px;
         text-align: center;
-        border-radius: 10px;
-        border: 0px solid red;
+        border-radius: 0px;
+        border: 0px solid blue;
         display: grid;
-        grid-template-rows: 40px auto 40px;
+        grid-template-rows: 30% auto 100px;
         grid-template-areas: 
             'header'
             'body'
@@ -27,6 +28,7 @@ body {
         #headerLabel {
             grid-area: header;
             margin: 5px;
+            margin-top: 25px;
             color: white;
             font-size: 20px;
             font-family: "Segoe UI", sans-serif;
@@ -46,8 +48,8 @@ body {
         }
         #continueButton {
             grid-area: button;
-            margin-top: 5px;
-            margin-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 30px;
             margin-left: 25%;
             margin-right: 25%;
             color: white;

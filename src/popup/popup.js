@@ -9,6 +9,17 @@ window.onload = function() {
 
 };
 
+function updateElements(header, body, button) {
+    headerLabel.textContent = header;
+    bodyLabel.textContent = body;
+    if(button == "") {
+        continueButton.hidden = true;
+    } else {
+        continueButton.hidden = false;
+        continueButton.textContent = button;
+    }
+}
+
 /**
  * Updates the colors of the document elements in accordance to the color theme.
  */

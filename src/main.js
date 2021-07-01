@@ -106,6 +106,39 @@ function createWindows() {
     app.quit();
   });
 
+  // When a window calls for popup to be shown.
+  primaryWindow.on('showPopup', () => {
+      primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
+        console.log(result);
+
+        let popupWindow;
+        
+        popupWindow = new BrowserWindow({
+          width: 400,
+          height: 300,
+          autoHideMenuBar: true,
+          webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            enableRemoteModule: true
+          }
+        });
+        popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));
+        //popupWindow.webContents.openDevTools();
+      
+        popupWindow.setResizable(false);
+        
+        popupWindow.webContents.on('did-finish-load', function() {
+          popupWindow.webContents.executeJavaScript('updateColors();').then(function() {
+            popupWindow.webContents.executeJavaScript('updateElements(\"' + result[0] + '\", \"' + result[1] + '\", \"' + result[2] + '\");').then(function() {
+              popupWindow.show();
+            });
+          });
+        });
+
+      });
+  });
+
   // ---------------------------------------------------------------------------------------------------//
 
   // Hides all windows

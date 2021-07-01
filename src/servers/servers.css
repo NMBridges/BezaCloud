@@ -10,7 +10,7 @@ body {
 }
     #overlay {
         position: fixed;
-        display: block;
+        display: none;
         width: 100%;
         height: 100%;
         top: 0;
@@ -21,68 +21,6 @@ body {
         z-index: 2;
         cursor: pointer;
     }
-        #showPass {
-            width: 100%;
-            height: 100%;
-        }
-    #infoOverlay {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0,0,0,0.5);
-        z-index: 2;
-        cursor: pointer;
-    }
-        #infoBox {
-            margin-left: max(calc(50% - 200px), 20px);
-            margin-right: max(calc(50% - 200px), 20px);
-            margin-top: min(200px, 30%);
-            margin-bottom: min(60px, 20%);
-            border-radius: 10px;
-            cursor:default;
-            display: grid;
-            grid-template-rows: 40px auto 45px;
-            grid-template-areas:
-                'infoHeader'
-                'infoBody'
-                'infoButton';
-        }
-            #infoHeader {
-                width: calc(100% - 30px);
-                height: calc(100% - 30px);
-                padding: 15px;
-                grid-area: infoHeader;
-                text-align: center;
-            }
-            #infoBody {
-                width: calc(100% - 30px);
-                height: calc(100% - 30px);
-                padding: 15px;
-                grid-area: infoBody;
-                text-align: center;
-                word-wrap: break-word;
-                overflow-wrap:break-word;
-            }
-            #infoButton {
-                margin-left: 25%;
-                margin-right: 25%;
-                height: calc(100% - 15px);
-                margin-top: 5px;
-                padding: 5px;
-                cursor:default;
-                grid-area: infoButton;
-                text-align: center;
-                border: 0px solid blue;
-                font-family: "Segoe UI", sans-serif;
-                font-weight:300;
-                font-style: normal;
-                font-size: 15px;
-                border-radius: 5px;
-            }
     .mainGridContainer {
         width:100%;
         height:100%;

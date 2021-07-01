@@ -5,8 +5,7 @@
     <title>Mercor Connect</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
     <link rel="stylesheet" href="primary.css">
-    
-    <script type="module" defer src="primary.js"></script>
+    <script type="text/javascript" defer src="primary.js"></script>
   </head>
   <body>
     <div class="grid-container-1">
@@ -18,10 +17,11 @@
         <button id="signOutButton"><img src="../assets/Logout.png"></button>
       </div>
       <div id="primaryBody">
-        <object data="../dashboard/dashboard.html" id="dash" class="page" frameborder="0"></object>
-        <object data="../servers/servers.html" id="serv" class="page" frameborder="0"></object>
-        <object data="../tasks/tasks.html" id="task" class="page" frameborder="0"></object>
-        <object data="../options/options.html" id="opti" class="page" frameborder="0"></object>
+        <object data="../dashboard/dashboard.html" id="dash" class="page" frameborder="0" name="dashboard"></object>
+        <object data="../servers/servers.html" id="serv" class="page" frameborder="0" name="servers"></object>
+        <object data="../tasks/tasks.html" id="task" class="page" frameborder="0" name="tasks"></object>
+        <object data="../options/options.html" id="opti" class="page" frameborder="0" name="options"></object>
+        <object data="../info/info.html" id="info" class="page" frameborder="0" name="info"></object>
       </div>
     </div>
   </body>

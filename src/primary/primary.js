@@ -1,5 +1,8 @@
 // Supplemental functions
-const { hex, Colors, getTheme, setTheme, getPage, setPage } = require("../mercor.js");
+const { 
+    hex, Colors, getTheme, setTheme, getPage,
+    setPage, getPopupValues, setPopupValues
+ } = require("../mercor.js");
 
 // Document items
 var dashboardButton = document.getElementById("dashboardButton");
@@ -13,6 +16,7 @@ var dash = document.getElementById("dash");
 var serv = document.getElementById("serv");
 var task = document.getElementById("task");
 var opti = document.getElementById("opti");
+var info = document.getElementById("info");
 
 window.onload = function() {
     to("Dashboard");
@@ -167,11 +171,26 @@ optionsButton.addEventListener('click', function() {
 
 // ---------------------------------------------------------------------------------- //
 
+if (window.addEventListener) {
+    window.addEventListener("message", onMessage, false);        
+} 
+else if (window.attachEvent) {
+    window.attachEvent("onmessage", onMessage, false);
+}
+
+function onMessage(event) {
+    var data = event.data;
+    if (typeof(window[data.func]) == "function") {
+        window[data.func].call(null, data.message);
+    }
+}
+
 /**
  * Performs necessary operations to transition from one page to another.
  * @param {string} page The page to transition to.
  */
 function to(page) {
+    console.log("To ", page);
     setPage(page);
 
     // Hides each iframe if it is not the desired page.
@@ -194,6 +213,11 @@ function to(page) {
         opti.hidden = false;
     } else {
         opti.hidden = true;
+    }
+    if(page == "Info") {
+        info.hidden = false;
+    } else {
+        info.hidden = true;
     }
 
     updateColors();

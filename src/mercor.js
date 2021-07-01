@@ -5,6 +5,13 @@ var mysql = require('mysql-await');
 const { Address } = require('@aws-sdk/client-ec2');
 const { exec, execSync } = require('child_process');
 
+/** Global variable that holds information for the popup window header. */
+var popupHeader = "";
+/** Global variable that holds information for the popup window body. */
+var popupBody = "";
+/** Global variable that holds information for the popup window button. */
+var popupButton = "";
+
 /** @type {string} The color theme of Mercor Connect. */
 var theme = "Dark";
 /** @type {string} The current page that Mercor Connect is on. */
@@ -278,6 +285,25 @@ function openRdpFile() {
 }
 
 /**
+ * Sets the values for the popup window.
+ * @param {string} header The header text.
+ * @param {string} body The body text.
+ * @param {string} button The button text. Blank if button should be hidden.
+ */
+ function setPopupValues(header, body, button) {
+    popupHeader = header;
+    popupBody = body;
+    popupButton = button;
+}
+
+/**
+ * @returns The text values for the popup window.
+ */
+function getPopupValues() {
+    return [popupHeader, popupBody, popupButton];
+}
+
+/**
  * @param {number} r The red value.
  * @param {number} g The green value.
  * @param {number} b The blue value.
@@ -487,5 +513,5 @@ module.exports = {
     cachedLicenseKey, tryLicenseKey, createAwsDir, updateKeyCache,
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
-    installAwsCli
+    installAwsCli, setPopupValues, getPopupValues
 };

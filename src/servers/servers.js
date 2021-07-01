@@ -1,6 +1,7 @@
 // Supplemental functions
 const { 
-    Colors, createRdpFile, openRdpFile, setPopupData
+    Colors, createRdpFile, openRdpFile, setPopupValues,
+    getPopupValues
 } = parent.require("../mercor.js");
 const { 
     getInstances, startInstance, stopInstance, 
@@ -23,7 +24,6 @@ var refreshButton = document.getElementById("refreshButton");
 var newServerButton = document.getElementById("newServerButton");
 var primaryBody = document.getElementById("primaryBody");
 var overlay = document.getElementById("overlay");
-var showPass = document.getElementById("showPass");
 
 /**
  * @type {Server[]} The servers belonging to the currently loaded region.
@@ -63,14 +63,14 @@ function connect(index) {
             // as the server does not have an attached key pair. You must provide the password manually.
             console.log("It appears that this server was not made using Mercor Connect or an error occurred, " +
                     "as the server does not have an attached key pair. You must provide the password manually.");
-            displayOverlay(true, "error");
+            displayOverlay(false);
         } else {
             getInstancePasswordData(server.id).then(function(result) {
                 if(pemFileExists(server.key)) {
                     if(result == "") {
                         // Server is not available yet
                         console.log("Server is not available yet.");
-                        displayOverlay(true, "error");
+                        displayOverlay(false);
                     } else {
                         // Decode password data
                         const decryptCmd = "aws ec2 get-password-data --instance-id " + server.id + " --priv-launch-key " + awsDir() + "/" + server.key + ".pem";
@@ -92,15 +92,15 @@ function connect(index) {
                                 const e = execSync(cmd1);
                                 const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
                                 exec(cmd2);
-                                displayOverlay(false, "");
+                                displayOverlay(false);
                                 // Should be running Remote Desktop
                             } else {
                                 // Mac functions
-                                displayOverlay(false, "");
+                                displayOverlay(false);
                             }
                         } else {
                             console.log("There was an error retrieving the password.");
-                            displayOverlay(true, "error");
+                            displayOverlay(false);
                         }
                     }
                 } else {
@@ -108,7 +108,7 @@ function connect(index) {
                     // the .pem file associated with the server's key pair has been deleted.
                     console.log("It appears that this server was not created with Mercor Connect or " +
                     "the .pem file associated with the server's key pair has been deleted.");
-                    displayOverlay(true, "error");
+                    displayOverlay(false);
                 }
             });
         }
@@ -121,15 +121,22 @@ function connect(index) {
             const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
             exec(cmd2);
             // Should be running Remote Desktop
-            displayOverlay(false, "");
+            displayOverlay(false);
         } else {
             // Mac
-            displayOverlay(true, "showPassword");
+
+            setPopupValues("The password to your server is", decodedPassword, "Copy and Continue");
+            
+            const remote = parent.require('electron').remote;
+            let w = remote.getCurrentWindow();
+            w.emit('showPopup');
+
             //updateInfoOverlay(true, "The password to your server is", decodedPassword, "Copy and Continue");
             const cmd1 = "touch " + awsDir() + "/server.rdp";
             const e1 = execSync(cmd1);
             const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/server.rdp";
             const e2 = execSync(cmd2);
+            displayOverlay(false);
         }
     }
     console.log(decodedPassword);
@@ -168,11 +175,11 @@ function newServer(name, ami, cpu) {
                             if(key != "ERROR") {
                                 createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                     // done
-                                    displayOverlay(false, "");
+                                    displayOverlay(false);
                                 });
                             } else {
                                 // Error
-                                displayOverlay(true, "error");
+                                displayOverlay(false);
                             }
                         });
                     } else {
@@ -185,16 +192,16 @@ function newServer(name, ami, cpu) {
                                     if(key != "ERROR") {
                                         createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                             // done
-                                            displayOverlay(false, "");
+                                            displayOverlay(false);
                                         });
                                     } else {
                                         // Error
-                                        displayOverlay(true, "error");
+                                        displayOverlay(false);
                                     }
                                 });
                             } else {
                                 // Error
-                                displayOverlay(true, "error");
+                                displayOverlay(false);
                             }
                         });
                     }
@@ -202,7 +209,7 @@ function newServer(name, ami, cpu) {
             });
         } else {
             // Error
-            displayOverlay(true, "error");
+            displayOverlay(false);
         }
     });
 }
@@ -262,7 +269,7 @@ function loadServers() {
 
         // Updates the colors of the new tiles
         updateColors();
-        displayOverlay(false, "");
+        displayOverlay(false);
     });
 }
 
@@ -347,7 +354,7 @@ function addTile(index) {
         // Connect to server.
         // If button is active, proceed.
         if(newConnButton.value == "active") {
-            displayOverlay(true, "");
+            displayOverlay(true);
             connect(parseInt(newConnButton.id));
         }
     });
@@ -401,7 +408,7 @@ function addTile(index) {
         if(newPowerButton.value == "active") {
             if(server.status == "stopped") {
                 // Turn server on.
-                displayOverlay(true, "");
+                displayOverlay(true);
                 startInstance(servers[parseInt(newPowerButton.id)].id).then(function(started) {
                     if(started) { 
                         // Good to go
@@ -412,7 +419,7 @@ function addTile(index) {
                 });
             } else if(server.status == "running") {
                 // Turn server off.
-                displayOverlay(true, "");
+                displayOverlay(true);
                 stopInstance(servers[parseInt(newPowerButton.id)].id).then(function(stopped) {
                     if(stopped) { 
                         // Good to go
@@ -446,7 +453,7 @@ function addTile(index) {
         if(newRebootButton.value == "active") {
             // Reboot server.
             if(server.status == "running") {
-                displayOverlay(true, "");
+                displayOverlay(true);
                 rebootInstance(servers[parseInt(newRebootButton.id)].id).then( function(rebooted) {
                     if(rebooted) {
                         // Good to go
@@ -478,7 +485,7 @@ function addTile(index) {
         // If the button is active, proceed.
         if(newTerminateButton.value == "active") {
             // Terminate server.
-            displayOverlay(true, "");
+            displayOverlay(true);
             terminateInstance(servers[parseInt(newRebootButton.id)].id).then(function(terminated) {
                 if(terminated) {
                     // Good to go
@@ -610,7 +617,7 @@ function splitSpecs(str) {
 // ---------------------------- refreshButton functions ----------------------------- //
 
 refreshButton.addEventListener('click', function() {
-    displayOverlay(true, "");
+    displayOverlay(true);
     loadServers();
 });
 
@@ -645,70 +652,16 @@ newServerButton.addEventListener('mouseleave', function() {
 /**
  * Turns the overlay on or off.
  * @param {boolean} to Boolean representing turning the overlay on (true) or off (false)
- * @param {string} page String representing the page to show or hide.
  */
- function displayOverlay(to, page) {
+ function displayOverlay(to) {
     if(to) {
-        overlay.hidden = false;
-        
-        if(page == "showPassword") {
-            showPass.hidden = false;
-        } else {
-            showPass.hidden = true;
-        }
+        overlay.style.display = "block";
     } else {
-        overlay.hidden = true;
+        overlay.style.display = "none";
     }
     const contenta = overlay.innerHTML;
     overlay.innerHTML = contenta;
     overlay.focus();
-
-    updateColors();
-}
-
-/**
- * Turns the infoOverlay on or off.
- * @param {boolean} to Boolean representing turning the infoOverlay on (true) or off (false)
- * @param {string} headerText The header text of the info overlay.
- * @param {string} bodyText The body text of the info overlay.
- * @param {string} buttonText The button's text of the info overlay.
- */
-function updateInfoOverlay(to, headerText, bodyText, buttonText) {
-    if(to) {
-        /*document.getElementById("infoHeader").textContent = headerText;
-        document.getElementById("infoBody").textContent = bodyText;
-        if(buttonText == "") {
-            infoButton.style.display = "none";
-        } else {
-            infoButton.style.display = "block";
-            infoButton.textContent = buttonText;
-
-            addELs();
-        }*/
-        
-        //showPass.hidden = false;
-    } else {
-        //showPass.hidden = true;
-    }
-
-    /*const contenta = showPass.innerHTML;
-    showPass.innerHTML = contenta;
-    showPass.focus();*/
-}
-
-function addELs() {
-    infoButton.addEventListener('click', function(ev) {
-        if(info.textContent == "Copy and Continue") {
-            clipboard.writeText(document.getElementById("infoBody").textContent);
-            const cmd3 = "open " + awsDir() + "/server.rdp";
-            exec(cmd3);
-            displayOverlay(false, "");
-        }
-    });
-
-    infoButton.addEventListener('mouseenter', function(ev) {
-        console.log("bruhh");
-    });
 }
 
 // ---------------------------------------------------------------------------------- //
@@ -852,7 +805,4 @@ function updateColors() {
             }
         }
     }
-    
-    console.log(showPass.contentWindow);
-    showPass.contentWindow.updateColors();
 }
