@@ -125,6 +125,20 @@ body {
                     border-radius: 10px;
                     background-color: green;
                 }
+                    .statusIcon .statusPopup {
+                        color: white;
+                        display: none;
+                        font-family: "Segoe UI", sans-serif;
+                        font-weight:300;
+                        font-style: normal;
+                        font-size: 10px;
+                        text-align: center;
+                        margin-top: 25px;
+                        margin-left: -8px;
+                    }
+                    .statusIcon:hover .statusPopup {
+                        display: block;
+                    }
                 .serverId {
                     text-overflow: ellipsis;
                     white-space: nowrap;

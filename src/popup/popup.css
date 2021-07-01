@@ -38,9 +38,9 @@ body {
         }
         #bodyLabel {
             grid-area: body;
-            margin: 5px;
+            margin: 15px;
             color: white;
-            font-size: 20px;
+            font-size: 15px;
             font-family: "Segoe UI", sans-serif;
             font-weight:300;
             font-style: normal;

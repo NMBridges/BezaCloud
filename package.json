@@ -47,6 +47,7 @@
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.18.0",
     "aws-sdk": "^2.932.0",
+    "clipboardy": "^2.3.0",
     "electron-squirrel-startup": "^1.0.0",
     "mysql": "^2.18.1",
     "mysql-await": "^2.1.8",

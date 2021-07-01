@@ -3,7 +3,7 @@ const EventEmitter = require('events');
 const path = require('path');
 const {
   tryLicenseKey, cachedLicenseKey, createAwsDir,
-  installAwsCli
+  installAwsCli, hasAwsCliInstalled, awsDir
 } = require("./mercor.js");
 
 let licenseKeyWindow;
@@ -15,10 +15,46 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
   app.quit();
 }
 
+function newPopupWindow(header, body, button) {
+  let popupWindow;
+  
+  popupWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+  popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));
+  //popupWindow.webContents.openDevTools();
+
+  popupWindow.setResizable(false);
+  
+  popupWindow.webContents.on('did-finish-load', function() {
+    popupWindow.webContents.executeJavaScript('updateColors();').then(function() {
+      popupWindow.webContents.executeJavaScript('updateElements(\"' + header + '\", \"' + body + '\", \"' + button + '\");').then(function() {
+        popupWindow.show();
+      });
+    });
+  });
+}
+
 // The main logic function that controls interaction between windows
 function createWindows() {
   // Installs the AWS CLI if it is not already installed.
-  installAwsCli();
+  hasAwsCliInstalled().then(function(result) {
+    console.log(result);
+    if(!result) {
+        installAwsCli().then(function() {
+          if(process.platform != 'win32') {
+            newPopupWindow("AWS CLI is not installed. Please run the following in Terminal:", "sudo installer -pkg " + awsDir() + "/AWSCLIV2.pkg -target /", "Copy and Close");
+          }
+        });
+    }
+  });
 
   // ------------------------------      licenseKeyWindow     ----------------------------------------// 
   
@@ -106,35 +142,12 @@ function createWindows() {
     app.quit();
   });
 
-  // When a window calls for popup to be shown.
+  // When a window calls for popup to be shown, it creates a popup window.
   primaryWindow.on('showPopup', () => {
       primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
         console.log(result);
 
-        let popupWindow;
-        
-        popupWindow = new BrowserWindow({
-          width: 400,
-          height: 300,
-          autoHideMenuBar: true,
-          webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            enableRemoteModule: true
-          }
-        });
-        popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));
-        //popupWindow.webContents.openDevTools();
-      
-        popupWindow.setResizable(false);
-        
-        popupWindow.webContents.on('did-finish-load', function() {
-          popupWindow.webContents.executeJavaScript('updateColors();').then(function() {
-            popupWindow.webContents.executeJavaScript('updateElements(\"' + result[0] + '\", \"' + result[1] + '\", \"' + result[2] + '\");').then(function() {
-              popupWindow.show();
-            });
-          });
-        });
+        newPopupWindow(result[0], result[1], result[2]);
 
       });
   });

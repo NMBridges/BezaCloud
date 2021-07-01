@@ -28,52 +28,42 @@ function awsDir() {
  * Returns whether or not the user has the AWS CLI installed.
  */
 const hasAwsCliInstalled = async () => {
-    exec("aws --version", function(err) {
-        if(err != null) {
-            console.log("AWS CLI not installed");
-            return false;
-        } else {
-            console.log("AWS CLI installed");
-            return true;
-        }
-    });
+    const { stdout, err } = exec("aws --version")
+    if(err != null) {
+        console.log(stderr);
+        console.log("AWS CLI not installed");
+        return false;
+    } else {
+        console.log("AWS CLI installed");
+        return true;
+    }
 }
 
+/**
+ * Downloads and installs the AWS CLI if on Windows. Downloads if on Mac.
+ */
 const installAwsCli = async () => {
-    hasAwsCliInstalled().then(function(result) {
-        if(!result) {
-            if(process.platform == "win32") {
-                exec("msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi", function(err) {
-                    if(err != null) {
-                        console.log("Success installing AWS CLI");
-                        return;
-                    } else {
-                        console.log("Error installing AWS CLI");
-                        return;
-                    }
-                });
+    if(process.platform == "win32") {
+        exec("msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi", function(err) {
+            if(err != null) {
+                console.log("Success installing AWS CLI");
+                return;
             } else {
-                exec("curl \"https://awscli.amazonaws.com/AWSCLIV2.pkg\" -o \"AWSCLIV2.pkg\"", function(err) {
-                    if(err == null) {
-                        // Prompt user with instructions of running the following command
-                        /*exec("sudo installer -pkg AWSCLIV2.pkg -target /", function(err) {
-                            if(err == null) {
-                                console.log("Success installing AWS CLI");
-                                return;
-                            } else {
-                                console.log("Error installing AWS CLI");
-                                return;
-                            }
-                        });*/
-                        return;
-                    } else {
-                        console.log("Error installing AWS CLI");
-                        return;
-                    }
-                });
+                console.log("Error installing AWS CLI");
+                return;
             }
-        }
-    });
+        });
+    } else {
+        exec("curl \"https://awscli.amazonaws.com/AWSCLIV2.pkg\" -o \"" + awsDir() + "/AWSCLIV2.pkg\"", function(err) {
+            if(err == null) {
+                console.log("AWS CLI downloaded successfully")
+                return;
+            } else {
+                console.log("Error downloading AWS CLI");
+                return;
+            }
+        });
+    }
 }
 
 /**
@@ -513,5 +503,5 @@ module.exports = {
     cachedLicenseKey, tryLicenseKey, createAwsDir, updateKeyCache,
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
-    installAwsCli, setPopupValues, getPopupValues
+    installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled
 };

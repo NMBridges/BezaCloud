@@ -1,7 +1,7 @@
 // Supplemental functions
 const { 
     Colors, createRdpFile, openRdpFile, setPopupValues,
-    getPopupValues
+    getPopupValues, awsDir
 } = parent.require("../mercor.js");
 const { 
     getInstances, startInstance, stopInstance, 
@@ -13,7 +13,6 @@ const {
     addTags
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
-const { clipboard } = parent.require('electron');
 const homeDir = parent.require('os').homedir();
 
 // Document items
@@ -29,13 +28,6 @@ var overlay = document.getElementById("overlay");
  * @type {Server[]} The servers belonging to the currently loaded region.
  */
 var servers = [];
-
-/**
- * @returns The directory where the credentials and config files are stored.
- */
- function awsDir() {
-    return homeDir + "/.aws";
-}
 
 window.onload = function() {
     loadServers();
@@ -63,6 +55,8 @@ function connect(index) {
             // as the server does not have an attached key pair. You must provide the password manually.
             console.log("It appears that this server was not made using Mercor Connect or an error occurred, " +
                     "as the server does not have an attached key pair. You must provide the password manually.");
+            newPopup("Error", "It appears that this server was not made using Mercor Connect or an error occurred, " +
+            "as the server does not have an attached key pair. You must provide the password manually.", "Close");
             displayOverlay(false);
         } else {
             getInstancePasswordData(server.id).then(function(result) {
@@ -70,6 +64,7 @@ function connect(index) {
                     if(result == "") {
                         // Server is not available yet
                         console.log("Server is not available yet.");
+                        newPopup("Error", "Server is not available yet. Servers may take up to 10 minutes to become available.", "Close");
                         displayOverlay(false);
                     } else {
                         // Decode password data
@@ -95,11 +90,17 @@ function connect(index) {
                                 displayOverlay(false);
                                 // Should be running Remote Desktop
                             } else {
-                                // Mac functions
+                                // Mac
+                                newPopup("The password to your server is", newPassword, "Copy and Continue");
+                                const cmd1 = "touch " + awsDir() + "/server.rdp";
+                                const e1 = execSync(cmd1);
+                                const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/server.rdp";
+                                const e2 = execSync(cmd2);
                                 displayOverlay(false);
                             }
                         } else {
                             console.log("There was an error retrieving the password.");
+                            newPopup("Error", "There was an error retrieving the server password.", "Close");
                             displayOverlay(false);
                         }
                     }
@@ -108,6 +109,9 @@ function connect(index) {
                     // the .pem file associated with the server's key pair has been deleted.
                     console.log("It appears that this server was not created with Mercor Connect or " +
                     "the .pem file associated with the server's key pair has been deleted.");
+                    newPopup("Error", "It appears that this server was not created with Mercor Connect or " +
+                    "the .pem file associated with the server's key pair is not in the correct location. Please resolve this " + 
+                    "by attaching the appropriate .pem file to the server in the My Servers page.", "Close");
                     displayOverlay(false);
                 }
             });
@@ -124,14 +128,7 @@ function connect(index) {
             displayOverlay(false);
         } else {
             // Mac
-
-            setPopupValues("The password to your server is", decodedPassword, "Copy and Continue");
-            
-            const remote = parent.require('electron').remote;
-            let w = remote.getCurrentWindow();
-            w.emit('showPopup');
-
-            //updateInfoOverlay(true, "The password to your server is", decodedPassword, "Copy and Continue");
+            newPopup("The password to your server is", decodedPassword, "Copy and Continue");
             const cmd1 = "touch " + awsDir() + "/server.rdp";
             const e1 = execSync(cmd1);
             const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/server.rdp";
@@ -175,10 +172,12 @@ function newServer(name, ami, cpu) {
                             if(key != "ERROR") {
                                 createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                     // done
+                                    newPopup("", "Server successfully created.", "Close");
                                     displayOverlay(false);
                                 });
                             } else {
                                 // Error
+                                newPopup("Error", "Error creating key pair.", "Close");
                                 displayOverlay(false);
                             }
                         });
@@ -192,15 +191,18 @@ function newServer(name, ami, cpu) {
                                     if(key != "ERROR") {
                                         createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                             // done
+                                            newPopup("", "Successfully created server.", "Close");
                                             displayOverlay(false);
                                         });
                                     } else {
                                         // Error
+                                        newPopup("Error", "Error creating key pair.", "Close");
                                         displayOverlay(false);
                                     }
                                 });
                             } else {
                                 // Error
+                                newPopup("Error", "Error creating security group.", "Close");
                                 displayOverlay(false);
                             }
                         });
@@ -209,6 +211,7 @@ function newServer(name, ami, cpu) {
             });
         } else {
             // Error
+            newPopup("Error", "Error retrieving VPC ID.", "Close");
             displayOverlay(false);
         }
     });
@@ -298,6 +301,11 @@ function addTile(index) {
     // The server status icon.
     var newStatus = document.createElement('div');
     newStatus.className = "statusIcon";
+
+    var newStatusLabel = document.createElement('div');
+    newStatusLabel.className = "statusPopup";
+    newStatusLabel.textContent = server.status;
+    newStatus.appendChild(newStatusLabel);
     newTile.appendChild(newStatus);
 
     // The server IP address descriptor element.
@@ -662,6 +670,19 @@ newServerButton.addEventListener('mouseleave', function() {
     const contenta = overlay.innerHTML;
     overlay.innerHTML = contenta;
     overlay.focus();
+}
+
+/**
+ * Creates a new popup window.
+ * @param {string} header The header text of the popup.
+ * @param {string} body The body text of the popup.
+ * @param {string} button The button text of the popup. Blank if hidden.
+ */
+function newPopup(header, body, button) {
+    setPopupValues(header, body, button);
+    const remote = parent.require('electron').remote;
+    let w = remote.getCurrentWindow();
+    w.emit('showPopup');
 }
 
 // ---------------------------------------------------------------------------------- //
