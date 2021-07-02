@@ -1,0 +1,11 @@
+@import url(../assets/fonts/fonts.css);
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    margin: auto;
+    font-weight:300;
+    font-style: normal;
+    max-width: 100%;
+    max-height: 100%;
+}
+    

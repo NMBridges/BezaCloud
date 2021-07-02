@@ -1,1 +1,75 @@
 @import url(../assets/fonts/fonts.css);
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: auto;
+  font-weight:300;
+  font-style: normal;
+  width: 100%;
+  height: 100%;
+}
+    #boundingBox {
+        width: 100%;
+        height: 100%;
+        grid-template-rows: 50px auto;
+        grid-template-areas:
+            'headerBar'
+            'primaryBody';
+        grid-gap: 0px;
+    }
+        #optionsHeaderBar {
+            grid-area: headerBar;
+            width: 100%;
+            height: 50px;
+        }
+            #optionsHeaderBarLabel {
+                display: inline-block;
+                line-height: 50px;
+                font-size: 25px;
+                margin-left: 15px;
+                color: white;
+            }
+        #optionsPrimaryBody {
+            grid-area: primaryBody;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+            #regionLabel {
+                position: absolute;
+                top: 50px;
+                left: 50px;
+                font-size: 25px;
+                color: white;
+            }
+            #regionButton {
+                position: absolute;
+                top: 100px;
+                left: 50px;
+                font-size: 25px;
+                font-family: "Segoe UI", sans-serif;
+                font-weight:300;
+                font-style: normal;
+                border: 0px solid white;
+                color: white;
+                background-color: blue;
+            }
+            #themeLabel {
+                position: absolute;
+                top: 150px;
+                left: 50px;
+                font-size: 25px;
+                color: white;
+            }
+            #themeButton {
+                position: absolute;
+                top: 200px;
+                left: 50px;
+                font-size: 25px;
+                font-family: "Segoe UI", sans-serif;
+                font-weight:300;
+                font-style: normal;
+                border: 0px solid white;
+                color: white;
+                background-color: blue;
+            }

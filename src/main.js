@@ -42,6 +42,33 @@ function newPopupWindow(header, body, button) {
   });
 }
 
+function newCreateServerWindow() {
+  let createServerWindow;
+  
+  createServerWindow = new BrowserWindow({
+    width: 400,
+    height: 500,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+  createServerWindow.loadFile(path.join(__dirname, 'newServer/newServer.html'));
+  createServerWindow.webContents.openDevTools();
+
+  createServerWindow.setResizable(false);
+  
+  createServerWindow.webContents.on('did-finish-load', function() {
+    createServerWindow.webContents.executeJavaScript('updateColors();').then(function() {
+      createServerWindow.webContents.executeJavaScript('resetElements();').then(function() {
+        createServerWindow.show();
+      });
+    });
+  });
+}
+
 // The main logic function that controls interaction between windows
 function createWindows() {
   // Installs the AWS CLI if it is not already installed.
@@ -144,12 +171,17 @@ function createWindows() {
 
   // When a window calls for popup to be shown, it creates a popup window.
   primaryWindow.on('showPopup', () => {
-      primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
-        console.log(result);
+    primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
+      console.log(result);
 
-        newPopupWindow(result[0], result[1], result[2]);
+      newPopupWindow(result[0], result[1], result[2]);
 
-      });
+    });
+  });
+
+  // When a window calls for newServer window, it creates a newServer window.
+  primaryWindow.on('newServer', () => {
+    newCreateServerWindow();
   });
 
   // ---------------------------------------------------------------------------------------------------//

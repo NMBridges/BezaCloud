@@ -156,7 +156,6 @@ function isMercor(index) {
  * @param {string} name The name of the server.
  * @param {string} ami The AMI ID to base the server on.
  * @param {string} cpu The CPU type.
- * @param {string} keyPair The key pair to use when creating the server.
  */
 function newServer(name, ami, cpu) {
     // Gets region's default VPC
@@ -642,7 +641,10 @@ refreshButton.addEventListener('mouseleave', function() {
 // ---------------------------- newServerButton functions --------------------------- //
 
 newServerButton.addEventListener('click', function() {
-    newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro", "chargeAWS-discord");
+    const remote = parent.require('electron').remote;
+    let w = remote.getCurrentWindow();
+    w.emit('newServer');
+    //newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro", "chargeAWS-discord");
 });
 
 newServerButton.addEventListener('mouseenter', function() {

@@ -61,6 +61,7 @@ function updateColors() {
 
     // Update subwindows
     dash.contentWindow.updateColors();
+    opti.contentWindow.updateColors();
 }
 
 // -------------------------- dashboardButton functions ----------------------------- //
