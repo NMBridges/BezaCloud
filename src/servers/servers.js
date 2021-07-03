@@ -1,7 +1,7 @@
 // Supplemental functions
 const { 
     Colors, createRdpFile, openRdpFile, setPopupValues,
-    getPopupValues, awsDir
+    getPopupValues, awsDir, getRegion
 } = parent.require("../mercor.js");
 const { 
     getInstances, startInstance, stopInstance, 
@@ -61,41 +61,47 @@ function connect(index) {
         } else {
             getInstancePasswordData(server.id).then(function(result) {
                 if(pemFileExists(server.key)) {
-                    if(result == "") {
+                    if(result == "" || result == "ERROR") {
                         // Server is not available yet
                         console.log("Server is not available yet.");
                         newPopup("Error", "Server is not available yet. Servers may take up to 10 minutes to become available.", "Close");
                         displayOverlay(false);
                     } else {
                         // Decode password data
-                        const decryptCmd = "aws ec2 get-password-data --instance-id " + server.id + " --priv-launch-key " + awsDir() + "/" + server.key + ".pem";
+                        const decryptCmd = "aws ec2 get-password-data --region " + getRegion() + " --instance-id " + server.id + " --priv-launch-key " + awsDir() + "/connections/" + server.key + ".pem";
                         const stdout = execSync(decryptCmd).toString();
                         const out = JSON.parse(stdout);
                         if("PasswordData" in out) {
                             const newPassword = out['PasswordData'];
                             console.log(newPassword);
-                            // Add new encoded password tag
-                            if(addTags(server.id, "Cert", btoa(newPassword))) {
-                                // Successfully added tags
-                            } else {
-                                // Oh well, try again next time.
-                            }
+                            if(newPassword != "") {
+                                // Add new encoded password tag
+                                if(addTags(server.id, "Cert", btoa(newPassword))) {
+                                    // Successfully added tags
+                                } else {
+                                    // Oh well, try again next time.
+                                }
 
-                            // Run Microsoft Remote Desktop
-                            if(parent.process.platform == 'win32') {
-                                const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
-                                const e = execSync(cmd1);
-                                const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-                                exec(cmd2);
-                                displayOverlay(false);
-                                // Should be running Remote Desktop
+                                // Run Microsoft Remote Desktop
+                                if(parent.process.platform == 'win32') {
+                                    const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
+                                    const e = execSync(cmd1);
+                                    const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
+                                    exec(cmd2);
+                                    displayOverlay(false);
+                                    // Should be running Remote Desktop
+                                } else {
+                                    // Mac
+                                    newPopup("The password to your server is", newPassword, "Copy and Continue");
+                                    const cmd1 = "touch " + awsDir() + "/connections/server.rdp";
+                                    const e1 = execSync(cmd1);
+                                    const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/connections/server.rdp";
+                                    const e2 = execSync(cmd2);
+                                    displayOverlay(false);
+                                }
                             } else {
-                                // Mac
-                                newPopup("The password to your server is", newPassword, "Copy and Continue");
-                                const cmd1 = "touch " + awsDir() + "/server.rdp";
-                                const e1 = execSync(cmd1);
-                                const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/server.rdp";
-                                const e2 = execSync(cmd2);
+                                console.log("There was an error retrieving the password. No password found.");
+                                newPopup("Error", "There was an error retrieving the server password. Servers may take 10 or more minutes after creation to become available.", "Close");
                                 displayOverlay(false);
                             }
                         } else {
@@ -129,9 +135,9 @@ function connect(index) {
         } else {
             // Mac
             newPopup("The password to your server is", decodedPassword, "Copy and Continue");
-            const cmd1 = "touch " + awsDir() + "/server.rdp";
+            const cmd1 = "touch " + awsDir() + "/connections/server.rdp";
             const e1 = execSync(cmd1);
-            const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/server.rdp";
+            const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/connections/server.rdp";
             const e2 = execSync(cmd2);
             displayOverlay(false);
         }
@@ -226,21 +232,23 @@ function newServer(name, ami, cpu) {
 function loadServers() {
     const servJson = getInstances().then(function(data) {
         servers = [];
-        for(var index = 0; index < data["Reservations"].length; index++) {
-            const srv = data["Reservations"][index];
-            const newSpecs = splitSpecs(getSpecs(srv));
-            if(getStatus(srv).toLowerCase() != "terminated") {
-                servers.push(new Server(
-                    getName(srv),
-                    getInstanceId(srv),
-                    (getIPv4(srv) != undefined) ? getIPv4(srv) : "",
-                    getPassword(srv),
-                    getKey(srv),
-                    getStatus(srv),
-                    (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
-                    (newSpecs.length > 2) ? newSpecs[1] : "",
-                    (newSpecs.length > 2) ? newSpecs[2] : ""
-                ));
+        if(data["Reservations"] != undefined) {
+            for(var index = 0; index < data["Reservations"].length; index++) {
+                const srv = data["Reservations"][index];
+                const newSpecs = splitSpecs(getSpecs(srv));
+                if(getStatus(srv).toLowerCase() != "terminated") {
+                    servers.push(new Server(
+                        getName(srv),
+                        getInstanceId(srv),
+                        (getIPv4(srv) != undefined) ? getIPv4(srv) : "",
+                        getPassword(srv),
+                        getKey(srv),
+                        getStatus(srv),
+                        (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
+                        (newSpecs.length > 2) ? newSpecs[1] : "",
+                        (newSpecs.length > 2) ? newSpecs[2] : ""
+                    ));
+                }
             }
         }
 
@@ -261,7 +269,14 @@ function loadServers() {
             return values[b.status] - values[a.status];
         })
 
-        // Clears old tiles
+        // Clears old tiles, resets region label
+        const regionDict = {
+            "us-east-1": "N. Virginia",
+            "us-east-2": "Ohio",
+            "us-west-1": "N. California",
+            "us-west-2": "Oregon"
+        };
+        regionLabel.textContent = regionDict[getRegion()];
         primaryBody.textContent = '';
         
         // Adds new tiles
@@ -644,7 +659,7 @@ newServerButton.addEventListener('click', function() {
     const remote = parent.require('electron').remote;
     let w = remote.getCurrentWindow();
     w.emit('newServer');
-    //newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro", "chargeAWS-discord");
+    newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro");
 });
 
 newServerButton.addEventListener('mouseenter', function() {
@@ -716,8 +731,8 @@ function updateColors() {
             // Enable if server is fully running.
             const state = servers[count].status.toLowerCase();
             if(state == "running") {
-                connectButtons[count].style.color = Colors.textSecondary();
-                connectButtons[count].style.borderColor = Colors.textSecondary();
+                connectButtons[count].style.color = Colors.textPrimary();
+                connectButtons[count].style.borderColor = Colors.textPrimary();
             } else {
                 connectButtons[count].style.color = Colors.textTertiary();
                 connectButtons[count].style.borderColor = Colors.textTertiary();
@@ -730,8 +745,8 @@ function updateColors() {
             // Enable if server is fully running or stopped.
             const state = servers[count].status.toLowerCase();
             if(state == "running" || state == "stopped") {
-                modifyButtons[count].style.color = Colors.textSecondary();
-                modifyButtons[count].style.borderColor = Colors.textSecondary();
+                modifyButtons[count].style.color = Colors.textPrimary();
+                modifyButtons[count].style.borderColor = Colors.textPrimary();
             } else {
                 modifyButtons[count].style.color = Colors.textTertiary();
                 modifyButtons[count].style.borderColor = Colors.textTertiary();
@@ -798,7 +813,7 @@ function updateColors() {
             // Enable if state is fully running or stopped.
             const state = servers[count].status.toLowerCase();
             if(state == "running" || state == "stopped") {
-                powerButtons[count].style.color = Colors.textSecondary();
+                powerButtons[count].style.color = Colors.textPrimary();
             } else {
                 powerButtons[count].style.color = Colors.textTertiary();
             }
@@ -810,7 +825,7 @@ function updateColors() {
             // Enable if server is fully running or stopped.
             const state = servers[count].status.toLowerCase();
             if(state == "running" || state == "stopped") {
-                rebootButtons[count].style.color = Colors.textSecondary();
+                rebootButtons[count].style.color = Colors.textPrimary();
             } else {
                 rebootButtons[count].style.color = Colors.textTertiary();
             }

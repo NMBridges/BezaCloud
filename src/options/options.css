@@ -37,39 +37,93 @@ body {
         }
             #regionLabel {
                 position: absolute;
-                top: 50px;
-                left: 50px;
+                top: 15px;
+                left: 20px;
                 font-size: 25px;
                 color: white;
             }
             #regionButton {
                 position: absolute;
-                top: 100px;
-                left: 50px;
-                font-size: 25px;
+                top: 60px;
+                left: 20px;
+                font-size: 15px;
                 font-family: "Segoe UI", sans-serif;
                 font-weight:300;
                 font-style: normal;
-                border: 0px solid white;
+                border: 1px solid white;
                 color: white;
-                background-color: blue;
+                border-radius: 8px;
+                width: 125px;
+                height: 40px;
             }
+                #regionSelect {
+                    position: absolute;
+                    top: 60px;
+                    left: 145px;
+                    margin: 0px;
+                    padding: 0px;
+                    width: 500px;
+                    height: 38px;
+                    display: grid;
+                    grid-template-columns: repeat(4, 125px);
+                    border-radius: 8px;
+                    border: 1px solid white;
+                }
+                    .regionSelectButton {
+                        grid-row: 1;
+                        font-size: 15px;
+                        font-family: "Segoe UI", sans-serif;
+                        font-weight:300;
+                        font-style: normal;
+                        margin: 0px;
+                        width: 125px;
+                        height: 100%;
+                        border-radius: 8px;
+                        border: 0px solid white;
+                    }
             #themeLabel {
                 position: absolute;
-                top: 150px;
-                left: 50px;
+                top: 130px;
+                left: 20px;
                 font-size: 25px;
                 color: white;
             }
             #themeButton {
                 position: absolute;
-                top: 200px;
-                left: 50px;
-                font-size: 25px;
+                top: 175px;
+                left: 20px;
+                font-size: 15px;
                 font-family: "Segoe UI", sans-serif;
                 font-weight:300;
                 font-style: normal;
-                border: 0px solid white;
+                border: 1px solid white;
                 color: white;
-                background-color: blue;
+                border-radius: 8px;
+                width: 125px;
+                height: 40px;
             }
+                #themeSelect {
+                    position: absolute;
+                    top: 175px;
+                    left: 145px;
+                    margin: 0px;
+                    padding: 0px;
+                    width: 250px;
+                    height: 38px;
+                    display: grid;
+                    grid-template-columns: repeat(2, 125px);
+                    border-radius: 8px;
+                    border: 1px solid white;
+                }
+                    .themeSelectButton {
+                        grid-row: 1;
+                        font-size: 15px;
+                        font-family: "Segoe UI", sans-serif;
+                        font-weight:300;
+                        font-style: normal;
+                        margin: 0px;
+                        width: 125px;
+                        height: 100%;
+                        border-radius: 8px;
+                        border: 0px solid white;
+                    }

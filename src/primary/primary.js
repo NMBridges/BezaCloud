@@ -61,6 +61,7 @@ function updateColors() {
 
     // Update subwindows
     dash.contentWindow.updateColors();
+    serv.contentWindow.updateColors();
     opti.contentWindow.updateColors();
 }
 
@@ -202,6 +203,7 @@ function to(page) {
     }
     if(page == "Servers") {
         serv.hidden = false;
+        serv.contentWindow.loadServers();
     } else {
         serv.hidden = true;
     }

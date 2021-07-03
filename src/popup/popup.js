@@ -25,7 +25,7 @@ window.onload = function() {
         console.log(continueButton.textContent);
         if(continueButton.textContent == 'Copy and Continue') {
             clipboardy.writeSync(bodyLabel.textContent);
-            const cmd1 = "open " + awsDir() + "/server.rdp";
+            const cmd1 = "open " + awsDir() + "/connections/server.rdp";
             const e1 = execSync(cmd1);
         } else if(continueButton.textContent == 'Copy and Close') {
             clipboardy.writeSync(bodyLabel.textContent);

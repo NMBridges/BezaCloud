@@ -14,6 +14,8 @@ var popupButton = "";
 
 /** @type {string} The color theme of Mercor Connect. */
 var theme = "Dark";
+/** @type {string} The AWS region of Mercor Connect. */
+var region = "us-east-1";
 /** @type {string} The current page that Mercor Connect is on. */
 var page = "Dashboard";
 
@@ -85,6 +87,20 @@ function getPage() {
  */
 function setTheme(newTheme) {
     theme = newTheme;
+}
+
+/**
+ *  @param {string} newRegion The new AWS region.
+ */
+function setRegion(newRegion) {
+    region = newRegion;
+}
+
+/**
+ * @returns The AWS region.
+ */
+function getRegion() {
+    return region;
 }
 
 /**
@@ -231,6 +247,7 @@ async function tryLicenseKey(inputKey) {
 function createAwsDir() {
     if(!fs.existsSync(awsDir())) {
         fs.mkdirSync(awsDir());
+        fs.mkdirSync(awsDir() + "/connections");
     }
     if(!fs.existsSync(awsDir() + "/licenseKey2.txt")) {
         fs.appendFileSync(awsDir() + "/licenseKey2.txt", "key=");
@@ -254,10 +271,10 @@ function updateKeyCache(newKey) {
  */ 
 function createRdpFile(address) {
     const newFile = "full address:s:" + address + "\nusername:s:Administrator";
-    if(!fs.existsSync(awsDir() + "/server.rdp")) {
-        fs.appendFileSync(awsDir() + "/server.rdp", newFile);
+    if(!fs.existsSync(awsDir() + "/connections/server.rdp")) {
+        fs.appendFileSync(awsDir() + "/connections/server.rdp", newFile);
     } else {
-        fs.writeFileSync(awsDir() + "/server.rdp", newFile);
+        fs.writeFileSync(awsDir() + "/connections/server.rdp", newFile);
     }
 }
 
@@ -265,11 +282,11 @@ function createRdpFile(address) {
  * Opens the .rdp file.
  */ 
 function openRdpFile() {
-    if(!fs.existsSync(awsDir() + "/server.rdp")) {
+    if(!fs.existsSync(awsDir() + "/connections/server.rdp")) {
         console.log("Error RDP file does not exist.")
         return false;
     } else {
-        exec("open " + awsDir() + "/server.rdp");
+        exec("open " + awsDir() + "/connections/server.rdp");
         return true;
     }
 }
@@ -503,5 +520,6 @@ module.exports = {
     cachedLicenseKey, tryLicenseKey, createAwsDir, updateKeyCache,
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
-    installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled
+    installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled,
+    setRegion, getRegion
 };

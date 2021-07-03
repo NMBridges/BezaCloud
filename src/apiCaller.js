@@ -16,6 +16,9 @@ const {
     AuthorizeSecurityGroupIngressCommand,
     IpPermission,
 } = require("@aws-sdk/client-ec2");
+const {
+    getRegion
+} = require("./mercor.js");
 var ec2Client = new EC2Client({ region: "us-east-1"});
 const fs = require('fs');
 const homeDir = require('os').homedir();
@@ -27,12 +30,16 @@ const homeDir = require('os').homedir();
     return homeDir + "/.aws";
 }
 
+function resetEC2Client() {
+    return new EC2Client({ region: getRegion()});
+}
+
 /**
  * Tests to see if the AWS credentials are valid
  */
 const connectionTest = async () => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1"});
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeInstancesCommand({}));
         console.log("Login successful");
         return true;
@@ -49,7 +56,7 @@ const connectionTest = async () => {
  */
 const startInstance = async (instanceId) => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1"});
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new StartInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Starting server successful");
         return true;
@@ -66,7 +73,7 @@ const startInstance = async (instanceId) => {
  */
 const stopInstance = async (instanceId) => {
     try {
-        ec2Client = new EC2Client({region: "us-east-1"});
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new StopInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Stopping server successful");
         return true;
@@ -83,7 +90,7 @@ const stopInstance = async (instanceId) => {
  */
 const rebootInstance = async (instanceId) => {
     try {
-        ec2Client = new EC2Client({region: "us-east-1"});
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new RebootInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Rebooting server successful");
         return true;
@@ -100,7 +107,7 @@ const rebootInstance = async (instanceId) => {
  */
 const terminateInstance = async (instanceId) => {
     try {
-        ec2Client = new EC2Client({region: "us-east-1"});
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new TerminateInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Terminating server successful");
         return true;
@@ -115,7 +122,7 @@ const terminateInstance = async (instanceId) => {
  */
 const getInstances = async () => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeInstancesCommand({}));
         return data;
     } catch {
@@ -143,7 +150,7 @@ function genRandom(len) {
  */
 const getDefaultVpcId = async () => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeVpcsCommand({}));
         for(var index = 0; index < data.Vpcs.length; index++) {
             if(data.Vpcs[index].IsDefault) {     
@@ -164,7 +171,7 @@ const getDefaultVpcId = async () => {
  */
 const getSecurityGroups = async () => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeSecurityGroupsCommand({}));
         console.log("Successfully retrieved security groups", data.SecurityGroups)
         return data.SecurityGroups;
@@ -194,7 +201,7 @@ function getMercorSecurityGroupId(secGroups) {
  */
 const createMercorSecurityGroup = async (vpcId) => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "mercorSecGroup", Description: "absolutely free", VpcId: vpcId}));
 
         try {
@@ -225,7 +232,7 @@ const createMercorSecurityGroup = async (vpcId) => {
  */
 const createKeyPair = async (key) => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
+        ec2Client = resetEC2Client();
         const keyName = genRandom(16);
         const data = await ec2Client.send(new CreateKeyPairCommand({KeyName: keyName}));
         console.log(data.KeyMaterial);
@@ -244,10 +251,10 @@ const createKeyPair = async (key) => {
  * @param {string} text
  */ 
 function createPemFile(key, text) {
-    if(!fs.existsSync(awsDir() + "/" + key + ".pem")) {
-        fs.appendFileSync(awsDir() + "/" + key + ".pem", text);
+    if(!fs.existsSync(awsDir() + "/connections/" + key + ".pem")) {
+        fs.appendFileSync(awsDir() + "/connections/" + key + ".pem", text);
     } else {
-        fs.writeFileSync(awsDir() + "/" + key + ".pem", text);
+        fs.writeFileSync(awsDir() + "/connections/" + key + ".pem", text);
     }
 }
 
@@ -256,7 +263,7 @@ function createPemFile(key, text) {
  * @param {string} key
  */ 
 function pemFileExists(key) {
-    return fs.existsSync(awsDir() + "/" + key + ".pem");
+    return fs.existsSync(awsDir() + "/connections/" + key + ".pem");
 }
 
 /**
@@ -267,7 +274,7 @@ function pemFileExists(key) {
  */
 const getInstancePasswordData = async (instanceId) => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
+        ec2Client = resetEC2Client();
         const data = await ec2Client.send(new GetPasswordDataCommand({InstanceId: instanceId}));
         console.log("Successfully retrieved password data", data);
         return data;
@@ -279,7 +286,7 @@ const getInstancePasswordData = async (instanceId) => {
 
 const addTags = async (instanceId, tag, value) => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
+        ec2Client = resetEC2Client();
         const tagParams = {
             Resources: [instanceId],
             Tags: [
@@ -303,7 +310,7 @@ const addTags = async (instanceId, tag, value) => {
  */
 const createInstance = async (ami, cpu, name, key, secGroupId) => {
     try {
-        ec2Client = new EC2Client({ region: "us-east-1" });
+        ec2Client = resetEC2Client();
 
         // Set the parameters
         const instanceParams = {
