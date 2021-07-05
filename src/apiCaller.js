@@ -16,6 +16,7 @@ const {
     AuthorizeSecurityGroupIngressCommand,
     IpPermission,
     CreateImageCommand,
+    DescribeImagesCommand,
 } = require("@aws-sdk/client-ec2");
 const {
     getRegion
@@ -307,6 +308,21 @@ const addTags = async (instanceId, tag, value) => {
 };
 
 /**
+ * Returns the AMIs that the user owns.
+ */
+const getUserAMIs = async () => {
+    try {
+        ec2Client = resetEC2Client();
+        const data = await ec2Client.send(new DescribeImagesCommand({Owners: ["self"]}));
+        console.log("Successfully retrieved AMI data", data);
+        return data;
+    } catch(err) {
+        console.log("Error retrieving AMI data", err);
+        return "ERROR";
+    }
+};
+
+/**
  * Creates an AWS instance.
  */
 const createInstance = async (ami, cpu, name, key, secGroupId) => {
@@ -383,11 +399,35 @@ class Server {
     }
 }
 
+/**
+ * Class that stores the necessary information for each AWS Template (AMI).
+ */
+ class Template {
+    /**
+     * Constructs a new Template object.
+     * @param {string} name The name of the Template.
+     * @param {string} id The AMI ID of the Template.
+     * @param {string} state The Template availability state.
+     * @param {boolean} public Whether the Template is public or private.
+     * @param {string} amiName The AMI name of the Template.
+     * @param {string} platform The Template OS platform.
+     */
+    constructor(name, id, state, public, amiName, platform) {
+        this.name = name;
+        this.id = id;
+        this.state = state;
+        this.public = public;
+        this.amiName = amiName;
+        this.platform = platform;
+    }
+}
+
 module.exports = 
 { 
-    Server, connectionTest, getInstances, startInstance, 
+    Server, Template, connectionTest, getInstances, startInstance, 
     stopInstance, rebootInstance, terminateInstance, 
     createKeyPair, getInstancePasswordData, createInstance,
     getSecurityGroups, getMercorSecurityGroupId, getDefaultVpcId,
-    createMercorSecurityGroup, pemFileExists, addTags
+    createMercorSecurityGroup, pemFileExists, addTags,
+    getUserAMIs
 };

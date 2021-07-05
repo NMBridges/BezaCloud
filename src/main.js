@@ -56,7 +56,7 @@ function newCreateServerWindow() {
     }
   });
   createServerWindow.loadFile(path.join(__dirname, 'newServer/newServer.html'));
-  //createServerWindow.webContents.openDevTools();
+  createServerWindow.webContents.openDevTools();
 
   createServerWindow.setResizable(false);
   

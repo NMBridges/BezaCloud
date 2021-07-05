@@ -1,5 +1,8 @@
 // Supplemental functions
 const { Colors, getTheme } = require('../mercor.js');
+const {
+    Template, getUserAMIs
+} = require('../apiCaller.js');
 
 // Page element references
 /** The main divider box that divides the page into sections. */
@@ -99,8 +102,11 @@ function updateColors() {
 function resetElements() {
     nameTextBox.value = "";
     
-    // Clears the Templates and CPUs of any list items
+    // Clears the Templates and CPUs of any list items, then retrieves the
+    // user's Templates and available CPUs
     templateSelect.innerHTML = '';
+    const y = getTemplates();
+
     templateSelect.style.setProperty('--rows', 5);
 
     for(var index = 0; index < 5; index++) {
@@ -188,7 +194,10 @@ function addCpuToList(name, index) {
  * @returns A list of Templates that the user has in their Template library.
  */
  function getTemplates() {
-
+    getUserAMIs().then(function(results) {
+        console.log(results);
+        // create list of templates
+    });
 }
 
 /**

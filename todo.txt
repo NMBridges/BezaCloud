@@ -40,3 +40,15 @@ CPU
 [ +   [    other AWS CPU textbox    ]  ] |
 
 Create Server   Cancel
+
+
+
+
+My Templates
+
+[  ] [  ] [  ]
+[  ] [  ] [  ]
+
+Imported Templates
+
+[  ] [  ]

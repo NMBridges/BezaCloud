@@ -15,7 +15,7 @@ var popupButton = "";
 /** @type {string} The color theme of Mercor Connect. */
 var theme = getTheme();
 /** @type {string} The AWS region of Mercor Connect. */
-var region = "us-east-1";
+var region = getRegion();
 /** @type {string} The current page that Mercor Connect is on. */
 var page = "Dashboard";
 
@@ -273,12 +273,17 @@ function getCacheValue(key) {
  */
 function setRegion(newRegion) {
     region = newRegion;
+    updateCache("region", newRegion);
 }
 
 /**
  * @returns The AWS region.
  */
 function getRegion() {
+    region = getCacheValue("region");
+    if(region == "ERROR" || region == undefined) {
+        setRegion("us-east-1");
+    }
     return region;
 }
 

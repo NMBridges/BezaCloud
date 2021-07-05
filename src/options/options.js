@@ -1,5 +1,8 @@
 // Suplemental functions
-const { Colors, setTheme, setRegion } = parent.require("../mercor.js");
+const { 
+    Colors, getTheme, setTheme, setRegion,
+    getRegion
+} = parent.require("../mercor.js");
 
 // Page elements
 var headerBar = document.getElementById('optionsHeaderBar');
@@ -126,8 +129,14 @@ function updateRegion(newRegion) {
 
 function resetElements() {
     // Pull current region and theme from cache
-    // regionButton.textContent = REGION
-    // themeButton.textContent = THEME
+    const regionDict = {
+        "us-east-1": "N. Virginia",
+        "us-east-2": "Ohio",
+        "us-west-1": "N. California",
+        "us-west-2": "Oregon"
+    };
+    regionButton.textContent = regionDict[getRegion()];
+    themeButton.textContent = getTheme();
 
     regionSelect.style.visibility = "hidden";
     themeSelect.style.visibility = "hidden";
