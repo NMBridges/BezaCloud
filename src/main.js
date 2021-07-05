@@ -56,7 +56,7 @@ function newCreateServerWindow() {
     }
   });
   createServerWindow.loadFile(path.join(__dirname, 'newServer/newServer.html'));
-  createServerWindow.webContents.openDevTools();
+  //createServerWindow.webContents.openDevTools();
 
   createServerWindow.setResizable(false);
   
@@ -164,6 +164,11 @@ function createWindows() {
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
   primaryWindow.webContents.openDevTools();
 
+  // Refreshes page elements
+  primaryWindow.on('refreshContents', function() {
+    primaryWindow.setSize(1201, 800);
+  });
+
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {
     app.quit();
@@ -172,10 +177,7 @@ function createWindows() {
   // When a window calls for popup to be shown, it creates a popup window.
   primaryWindow.on('showPopup', () => {
     primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
-      console.log(result);
-
       newPopupWindow(result[0], result[1], result[2]);
-
     });
   });
 

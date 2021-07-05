@@ -13,7 +13,7 @@ var popupBody = "";
 var popupButton = "";
 
 /** @type {string} The color theme of Mercor Connect. */
-var theme = "Dark";
+var theme = getTheme();
 /** @type {string} The AWS region of Mercor Connect. */
 var region = "us-east-1";
 /** @type {string} The current page that Mercor Connect is on. */
@@ -69,38 +69,10 @@ const installAwsCli = async () => {
 }
 
 /**
- * @returns The color theme.
- */
-function getTheme() {
-    return theme;
-}
-
-/**
  * @returns The current page.
  */
 function getPage() {
     return page;
-}
-
-/**
- *  @param {string} newTheme The new color theme.
- */
-function setTheme(newTheme) {
-    theme = newTheme;
-}
-
-/**
- *  @param {string} newRegion The new AWS region.
- */
-function setRegion(newRegion) {
-    region = newRegion;
-}
-
-/**
- * @returns The AWS region.
- */
-function getRegion() {
-    return region;
 }
 
 /**
@@ -252,7 +224,81 @@ function createAwsDir() {
     if(!fs.existsSync(awsDir() + "/licenseKey2.txt")) {
         fs.appendFileSync(awsDir() + "/licenseKey2.txt", "key=");
     }
+    if(!fs.existsSync(awsDir() + "/cache.json")) {
+        fs.appendFileSync(awsDir() + "/cache.json", '{}');
+    }
     // add other sections as needed
+}
+
+/**
+ * Updates the cache with the given key / value pair.
+ * @param {string} key The key that needs to be updated.
+ * @param {string} value The value that needs to be updated.
+ */
+function updateCache(key, value) {
+    if(!fs.existsSync(awsDir() + "/cache.json")) {
+        fs.appendFileSync(awsDir() + "/cache.json", '{}');
+    }
+
+    const raw = fs.readFileSync(awsDir() + "/cache.json");
+    const jsonObj = JSON.parse(raw);
+    jsonObj[key] = value;
+    fs.writeFileSync(awsDir() + "/cache.json", JSON.stringify(jsonObj), err => {
+        if (err) {
+            console.log("Error writing file:", err);
+        }
+    });
+}
+
+/**
+ * @param {string} key 
+ * @returns The cache value for the specified key.
+ */
+function getCacheValue(key) {
+    if(!fs.existsSync(awsDir() + "/cache.json")) {
+        fs.appendFileSync(awsDir() + "/cache.json", '{}');
+        return "ERROR";
+    }
+    const raw = fs.readFileSync(awsDir() + "/cache.json");
+    const jsonObj = JSON.parse(raw);
+    if(key in jsonObj) {
+        return jsonObj[key];
+    } else {
+        return "ERROR";
+    }
+}
+
+/**
+ *  @param {string} newRegion The new AWS region.
+ */
+function setRegion(newRegion) {
+    region = newRegion;
+}
+
+/**
+ * @returns The AWS region.
+ */
+function getRegion() {
+    return region;
+}
+
+/**
+ * @returns The color theme.
+ */
+function getTheme() {
+    theme = getCacheValue("theme");
+    if(theme == "ERROR" || theme == undefined) {
+        setTheme("Dark");
+    }
+    return theme;
+}
+
+/**
+ *  @param {string} newTheme The new color theme.
+ */
+function setTheme(newTheme) {
+    theme = newTheme;
+    updateCache("theme", newTheme);
 }
 
 /** 
@@ -410,6 +456,14 @@ class Colors {
         }
         return "D90166";
     }
+    static backgroundPrimaryDoubleAccent() {
+        if (theme == "Dark") {
+            return hex(55,67,84);
+        } else if (theme == "Mercor") {
+            return hex(112,96,255);
+        }
+        return "D90166";
+    }
     static backgroundSecondaryMouseHover() {
         if (theme == "Dark") {
             return hex(222,121,35);
@@ -521,5 +575,5 @@ module.exports = {
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
     installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled,
-    setRegion, getRegion
+    setRegion, getRegion, updateCache, getCacheValue
 };

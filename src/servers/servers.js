@@ -544,9 +544,11 @@ function addTile(index) {
  * @param {JSON} json The instance JSON object.
  */
 function getName(json) {
-    for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-        if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Name") {
-            return json["Instances"][0]["Tags"][tagIndex]["Value"];
+    if("Tags" in json["Instances"][0]) {
+        for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+            if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Name") {
+                return json["Instances"][0]["Tags"][tagIndex]["Value"];
+            }
         }
     }
     return "[Not Named]";
@@ -659,7 +661,7 @@ newServerButton.addEventListener('click', function() {
     const remote = parent.require('electron').remote;
     let w = remote.getCurrentWindow();
     w.emit('newServer');
-    newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro");
+    //newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro");
 });
 
 newServerButton.addEventListener('mouseenter', function() {

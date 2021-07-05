@@ -1,8 +1,19 @@
 - Pull License Key IP server
-- Pull AMI types
-- Fix bug when no tags, not even names
+- Pull AMI + CPU types
 
-Fix button copy and continue
+Add manually inputting passwords
+
+Add option to disable cost pulling
+
+Pull user's AMIs, add any cached AMIs that aren't theirs, load them to new server window.
+
+
+Instead of prebuilt AMIs, give the option for basic windows platform, then you can
+save your servers to AMIs
+- Note: need to solve random password problem. Perhaps basic windows platform is not
+    pure basic, it is an AMI that is already created
+
+Close all the way if no tasks
 
 Servers overlays
     When there is no password, must be manual
@@ -10,3 +21,22 @@ Servers overlays
     When the user wants to make a new server
     When the user tries to connect to a server
         too soon
+
+
+Create New Server
+
+Name
+[ Name text box ]
+
+Template
+[ 0   Default Mercor Windows Template  ] |
+[ O   Your custom template 1           ] i  // scrolls
+[ +   [      new AMI id textbox     ]  ] |
+
+CPU
+[ 0   t2.micro  <- on hover, SPECS     ] |
+[ O   t3.micro                         ] i  // scrolls
+[ O   t4.micro                         ] |
+[ +   [    other AWS CPU textbox    ]  ] |
+
+Create Server   Cancel

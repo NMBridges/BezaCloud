@@ -21,14 +21,17 @@ var info = document.getElementById("info");
 window.onload = function() {
     to("Dashboard");
 
+    const remote = require('electron').remote;
+    let w = remote.getCurrentWindow();
+    w.emit('refreshContents');
     
-
 };
 
 /**
  * Updates the CSS style colors for the page based on the color theme.
  */
 function updateColors() {
+    getTheme();
     const pg = getPage();
     if(pg == "Dashboard") {
         dashboardButton.style.backgroundColor = Colors.backgroundSecondarySelected();

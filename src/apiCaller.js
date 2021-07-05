@@ -15,6 +15,7 @@ const {
     DescribeVpcsCommand,
     AuthorizeSecurityGroupIngressCommand,
     IpPermission,
+    CreateImageCommand,
 } = require("@aws-sdk/client-ec2");
 const {
     getRegion
