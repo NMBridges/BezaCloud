@@ -9,6 +9,7 @@ var dashboardButton = document.getElementById("dashboardButton");
 var serversButton = document.getElementById("serversButton");
 var tasksButton = document.getElementById("tasksButton");
 var optionsButton = document.getElementById("optionsButton");
+var templatesButton = document.getElementById("templatesButton");
 var signOutButton = document.getElementById("signOutButton");
 var menuBar = document.getElementById("menuBar");
 
@@ -16,7 +17,7 @@ var dash = document.getElementById("dash");
 var serv = document.getElementById("serv");
 var task = document.getElementById("task");
 var opti = document.getElementById("opti");
-var info = document.getElementById("info");
+var temp = document.getElementById("temp");
 
 window.onload = function() {
     to("Dashboard");
@@ -55,11 +56,17 @@ function updateColors() {
     } else {
         tasksButton.style.backgroundColor = Colors.backgroundSecondary();
     }
+    if(pg == "Templates") {
+        templatesButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+    } else {
+        templatesButton.style.backgroundColor = Colors.backgroundSecondary();
+    }
     signOutButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     dashboardButton.style.color = Colors.menuTextPrimary();
     serversButton.style.color = Colors.menuTextPrimary();
     optionsButton.style.color = Colors.menuTextPrimary();
     tasksButton.style.color = Colors.menuTextPrimary();
+    templatesButton.style.color = Colors.menuTextPrimary();
     signOutButton.style.color = Colors.menuTextPrimary();
 
     menuBar.style.backgroundColor = Colors.backgroundSecondary();
@@ -178,6 +185,33 @@ optionsButton.addEventListener('click', function() {
 
 // ---------------------------------------------------------------------------------- //
 
+// --------------------------- templatesButton functions ---------------------------- //
+
+templatesButton.addEventListener('mouseenter', function() {
+    if(getPage() == "Templates") {
+        templatesButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+    } else {
+        templatesButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+    }
+});
+
+templatesButton.addEventListener('mouseleave', function() {
+    if(getPage() == "Templates") {
+        templatesButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+    } else {
+        templatesButton.style.backgroundColor = Colors.backgroundSecondary();
+    }
+});
+
+/** Goes to the Options page */
+templatesButton.addEventListener('click', function() {
+    if(getPage() != "Templates") {
+        to("Templates");
+    }
+});
+
+// ---------------------------------------------------------------------------------- //
+
 if (window.addEventListener) {
     window.addEventListener("message", onMessage, false);        
 } 
@@ -222,10 +256,10 @@ function to(page) {
     } else {
         opti.hidden = true;
     }
-    if(page == "Info") {
-        info.hidden = false;
+    if(page == "Templates") {
+        temp.hidden = false;
     } else {
-        info.hidden = true;
+        temp.hidden = true;
     }
 
     updateColors();
