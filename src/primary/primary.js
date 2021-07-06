@@ -21,6 +21,12 @@ var info = document.getElementById("info");
 window.onload = function() {
     to("Dashboard");
 
+    if(process.platform == "darwin") {
+        const remote = require('electron').remote;
+        let w = remote.getCurrentWindow();
+        w.emit('refreshContents');
+    }
+
 };
 
 /**

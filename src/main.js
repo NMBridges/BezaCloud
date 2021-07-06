@@ -170,6 +170,11 @@ function createWindows() {
     app.quit();
   });
 
+  // On Mac, refreshes contents by resizing the window.
+  primaryWindow.on('refreshContents', () => {
+    primaryWindow.setSize(1201, 800);
+  });
+
   // When a window calls for popup to be shown, it creates a popup window.
   primaryWindow.on('showPopup', () => {
     primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
