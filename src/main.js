@@ -56,13 +56,13 @@ function newCreateServerWindow() {
     }
   });
   createServerWindow.loadFile(path.join(__dirname, 'newServer/newServer.html'));
-  createServerWindow.webContents.openDevTools();
+  //createServerWindow.webContents.openDevTools();
 
   createServerWindow.setResizable(false);
   
-  createServerWindow.webContents.on('did-finish-load', function() {
-    createServerWindow.webContents.executeJavaScript('updateColors();').then(function() {
-      createServerWindow.webContents.executeJavaScript('resetElements();').then(function() {
+  createServerWindow.webContents.on('ready-to-show', function() {
+    createServerWindow.webContents.executeJavaScript('resetElements();').then(function() {
+      createServerWindow.webContents.executeJavaScript('updateColors();').then(function() {
         createServerWindow.show();
       });
     });
@@ -140,8 +140,8 @@ function createWindows() {
   });
 
   loginWindow.on('loginSuccessful', () => {
-    loginWindow.hide();
     primaryWindow.show();
+    loginWindow.hide();
   });
 
   // ---------------------------------------------------------------------------------------------------//
@@ -159,15 +159,11 @@ function createWindows() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
-    }
+    },
+    show: false
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
   primaryWindow.webContents.openDevTools();
-
-  // Refreshes page elements
-  primaryWindow.on('refreshContents', function() {
-    primaryWindow.setSize(1201, 800);
-  });
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {

@@ -6,7 +6,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron-forge start",
-    "package":"asar pack out/'Mercor Connect-darwin-x64'/'Mercor Connect.app'/Contents/Resources/app out/'Mercor Connect-darwin-x64'/'Mercor Connect.app'/Contents/Resources/app.asar",
+    "package": "asar pack out/'Mercor Connect-darwin-x64'/'Mercor Connect.app'/Contents/Resources/app out/'Mercor Connect-darwin-x64'/'Mercor Connect.app'/Contents/Resources/app.asar",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",

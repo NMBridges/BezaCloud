@@ -24,6 +24,7 @@ const {
 var ec2Client = new EC2Client({ region: "us-east-1"});
 const fs = require('fs');
 const homeDir = require('os').homedir();
+const { exec, execSync } = require('child_process');
 
 /**
  * @returns The directory where the credentials and config files are stored.
@@ -310,16 +311,20 @@ const addTags = async (instanceId, tag, value) => {
 /**
  * Returns the AMIs that the user owns.
  */
-const getUserAMIs = async () => {
-    try {
+function getUserAMIs() {
+    const stdout = execSync("aws ec2 describe-images --owners \"self\" --no-cli-pager").toString();
+    console.log("Successfully retrieved user's AMIs", JSON.parse(stdout));
+    return JSON.parse(stdout);
+    /*try {
+        // aws ec2 describe-images --owners "self" --no-cli-pager
         ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DescribeImagesCommand({Owners: ["self"]}));
+        const data = await ec2Client.send(new DescribeImagesCommand({ImageIds: ["ami-071fe6e60c8fdb961"]}));
         console.log("Successfully retrieved AMI data", data);
         return data;
     } catch(err) {
         console.log("Error retrieving AMI data", err);
         return "ERROR";
-    }
+    }*/
 };
 
 /**
@@ -407,18 +412,18 @@ class Server {
      * Constructs a new Template object.
      * @param {string} name The name of the Template.
      * @param {string} id The AMI ID of the Template.
-     * @param {string} state The Template availability state.
-     * @param {boolean} public Whether the Template is public or private.
+     * @param {string} status The Template availability state.
+     * @param {boolean} publ Whether the Template is public or private.
      * @param {string} amiName The AMI name of the Template.
-     * @param {string} platform The Template OS platform.
+     * @param {string} plat The Template OS platform.
      */
-    constructor(name, id, state, public, amiName, platform) {
+    constructor(name, id, status, pub, amiName, plat) {
         this.name = name;
         this.id = id;
-        this.state = state;
-        this.public = public;
+        this.status = status;
+        this.pub = pub;
         this.amiName = amiName;
-        this.platform = platform;
+        this.plat = plat;
     }
 }
 

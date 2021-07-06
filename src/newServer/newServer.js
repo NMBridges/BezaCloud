@@ -26,6 +26,13 @@ var createServerButton = document.getElementById('createServerButton');
 /** The button that closes the window and cancels the operation when clicked. */
 var cancelButton = document.getElementById('cancelButton');
 
+/** @type {Template[]} The list of Templates available to the user. */
+var templates = [];
+
+window.onload = function() {
+    updateColors();
+};
+
 /**
  * Updates the elements of the window in accordance to the color theme.
  */
@@ -105,12 +112,12 @@ function resetElements() {
     // Clears the Templates and CPUs of any list items, then retrieves the
     // user's Templates and available CPUs
     templateSelect.innerHTML = '';
-    const y = getTemplates();
+    loadTemplates();
 
-    templateSelect.style.setProperty('--rows', 5);
+    templateSelect.style.setProperty('--rows', templates.length);
 
-    for(var index = 0; index < 5; index++) {
-        addTemplateToList("HOOGA" + index, "aldsj3229" + index, index);
+    for(var index = 0; index < templates.length; index++) {
+        addTemplateToList((templates[index].name == "") ? templates[index].amiName : templates[index].name, templates[index].id, index);
     }
 
     cpuSelect.innerHTML = '';
@@ -191,13 +198,50 @@ function addCpuToList(name, index) {
 }
 
 /**
- * @returns A list of Templates that the user has in their Template library.
+ * Loads 'templates' with a list of Templates that the user has in their Template library.
  */
- function getTemplates() {
-    getUserAMIs().then(function(results) {
-        console.log(results);
+function loadTemplates() {
+    const results = getUserAMIs();
+    console.log(results);
+    templates = [];
+    if(results != "ERROR") {
         // create list of templates
-    });
+        if('Images' in results) {
+            for(var index = 0; index < results['Images'].length; index++) {
+                const ami = results['Images'][index];
+
+                var tempTemplateName = '';
+                if(ami['Tags'] != undefined) {
+                    for(var tagIndex = 0; tagIndex < ami['Tags'].length; tagIndex++) {
+                        if(ami['Tags'][tagIndex]['Key'] == "Name") {
+                            tempTemplateName = ami['Tags'][tagIndex]['Value'];
+                        }
+                    }
+                }
+                const templateName = tempTemplateName;
+                const templateId = ami['ImageId'];
+                const templateStatus = ami['State'];
+                const templatePub = ami['Public'];
+                const templateAmiName = ami['Name'];
+                const templatePlat = ami['Platform'];
+
+                var newTemplate = new Template(
+                    templateName,
+                    templateId,
+                    templateStatus,
+                    templatePub,
+                    templateAmiName,
+                    templatePlat
+                );
+
+                templates.push(newTemplate);
+            }
+        } else {
+            // Error
+        }
+    } else {
+        // Error
+    }
 }
 
 /**
