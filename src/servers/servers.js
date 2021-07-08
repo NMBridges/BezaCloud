@@ -10,7 +10,7 @@ const {
     createInstance, getSecurityGroups, 
     getDefaultVpcId, createMercorSecurityGroup,
     getMercorSecurityGroupId, pemFileExists,
-    addTags
+    addTags, createImage
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
 const homeDir = parent.require('os').homedir();
@@ -545,9 +545,11 @@ function addTile(index) {
  */
 function getName(json) {
     if("Tags" in json["Instances"][0]) {
-        for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-            if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Name") {
-                return json["Instances"][0]["Tags"][tagIndex]["Value"];
+        if(json["Instances"][0]["Tags"] != undefined) {
+            for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+                if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Name") {
+                    return json["Instances"][0]["Tags"][tagIndex]["Value"];
+                }
             }
         }
     }
@@ -586,9 +588,13 @@ function getIPv4(json) {
  * @param {JSON} json The instance JSON object.
  */
 function getPassword(json) {
-    for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-        if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Cert") {
-            return json["Instances"][0]["Tags"][tagIndex]["Value"];
+    if("Tags" in json["Instances"][0]) {
+        if(json["Instances"][0]["Tags"] != undefined) {
+            for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+                if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Cert") {
+                    return json["Instances"][0]["Tags"][tagIndex]["Value"];
+                }
+            }
         }
     }
     return "";
@@ -599,9 +605,13 @@ function getPassword(json) {
  * @param {JSON} json The instance JSON object.
  */
 function getKey(json) {
-    for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-        if("KeyName" in json["Instances"][0]) {
-            return json["Instances"][0]["KeyName"];
+    if("Tags" in json["Instances"][0]) {
+        if(json["Instances"][0]["Tags"] != undefined) {
+            for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+                if("KeyName" in json["Instances"][0]) {
+                    return json["Instances"][0]["KeyName"];
+                }
+            }
         }
     }
     return "";
@@ -620,9 +630,13 @@ function getCpuType(json) {
  * @param {JSON} json The instance JSON object.
  */
 function getSpecs(json) {
-    for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-        if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Specifications") {
-            return json["Instances"][0]["Tags"][tagIndex]["Value"];
+    if("Tags" in json["Instances"][0]) {
+        if(json["Instances"][0]["Tags"] != undefined) {
+            for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+                if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Specifications") {
+                    return json["Instances"][0]["Tags"][tagIndex]["Value"];
+                }
+            }
         }
     }
     return "";
@@ -662,6 +676,7 @@ newServerButton.addEventListener('click', function() {
     let w = remote.getCurrentWindow();
     w.emit('newServer');
     //newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro");
+    //createImage("i-0aff62c6e9addd8d7", "NEWEST-AMI3");
 });
 
 newServerButton.addEventListener('mouseenter', function() {

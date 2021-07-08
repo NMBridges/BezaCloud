@@ -258,6 +258,7 @@ function to(page) {
     }
     if(page == "Templates") {
         temp.hidden = false;
+        temp.contentWindow.loadTemplates();
     } else {
         temp.hidden = true;
     }

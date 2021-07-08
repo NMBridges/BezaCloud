@@ -17,6 +17,9 @@ const {
     IpPermission,
     CreateImageCommand,
     DescribeImagesCommand,
+    ModifyImageAttributeCommand,
+    DeregisterImageCommand,
+    CopyImageCommand,
 } = require("@aws-sdk/client-ec2");
 const {
     getRegion
@@ -25,6 +28,7 @@ var ec2Client = new EC2Client({ region: "us-east-1"});
 const fs = require('fs');
 const homeDir = require('os').homedir();
 const { exec, execSync } = require('child_process');
+const promiseExec = require('util').promisify(exec);
 
 /**
  * @returns The directory where the credentials and config files are stored.
@@ -311,20 +315,107 @@ const addTags = async (instanceId, tag, value) => {
 /**
  * Returns the AMIs that the user owns.
  */
-function getUserAMIs() {
-    const stdout = execSync("aws ec2 describe-images --owners \"self\" --no-cli-pager").toString();
+async function getUserAMIs() {
+    const { stdout, stderr } = await promiseExec("aws ec2 describe-images --owners \"self\" --no-cli-pager --region " + getRegion());
     console.log("Successfully retrieved user's AMIs", JSON.parse(stdout));
     return JSON.parse(stdout);
-    /*try {
-        // aws ec2 describe-images --owners "self" --no-cli-pager
+};
+
+/**
+ * Changes the visibility of an AMI.
+ * @param {string} id The AMI ID to alter.
+ * @param {string} public Whether the AMI should be made public.
+ */
+const changeAmiVisibility = async (id, public) => {
+    try {
         ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DescribeImagesCommand({ImageIds: ["ami-071fe6e60c8fdb961"]}));
-        console.log("Successfully retrieved AMI data", data);
+        var parameters;
+        if(public) {
+            parameters = {
+                ImageId: id, 
+                LaunchPermission: {
+                    Add: [
+                        { 
+                            Group: "all"
+                        }
+                    ],
+                    Remove: [
+                        {
+    
+                        }
+                    ]
+                }
+            }
+        } else {
+            parameters = {
+                ImageId: id, 
+                LaunchPermission: {
+                    Remove: [
+                        {
+                            Group: "all"
+                        }
+                    ]
+                }
+            }
+        }
+        const data = await ec2Client.send(new ModifyImageAttributeCommand(parameters));
+        console.log("Successfully changed the AMI visibility", data);
         return data;
     } catch(err) {
-        console.log("Error retrieving AMI data", err);
+        console.log("Error changing the AMI visibility", err);
         return "ERROR";
-    }*/
+    }
+};
+
+/**
+ * Creates a new AMI based on an instance.
+ * @param {string} id The instance ID to base the AMI on.
+ * @param {string} name The name of the new AMI.
+ */
+const createImage = async (id, name) => {
+    try {
+        ec2Client = resetEC2Client();
+        const data = await ec2Client.send(new CreateImageCommand({InstanceId: id, Name: name}));
+        console.log("Successfully created image", data);
+        return data;
+    } catch(err) {
+        console.log("Error creating image", err);
+        return "ERROR";
+    }
+};
+
+/**
+ * Creates a new AMI in another region based on another AMI.
+ * @param {string} id The AMI ID to base the AMI on.
+ * @param {string} name The name of the new AMI.
+ * @param {string} newRegion The new region to copy to.
+ */
+ const copyImage = async (id, name, newRegion) => {
+    try {
+        ec2Client = new EC2Client({ region: newRegion});
+        const data = await ec2Client.send(new CopyImageCommand({SourceImageId: id, SourceRegion: getRegion(), Name: name}));
+        console.log("Successfully moved image", data);
+        return data;
+    } catch(err) {
+        console.log("Error moving image", err);
+        return "ERROR";
+    }
+};
+
+/**
+ * Deletes an AMI.
+ * @param {string} id The ID of the AMI to delete.
+ */
+const deleteImage = async (id) => {
+    try {
+        ec2Client = resetEC2Client();
+        const data = await ec2Client.send(new DeregisterImageCommand({ImageId: id}));
+        console.log("Successfully deleted image", data);
+        return data;
+    } catch(err) {
+        console.log("Error deleting image", err);
+        return "ERROR";
+    }
 };
 
 /**
@@ -416,14 +507,16 @@ class Server {
      * @param {boolean} publ Whether the Template is public or private.
      * @param {string} amiName The AMI name of the Template.
      * @param {string} plat The Template OS platform.
+     * @param {string} owner The Template OS platform.
      */
-    constructor(name, id, status, pub, amiName, plat) {
+    constructor(name, id, status, pub, amiName, plat, owner) {
         this.name = name;
         this.id = id;
         this.status = status;
         this.pub = pub;
         this.amiName = amiName;
         this.plat = plat;
+        this.owner = owner;
     }
 }
 
@@ -434,5 +527,6 @@ module.exports =
     createKeyPair, getInstancePasswordData, createInstance,
     getSecurityGroups, getMercorSecurityGroupId, getDefaultVpcId,
     createMercorSecurityGroup, pemFileExists, addTags,
-    getUserAMIs
+    getUserAMIs, changeAmiVisibility, createImage, deleteImage,
+    copyImage
 };

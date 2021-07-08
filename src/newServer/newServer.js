@@ -1,7 +1,9 @@
 // Supplemental functions
-const { Colors, getTheme } = require('../mercor.js');
+const { Colors, getTheme, setPopupValues } = require('../mercor.js');
 const {
-    Template, getUserAMIs
+    Template, getUserAMIs, getDefaultVpcId, getSecurityGroups,
+    getMercorSecurityGroupId, createKeyPair, createInstance,
+    createMercorSecurityGroup
 } = require('../apiCaller.js');
 
 // Page element references
@@ -250,3 +252,128 @@ function loadTemplates() {
 function getCpus() {
     
 }
+
+// --------------------------- Server Creating Functions ------------------------ //
+
+/**
+ * Creates a server based on the specified parameters.
+ * @param {string} name The name of the server.
+ * @param {string} ami The AMI ID to base the server on.
+ * @param {string} cpu The CPU type.
+ */
+ async function newServer(name, ami, cpu) {
+    // Gets region's default VPC
+    getDefaultVpcId().then(function(vpcId) {
+        if(vpcId != "ERROR") {
+            getSecurityGroups().then(function(secGroups) {
+                if(secGroups[0] != "ERROR") {
+                    // Checks if Mercor security group exists in the region
+                    var secGroupId = getMercorSecurityGroupId(secGroups);
+                    if(secGroupId != "NONE") {
+                        // Continue as is
+                        createKeyPair().then(function(key) {
+                            if(key != "ERROR") {
+                                createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
+                                    // done
+                                    newPopup("", "Server successfully created.", "Close");
+                                    window.close();
+                                    return true;
+                                });
+                            } else {
+                                // Error
+                                newPopup("Error", "Error creating key pair.", "Close");
+                                window.close();
+                                return false;
+                            }
+                        });
+                    } else {
+                        // If not, creates one
+                        createMercorSecurityGroup(vpcId).then(function(newId) {
+                            secGroupId = newId;
+                            if(secGroupId != "ERROR") {
+                                // Continue
+                                createKeyPair().then(function(key) {
+                                    if(key != "ERROR") {
+                                        createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
+                                            // done
+                                            newPopup("", "Successfully created server.", "Close");
+                                            window.close();
+                                            return true;
+                                        });
+                                    } else {
+                                        // Error
+                                        newPopup("Error", "Error creating key pair.", "Close");
+                                        window.close();
+                                        return false;
+                                    }
+                                });
+                            } else {
+                                // Error
+                                newPopup("Error", "Error creating security group.", "Close");
+                                window.close();
+                                return false;
+                            }
+                        });
+                    }
+                } 
+            });
+        } else {
+            // Error
+            newPopup("Error", "Error retrieving VPC ID.", "Close");
+            window.close();
+            return false;
+        }
+    });
+}
+
+createServerButton.addEventListener('mouseenter', function() {
+    if(getTheme() == "Dark") {
+        createServerButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+    } else {
+        createServerButton.style.backgroundColor = Colors.textSecondary();
+    }
+});
+
+createServerButton.addEventListener('mouseleave', function() {
+    if(getTheme() == "Dark") {
+        createServerButton.style.backgroundColor = Colors.backgroundSecondary();
+    } else {
+        createServerButton.style.backgroundColor = Colors.textPrimary();
+    }
+});
+
+createServerButton.addEventListener('click', function() {
+    // Create server
+    newServer(nameTextBox.value, "ami-082fef828802774de", "t2.micro");
+});
+
+cancelButton.addEventListener('mouseenter', function() {
+    cancelButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+});
+
+cancelButton.addEventListener('mouseleave', function() {
+    cancelButton.style.backgroundColor = Colors.backgroundPrimary();
+});
+
+cancelButton.addEventListener('click', function() {
+    window.close();
+});
+
+// ------------------------------------------------------------------------------ //
+
+// ------------------------  miscellaneous functions  --------------------------- //
+
+/**
+ * Creates a new popup window.
+ * @param {string} header The header text of the popup.
+ * @param {string} body The body text of the popup.
+ * @param {string} button The button text of the popup. Blank if hidden.
+ */
+ function newPopup(header, body, button) {
+    setPopupValues(header, body, button);
+    const remote = parent.require('electron').remote;
+    let w = remote.getCurrentWindow();
+    w.emit('showPopup');
+}
+
+// ------------------------------------------------------------------------------ //

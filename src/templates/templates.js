@@ -3,19 +3,14 @@ const {
     Colors, createRdpFile, openRdpFile, setPopupValues,
     getPopupValues, awsDir, getRegion
 } = parent.require("../mercor.js");
-const { 
-    getInstances, startInstance, stopInstance, 
-    terminateInstance, rebootInstance, Template,
-    createKeyPair, getInstancePasswordData,
-    createInstance, getSecurityGroups, 
-    getDefaultVpcId, createMercorSecurityGroup,
-    getMercorSecurityGroupId, pemFileExists,
-    addTags, Server
+const {
+    getUserAMIs, Template, changeAmiVisibility, deleteImage,
+    copyImage
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
 const homeDir = parent.require('os').homedir();
 
-// Document items
+// Document elements
 var topBar = document.getElementById("topBar");
 var mainPageLabel = document.getElementById("mainPageLabel");
 var regionLabel = document.getElementById("regionLabel");
@@ -42,33 +37,58 @@ window.onload = function() {
  * Pulls all AWS AMIs from the user's account in the given region.
  */
 function loadTemplates() {
-    const servJson = getInstances().then(function(data) {
-        servers = [];
-        if(data["Reservations"] != undefined) {
-            for(var index = 0; index < data["Reservations"].length; index++) {
-                const srv = data["Reservations"][index];
-                const newSpecs = splitSpecs(getSpecs(srv));
-                if(getStatus(srv).toLowerCase() != "terminated") {
-                    servers.push(new Server(
-                        getName(srv),
-                        getInstanceId(srv),
-                        (getIPv4(srv) != undefined) ? getIPv4(srv) : "",
-                        getPassword(srv),
-                        getKey(srv),
-                        getStatus(srv),
-                        (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
-                        (newSpecs.length > 2) ? newSpecs[1] : "",
-                        (newSpecs.length > 2) ? newSpecs[2] : ""
-                    ));
+    getUserAMIs().then(function(results) {
+        console.log(results);
+        templates = [];
+        // Gets the list of the user's AMIs
+        if(results != "ERROR") {
+            // create list of templates
+            if('Images' in results) {
+                for(var index = 0; index < results['Images'].length; index++) {
+                    const ami = results['Images'][index];
+    
+                    var tempTemplateName = '';
+                    if(ami['Tags'] != undefined) {
+                        for(var tagIndex = 0; tagIndex < ami['Tags'].length; tagIndex++) {
+                            if(ami['Tags'][tagIndex]['Key'] == "Name") {
+                                tempTemplateName = ami['Tags'][tagIndex]['Value'];
+                            }
+                        }
+                    }
+                    const templateName = tempTemplateName;
+                    const templateId = ami['ImageId'];
+                    const templateStatus = ami['State'];
+                    const templatePub = ami['Public'];
+                    const templateAmiName = ami['Name'];
+                    const templatePlat = ami['PlatformDetails'];
+    
+                    var newTemplate = new Template(
+                        templateName,
+                        templateId,
+                        templateStatus,
+                        templatePub,
+                        templateAmiName,
+                        templatePlat,
+                        "self"
+                    );
+    
+                    templates.push(newTemplate);
                 }
+            } else {
+                // Error
             }
+        } else {
+            // Error
         }
-
-        console.log(data['Reservations']);
-        console.log(servers);
-
-        // Sorts the servers on the dashboard according to their status.
-        // Running servers appear first.
+        // Gets data for the other cached AMIs
+        // Call function and input cached AMI IDs
+        
+        //...
+    
+        console.log(templates);
+    
+        // Sort if necessary
+        /*
         const values = {
             "running": 5,
             "pending": 4,
@@ -79,9 +99,10 @@ function loadTemplates() {
         };
         servers.sort(function(a, b) {
             return values[b.status] - values[a.status];
-        })
-
-        // Clears old tiles, resets region label
+        });
+        */
+    
+        // Clears old Template tiles, resets region label
         const regionDict = {
             "us-east-1": "N. Virginia",
             "us-east-2": "Ohio",
@@ -90,13 +111,12 @@ function loadTemplates() {
         };
         regionLabel.textContent = regionDict[getRegion()];
         primaryBody.textContent = '';
-        
+    
         // Adds new tiles
-        for(var counter = 0; counter < servers.length; counter++) {
+        for(var counter = 0; counter < templates.length; counter++) {
             addTile(counter);
         }
-
-        // Updates the colors of the new tiles
+    
         updateColors();
         displayOverlay(false);
     });
@@ -107,94 +127,53 @@ function loadTemplates() {
  * @param {number} index The index of the template in 'templates' to add.
  */
 function addTile(index) {
-    const server = servers[index];
+    const template = templates[index];
     // The main tile block.
     var newTile = document.createElement('div');
     newTile.className = "tile";
 
-    // The server name descriptor element.
+    // The Template name descriptor element.
     var newName = document.createElement('div');
-    newName.className = "serverName";
-    newName.textContent = server.name;
+    newName.className = "templateName";
+    newName.textContent = template.amiName;
     newTile.appendChild(newName);
 
-    // The server ID descriptor element.
+    // The server IP address descriptor element.
+    if(template.name != "") {
+        var newTagName = document.createElement('div');
+        newTagName.className = "templateTagName";
+        newTagName.textContent = "Given Name: " + template.name;
+        newTile.appendChild(newTagName);
+    }
+
+    // The Template AMI ID descriptor element.
     var newId = document.createElement('div');
-    newId.className = "serverId";
-    newId.textContent = "ID: " + server.id;
+    newId.className = "templateId";
+    newId.textContent = "ID: " + template.id;
     newTile.appendChild(newId);
 
-    // The server status icon.
+    // The Template status icon.
     var newStatus = document.createElement('div');
     newStatus.className = "statusIcon";
-
     var newStatusLabel = document.createElement('div');
     newStatusLabel.className = "statusPopup";
-    newStatusLabel.textContent = server.status;
+    newStatusLabel.textContent = template.status;
     newStatus.appendChild(newStatusLabel);
     newTile.appendChild(newStatus);
 
-    // The server IP address descriptor element.
-    if(server.ipv4 != "") {
-        var newIp = document.createElement('div');
-        newIp.className = "serverIPv4";
-        newIp.textContent = "IPv4: " + server.ipv4;
-        newTile.appendChild(newIp);
-    }
+    // The Template visibility label element.
+    var newPlatformLabel = document.createElement('div');
+    newPlatformLabel.className = "platformLabel";
+    newPlatformLabel.textContent = "Platform";
+    newTile.appendChild(newPlatformLabel);
 
-    // The server specifications label element.
-    var newSpecsLabel = document.createElement('div');
-    newSpecsLabel.className = "specsLabel";
-    newSpecsLabel.textContent = "Specifications";
-    newTile.appendChild(newSpecsLabel);
+    // The Template visibility descriptor element.
+    var newTemplateVisibility = document.createElement('div');
+    newTemplateVisibility.className = "templatePlatform";
+    newTemplateVisibility.textContent = template.plat;
+    newTile.appendChild(newTemplateVisibility);
 
-    // The server CPU descriptor element.
-    var newCpu = document.createElement('div');
-    newCpu.className = "serverCPU";
-    newCpu.textContent = "CPU: " + server.cpu;
-    newTile.appendChild(newCpu);
-
-    // The server RAM descriptor element.
-    if(server.memory != "") {
-        var newMemory = document.createElement('div');
-        newMemory.className = "serverRAM";
-        newMemory.textContent = "Memory: " + server.memory;
-        newTile.appendChild(newMemory);
-    }
-
-    // The server storage descriptor element.
-    if(server.storage != "") {
-        var newStorage = document.createElement('div');
-        newStorage.className = "serverStorage";
-        newStorage.textContent = "Storage: " + server.storage;
-        newTile.appendChild(newStorage);
-    }
-
-    // The server connection button.
-    var newConnButton = document.createElement('button');
-    newConnButton.className = "connectButton";
-    newConnButton.textContent = "Connect";
-    newConnButton.id = "" + index;
-    newConnButton.addEventListener('mouseenter', function() {
-        // If button is active, proceed.
-        if(newConnButton.value == "active") {
-            newConnButton.style.backgroundColor = Colors.backgroundPrimary();
-        }
-    });
-    newConnButton.addEventListener('mouseleave', function() {
-        newConnButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
-    });
-    newConnButton.addEventListener('click', function() {
-        // Connect to server.
-        // If button is active, proceed.
-        if(newConnButton.value == "active") {
-            displayOverlay(true);
-            connect(parseInt(newConnButton.id));
-        }
-    });
-    newTile.appendChild(newConnButton);
-
-    // The modify server button.
+    // The modify Template button.
     var newModifyButton = document.createElement('button');
     newModifyButton.className = "modifyButton";
     newModifyButton.textContent = "Modify";
@@ -220,88 +199,77 @@ function addTile(index) {
         }
     });
 
-    // The toggle power button.
-    var newPowerButton = document.createElement('div');
-    newPowerButton.className = "powerButton";
-    newPowerButton.textContent = "Start";
-    if(server.status == "running") {
-        newPowerButton.textContent = "Stop";
+    // The toggle visibility button.
+    var newVisibilityButton = document.createElement('div');
+    newVisibilityButton.className = "visibilityButton";
+    newVisibilityButton.textContent = "Make Public";
+    if(template.pub) {
+        newVisibilityButton.textContent = "Make Private";
     }
-    newPowerButton.id = "" + index;
-    newPowerButton.addEventListener('mouseenter', function() {
+    newVisibilityButton.id = "" + index;
+    newVisibilityButton.addEventListener('mouseenter', function() {
         // If the button is active, proceed.
-        if(newPowerButton.value == "active") {
-            newPowerButton.style.backgroundColor = Colors.backgroundPrimary();
+        if(newVisibilityButton.value == "active") {
+            newVisibilityButton.style.backgroundColor = Colors.backgroundPrimary();
         }
     });
-    newPowerButton.addEventListener('mouseleave', function() {
-        newPowerButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    newVisibilityButton.addEventListener('mouseleave', function() {
+        newVisibilityButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
     });
-    newPowerButton.addEventListener('click', function() {
+    newVisibilityButton.addEventListener('click', function() {
         // If the button is active, proceed.
-        if(newPowerButton.value == "active") {
-            if(server.status == "stopped") {
-                // Turn server on.
+        if(newVisibilityButton.value == "active") {
+            if(template.pub) {
+                // Make the server private.
                 displayOverlay(true);
-                startInstance(servers[parseInt(newPowerButton.id)].id).then(function(started) {
-                    if(started) { 
-                        // Good to go
-                        loadServers();
-                    } else {
-                        // Error starting server
+
+                changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, false).then(function(result) {
+                    if(result == "ERROR") {
+                        console.log("ERROR");
                     }
+                    loadTemplates();
                 });
-            } else if(server.status == "running") {
-                // Turn server off.
+            } else {
+                // Make the server public.
                 displayOverlay(true);
-                stopInstance(servers[parseInt(newPowerButton.id)].id).then(function(stopped) {
-                    if(stopped) { 
-                        // Good to go
-                        loadServers();
-                    } else {
-                        // Error stopping server
+                
+                changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, true).then(function(result) {
+                    if(result == "ERROR") {
+                        console.log("ERROR");
                     }
+                    loadTemplates();
                 });
             }
         }
     });
-    newModifyArea.appendChild(newPowerButton);
+    newModifyArea.appendChild(newVisibilityButton);
 
-    // The reboot server button.
-    var newRebootButton = document.createElement('div');
-    newRebootButton.className = "rebootButton";
-    newRebootButton.textContent = "Reboot";
-    newRebootButton.id = "" + index;
-    newRebootButton.value
-    newRebootButton.addEventListener('mouseenter', function() {
+    // The toggle visibility button.
+    var newCopyButton = document.createElement('div');
+    newCopyButton.className = "copyButton";
+    newCopyButton.textContent = "Copy to Different Region";
+    newCopyButton.id = "" + index;
+    newCopyButton.addEventListener('mouseenter', function() {
         // If the button is active, proceed.
-        if(newRebootButton.value == "active") {
-            newRebootButton.style.backgroundColor = Colors.backgroundPrimary();
+        if(newCopyButton.value == "active") {
+            newCopyButton.style.backgroundColor = Colors.backgroundPrimary();
         }
     });
-    newRebootButton.addEventListener('mouseleave', function() {
-        newRebootButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    newCopyButton.addEventListener('mouseleave', function() {
+        newCopyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
     });
-    newRebootButton.addEventListener('click', function() {
+    newCopyButton.addEventListener('click', function() {
         // If the button is active, proceed.
-        if(newRebootButton.value == "active") {
-            // Reboot server.
-            if(server.status == "running") {
-                displayOverlay(true);
-                rebootInstance(servers[parseInt(newRebootButton.id)].id).then( function(rebooted) {
-                    if(rebooted) {
-                        // Good to go
-                        loadServers();
-                    } else {
-                        // Error rebooting server
-                    }
-                });
-            }
+        if(newCopyButton.value == "active") {
+            // Copy the Template to another region
+            /*copyImage(templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName, "us-east-2").then(function() {
+                loadTemplates();
+            });*/
         }
     });
-    newModifyArea.appendChild(newRebootButton);
-
-    // The permadelete server button.
+    newModifyArea.appendChild(newCopyButton);
+    
+    // The permadelete Template button.
     var newTerminateButton = document.createElement('div');
     newTerminateButton.className = "terminateButton";
     newTerminateButton.textContent = "Permadelete";
@@ -318,134 +286,29 @@ function addTile(index) {
     newTerminateButton.addEventListener('click', function() {
         // If the button is active, proceed.
         if(newTerminateButton.value == "active") {
-            // Terminate server.
+            // Terminate Template.
             displayOverlay(true);
-            terminateInstance(servers[parseInt(newRebootButton.id)].id).then(function(terminated) {
-                if(terminated) {
-                    // Good to go
-                    loadServers();
-                } else {
-                    // Error rebooting server
-                }
+            deleteImage(templates[parseInt(newTerminateButton.id)].id).then(function() {
+                loadTemplates();
             });
         }
     });
     newModifyArea.appendChild(newTerminateButton);
 
-    newPowerButton.value = "inactive";
-    newRebootButton.value = "inactive";
+
+    newVisibilityButton.value = "inactive";
+    newCopyButton.value = "inactive";
     newTerminateButton.value = "inactive";
-    newConnButton.value = "inactive";
     newModifyButton.value = "inactive";
-    if(server.status == "running" || server.status == "stopped") {
-        newPowerButton.value = "active";
-        newRebootButton.value = "active";
+    if(template.owner == "self" && template.status == "available") {
+        newVisibilityButton.value = "active";
+        newCopyButton.value = "active";
         newTerminateButton.value = "active";
         newModifyButton.value = "active";
-        if(server.status == "running") {
-            newConnButton.value = "active";
-        }
     }
 
     newTile.appendChild(newModifyArea);
     primaryBody.appendChild(newTile);
-}
-
-/**
- * Returns the name of the server instance, given the instance JSON.
- * @param {JSON} json The instance JSON object.
- */
-function getName(json) {
-    if("Tags" in json["Instances"][0]) {
-        for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-            if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Name") {
-                return json["Instances"][0]["Tags"][tagIndex]["Value"];
-            }
-        }
-    }
-    return "[Not Named]";
-}
-
-/**
- * Returns the status of the server instance, given the instance JSON.
- * @param {JSON} json The instance JSON object.
- */
-function getStatus(json) {
-    return json["Instances"][0]["State"]["Name"];
-}
-
-/**
- * Returns the ID of the server instance, given the instance JSON.
- * @param {JSON} json The instance JSON object.
- */
-function getInstanceId(json) {
-    return json["Instances"][0]["InstanceId"];
-}
-
-/**
- * Returns the public IPv4 of the server instance, given the instance JSON.
- * @param {JSON} json The instance JSON object.
- */
-function getIPv4(json) {
-    if("PublicIpAddress" in json["Instances"][0]) {
-        return json["Instances"][0]["PublicIpAddress"];
-    }
-    return "";
-}
-
-/**
- * Returns the encoded password of the server instance, given the instance JSON.
- * @param {JSON} json The instance JSON object.
- */
-function getPassword(json) {
-    for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-        if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Cert") {
-            return json["Instances"][0]["Tags"][tagIndex]["Value"];
-        }
-    }
-    return "";
-}
-
-/**
- * Returns the key of the server instance, given the instance JSON.
- * @param {JSON} json The instance JSON object.
- */
-function getKey(json) {
-    for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-        if("KeyName" in json["Instances"][0]) {
-            return json["Instances"][0]["KeyName"];
-        }
-    }
-    return "";
-}
-
-/**
- * Returns the CPU type of the server instance, given the instance JSON.
- * @param {JSON} json The instance JSON object.
- */
-function getCpuType(json) {
-    return json["Instances"][0]["InstanceType"];
-}
-
-/**
- * Returns the specs of the server instance, given the instance JSON.
- * @param {JSON} json The instance JSON object.
- */
-function getSpecs(json) {
-    for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
-        if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Specifications") {
-            return json["Instances"][0]["Tags"][tagIndex]["Value"];
-        }
-    }
-    return "";
-}
-
-/**
- * Splits the specifications into 3 separate strings.
- * @param {string} str The inputted string specs to be split.
- */
-function splitSpecs(str) {
-    return str.split(" / ");
 }
 
 // ---------------------------------------------------------------------------------- //
@@ -538,26 +401,12 @@ function updateColors() {
             tiles[count].style.borderColor = Colors.textSecondary();
         }
 
-        var connectButtons = document.getElementsByClassName("connectButton");
-        for(var count = 0; count < connectButtons.length; count++) {
-            connectButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if server is fully running.
-            const state = servers[count].status.toLowerCase();
-            if(state == "running") {
-                connectButtons[count].style.color = Colors.textPrimary();
-                connectButtons[count].style.borderColor = Colors.textPrimary();
-            } else {
-                connectButtons[count].style.color = Colors.textTertiary();
-                connectButtons[count].style.borderColor = Colors.textTertiary();
-            }
-        }
-
         var modifyButtons = document.getElementsByClassName("modifyButton");
         for(var count = 0; count < modifyButtons.length; count++) {
             modifyButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
             // Enable if server is fully running or stopped.
-            const state = servers[count].status.toLowerCase();
-            if(state == "running" || state == "stopped") {
+            const state = templates[count].status.toLowerCase();
+            if(state == "available" && templates[count].owner == "self") {
                 modifyButtons[count].style.color = Colors.textPrimary();
                 modifyButtons[count].style.borderColor = Colors.textPrimary();
             } else {
@@ -566,16 +415,16 @@ function updateColors() {
             }
         }
 
-        var serverNames = document.getElementsByClassName("serverName");
-        for(var count = 0; count < serverNames.length; count++) {
-            serverNames[count].style.color = Colors.textPrimary();
+        var templateNames = document.getElementsByClassName("templateName");
+        for(var count = 0; count < templateNames.length; count++) {
+            templateNames[count].style.color = Colors.textPrimary();
         }
 
         var statusIcons = document.getElementsByClassName("statusIcon");
         for(var count = 0; count < statusIcons.length; count++) {
             // Adjusts the color depending on the server's status.
-            const state = servers[count].status.toLowerCase();
-            if(state == "running") {
+            const state = templates[count].status.toLowerCase();
+            if(state == "available") {
                 statusIcons[count].style.backgroundColor = "#33cc33";
             } else if(state == "shutting-down" || state == "pending" || state == "stopping") {
                 statusIcons[count].style.backgroundColor = "#cccc33";
@@ -584,34 +433,24 @@ function updateColors() {
             }
         }
         
-        var serverIds = document.getElementsByClassName("serverId");
-        for(var count = 0; count < serverIds.length; count++) {
-            serverIds[count].style.color = Colors.textSecondary();
+        var templateIds = document.getElementsByClassName("templateId");
+        for(var count = 0; count < templateIds.length; count++) {
+            templateIds[count].style.color = Colors.textSecondary();
         }
         
-        var serverIPv4s = document.getElementsByClassName("serverIPv4");
-        for(var count = 0; count < serverIPv4s.length; count++) {
-            serverIPv4s[count].style.color = Colors.textSecondary();
+        var templateTagNames = document.getElementsByClassName("templateTagName");
+        for(var count = 0; count < templateTagNames.length; count++) {
+            templateTagNames[count].style.color = Colors.textSecondary();
         }
 
-        var specsLabels = document.getElementsByClassName("specsLabel");
-        for(var count = 0; count < specsLabels.length; count++) {
-            specsLabels[count].style.color = Colors.textPrimary();
+        var platformLabels = document.getElementsByClassName("platformLabel");
+        for(var count = 0; count < platformLabels.length; count++) {
+            platformLabels[count].style.color = Colors.textPrimary();
         }
         
-        var serverCPUs = document.getElementsByClassName("serverCPU");
-        for(var count = 0; count < serverCPUs.length; count++) {
-            serverCPUs[count].style.color = Colors.textSecondary();
-        }
-        
-        var serverRAMs = document.getElementsByClassName("serverRAM");
-        for(var count = 0; count < serverRAMs.length; count++) {
-            serverRAMs[count].style.color = Colors.textSecondary();
-        }
-        
-        var serverStorages = document.getElementsByClassName("serverStorage");
-        for(var count = 0; count < serverStorages.length; count++) {
-            serverStorages[count].style.color = Colors.textSecondary();
+        var templatePlatforms = document.getElementsByClassName("templatePlatform");
+        for(var count = 0; count < templatePlatforms.length; count++) {
+            templatePlatforms[count].style.color = Colors.textSecondary();
         }
 
         var modifyAreas = document.getElementsByClassName("modifyArea");
@@ -620,36 +459,36 @@ function updateColors() {
             modifyAreas[count].style.borderColor = Colors.textSecondary();
         }
 
-        var powerButtons = document.getElementsByClassName("powerButton");
-        for(var count = 0; count < powerButtons.length; count++) {
-            powerButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if state is fully running or stopped.
-            const state = servers[count].status.toLowerCase();
-            if(state == "running" || state == "stopped") {
-                powerButtons[count].style.color = Colors.textPrimary();
+        var visibilityButtons = document.getElementsByClassName("visibilityButton");
+        for(var count = 0; count < visibilityButtons.length; count++) {
+            visibilityButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            // Enable if the Template is available and owned by the user.
+            const state = templates[count].status.toLowerCase();
+            if(state == "available" && templates[count].owner == "self") {
+                visibilityButtons[count].style.color = Colors.textPrimary();
             } else {
-                powerButtons[count].style.color = Colors.textTertiary();
+                visibilityButtons[count].style.color = Colors.textTertiary();
             }
         }
 
-        var rebootButtons = document.getElementsByClassName("rebootButton");
-        for(var count = 0; count < rebootButtons.length; count++) {
-            rebootButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if server is fully running or stopped.
-            const state = servers[count].status.toLowerCase();
-            if(state == "running" || state == "stopped") {
-                rebootButtons[count].style.color = Colors.textPrimary();
+        var copyButtons = document.getElementsByClassName("copyButton");
+        for(var count = 0; count < copyButtons.length; count++) {
+            copyButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            // Enable if the Template is available and owned by the user.
+            const state = templates[count].status.toLowerCase();
+            if(state == "available" && templates[count].owner == "self") {
+                copyButtons[count].style.color = Colors.textPrimary();
             } else {
-                rebootButtons[count].style.color = Colors.textTertiary();
+                copyButtons[count].style.color = Colors.textTertiary();
             }
         }
 
         var terminateButtons = document.getElementsByClassName("terminateButton");
         for(var count = 0; count < terminateButtons.length; count++) {
             terminateButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if server is fully running or stopped.
-            const state = servers[count].status.toLowerCase();
-            if(state == "running" || state == "stopped") {
+            // Enable if the Template is available and owned by the user.
+            const state = templates[count].status.toLowerCase();
+            if(state == "available" && templates[count].owner == "self") {
                 terminateButtons[count].style.color = "#cc3333";
             } else {
                 terminateButtons[count].style.color = "#882222";

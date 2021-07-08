@@ -33,7 +33,7 @@ function newPopupWindow(header, body, button) {
 
   popupWindow.setResizable(false);
   
-  popupWindow.webContents.on('did-finish-load', function() {
+  popupWindow.webContents.on('ready-to-show', function() {
     popupWindow.webContents.executeJavaScript('updateColors();').then(function() {
       popupWindow.webContents.executeJavaScript('updateElements(\"' + header + '\", \"' + body + '\", \"' + button + '\");').then(function() {
         popupWindow.show();
@@ -59,6 +59,11 @@ function newCreateServerWindow() {
   //createServerWindow.webContents.openDevTools();
 
   createServerWindow.setResizable(false);
+
+  createServerWindow.on('close', function() {
+    primaryWindow.webContents.executeJavaScript('serv.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('serv.contentWindow.loadServers();');
+  });
   
   createServerWindow.webContents.on('ready-to-show', function() {
     createServerWindow.webContents.executeJavaScript('resetElements();').then(function() {

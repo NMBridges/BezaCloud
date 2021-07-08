@@ -5,6 +5,8 @@ Add manually inputting passwords
 
 Add option to disable cost pulling
 
+Offline support
+
 Pull user's AMIs, add any cached AMIs that aren't theirs, load them to new server window.
 
 
