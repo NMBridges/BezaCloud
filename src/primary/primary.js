@@ -242,6 +242,7 @@ function to(page) {
     }
     if(page == "Servers") {
         serv.hidden = false;
+        serv.contentWindow.displayOverlay(true);
         serv.contentWindow.loadServers();
     } else {
         serv.hidden = true;
@@ -258,6 +259,7 @@ function to(page) {
     }
     if(page == "Templates") {
         temp.hidden = false;
+        temp.contentWindow.displayOverlay(true);
         temp.contentWindow.loadTemplates();
     } else {
         temp.hidden = true;

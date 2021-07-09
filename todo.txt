@@ -1,13 +1,18 @@
-- Pull License Key IP server
-- Pull AMI + CPU types
-
-Add manually inputting passwords
-
-Add option to disable cost pulling
-
-Offline support
-
-Pull user's AMIs, add any cached AMIs that aren't theirs, load them to new server window.
+- Pull License Key IP server [License Key]
+- Pull AMI + CPU types [Servers]
+- Add manually inputting passwords [Servers]
+- Add cost pulling [Dashboard]
+- Add option to disable cost pulling [Options]
+- Offline support [all]
+- Add "new external AMI" option [Templates]
+- Add "copy AMI to another region" option [Templates]
+- Add Templates icon [Templates]
+- Fix random passwords [Templates]
+- Revise "+" icon [Servers, Templates, Tasks]
+- Revise New Server window [Servers]
+- Add Create Image option  [Servers]
+- Add Tasks page [Tasks]
+- Add notifications [Tasks]
 
 
 Instead of prebuilt AMIs, give the option for basic windows platform, then you can
@@ -17,12 +22,6 @@ save your servers to AMIs
 
 Close all the way if no tasks
 
-Servers overlays
-    When there is no password, must be manual
-    When there is a password and it is on Mac
-    When the user wants to make a new server
-    When the user tries to connect to a server
-        too soon
 
 
 Create New Server
@@ -43,14 +42,3 @@ CPU
 
 Create Server   Cancel
 
-
-
-
-My Templates
-
-[  ] [  ] [  ]
-[  ] [  ] [  ]
-
-Imported Templates
-
-[  ] [  ]

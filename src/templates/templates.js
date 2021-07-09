@@ -1,11 +1,12 @@
 // Supplemental functions
 const { 
     Colors, createRdpFile, openRdpFile, setPopupValues,
-    getPopupValues, awsDir, getRegion
+    getPopupValues, awsDir, getRegion, updateCache,
+    getCacheValue
 } = parent.require("../mercor.js");
 const {
     getUserAMIs, Template, changeAmiVisibility, deleteImage,
-    copyImage
+    copyImage, getAmiData
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
 const homeDir = parent.require('os').homedir();
@@ -24,9 +25,12 @@ var overlay = document.getElementById("overlay");
  */
 var templates = [];
 
-window.onload = function() {
-    loadTemplates();
+/** Boolean that describes whether or not the page is loading Templates. */
+var loadingTemplates = false;
 
+window.onload = function() {
+    //loadTemplates();
+    updateColors();
 
 
 };
@@ -34,92 +38,177 @@ window.onload = function() {
 // ---------------------------- Template Loading Functions -------------------------- //
 
 /**
+ * Given an AMI JSON object, it returns a Template object.
+ * @param {string} ami The AMI JSON object to parse.
+ * @param {string} owner The owner of the AMI.
+ */
+function createTemplateObject(ami, owner) {
+    var tempTemplateName = '';
+    if(ami['Tags'] != undefined) {
+        for(var tagIndex = 0; tagIndex < ami['Tags'].length; tagIndex++) {
+            if(ami['Tags'][tagIndex]['Key'] == "Name") {
+                tempTemplateName = ami['Tags'][tagIndex]['Value'];
+            }
+        }
+    }
+    const templateName = tempTemplateName;
+    const templateId = ami['ImageId'];
+    const templateStatus = ami['State'];
+    const templatePub = ami['Public'];
+    const templateAmiName = ami['Name'];
+    const templatePlat = ami['PlatformDetails'];
+
+    var newTemplate = new Template(
+        templateName,
+        templateId,
+        templateStatus,
+        templatePub,
+        templateAmiName,
+        templatePlat,
+        owner
+    );
+    return newTemplate;
+}
+
+/**
  * Pulls all AWS AMIs from the user's account in the given region.
  */
 function loadTemplates() {
-    getUserAMIs().then(function(results) {
-        console.log(results);
-        templates = [];
-        // Gets the list of the user's AMIs
-        if(results != "ERROR") {
-            // create list of templates
-            if('Images' in results) {
-                for(var index = 0; index < results['Images'].length; index++) {
-                    const ami = results['Images'][index];
-    
-                    var tempTemplateName = '';
-                    if(ami['Tags'] != undefined) {
-                        for(var tagIndex = 0; tagIndex < ami['Tags'].length; tagIndex++) {
-                            if(ami['Tags'][tagIndex]['Key'] == "Name") {
-                                tempTemplateName = ami['Tags'][tagIndex]['Value'];
-                            }
-                        }
+    primaryBody.innerHTML = '';
+    if(!loadingTemplates) {
+        loadingTemplates = true;
+        getUserAMIs().then(function(results) {
+            console.log(results);
+            templates = [];
+            // Gets the list of the user's AMIs
+            if(results != "ERROR") {
+                // create list of templates
+                if('Images' in results) {
+                    for(var index = 0; index < results['Images'].length; index++) {
+                        templates.push(createTemplateObject(results['Images'][index], "self"));
                     }
-                    const templateName = tempTemplateName;
-                    const templateId = ami['ImageId'];
-                    const templateStatus = ami['State'];
-                    const templatePub = ami['Public'];
-                    const templateAmiName = ami['Name'];
-                    const templatePlat = ami['PlatformDetails'];
-    
-                    var newTemplate = new Template(
-                        templateName,
-                        templateId,
-                        templateStatus,
-                        templatePub,
-                        templateAmiName,
-                        templatePlat,
-                        "self"
-                    );
-    
-                    templates.push(newTemplate);
+                } else {
+                    // Error
                 }
             } else {
                 // Error
             }
-        } else {
-            // Error
-        }
-        // Gets data for the other cached AMIs
-        // Call function and input cached AMI IDs
         
-        //...
-    
-        console.log(templates);
-    
-        // Sort if necessary
-        /*
-        const values = {
-            "running": 5,
-            "pending": 4,
-            "stopping": 3,
-            "shutting-down": 2,
-            "stopped": 1,
-            "terminated": 0
-        };
-        servers.sort(function(a, b) {
-            return values[b.status] - values[a.status];
+            console.log(templates);
+            
+            // Gets data for the other cached AMIs
+            const cachedAmiIds = getCacheValue("templates");
+            if(cachedAmiIds != "ERROR") {
+                console.log(cachedAmiIds);
+
+                var newTemplatesToPull = [];
+
+                for(var cacheIndex = 0; cacheIndex < cachedAmiIds.length; cacheIndex++) {
+                    for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
+                        if(templates[templateIndex].id == cachedAmiIds[cacheIndex]) {
+                            break;
+                        } else if(templateIndex == templates.length - 1) {
+                            newTemplatesToPull.push(cachedAmiIds[cacheIndex]);
+                        }
+                    }
+                }
+
+                if(newTemplatesToPull.length > 0) {
+                    // Get AMI data about the AMI IDs
+                    getAmiData(newTemplatesToPull).then(function(results) {
+                        console.log(results);
+                        if(results != "ERROR") {
+                            // create list of templates
+                            if('Images' in results) {
+                                for(var index = 0; index < results['Images'].length; index++) {
+                                    templates.push(createTemplateObject(results['Images'][index], "other"));
+                                }
+                            } else {
+                                // Error
+                            }
+                        } else {
+                            // Error
+                        }
+
+                        // Stores templates AMI IDs in Cache
+                        var templateIds = [];
+                        for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
+                            templateIds.push(templates[templateIndex].id);
+                        }
+                        updateCache("templates", templateIds);
+                    
+                        // Clears old Template tiles, resets region label
+                        const regionDict = {
+                            "us-east-1": "N. Virginia",
+                            "us-east-2": "Ohio",
+                            "us-west-1": "N. California",
+                            "us-west-2": "Oregon"
+                        };
+                        regionLabel.textContent = regionDict[getRegion()];
+                    
+                        // Adds new tiles
+                        for(var counter = 0; counter < templates.length; counter++) {
+                            addTile(counter);
+                        }
+                    
+                        updateColors();
+                        displayOverlay(false);
+                        loadingTemplates = false;
+                    });
+                } else {
+                    // Stores templates AMI IDs in Cache
+                    var templateIds = [];
+                    for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
+                        templateIds.push(templates[templateIndex].id);
+                    }
+                    updateCache("templates", templateIds);
+                
+                    // Clears old Template tiles, resets region label
+                    const regionDict = {
+                        "us-east-1": "N. Virginia",
+                        "us-east-2": "Ohio",
+                        "us-west-1": "N. California",
+                        "us-west-2": "Oregon"
+                    };
+                    regionLabel.textContent = regionDict[getRegion()];
+                
+                    // Adds new tiles
+                    for(var counter = 0; counter < templates.length; counter++) {
+                        addTile(counter);
+                    }
+                
+                    updateColors();
+                    displayOverlay(false);
+                    loadingTemplates = false;
+                }
+            } else {
+                // Stores templates AMI IDs in Cache
+                var templateIds = [];
+                for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
+                    templateIds.push(templates[templateIndex].id);
+                }
+                updateCache("templates", templateIds);
+            
+                // Clears old Template tiles, resets region label
+                const regionDict = {
+                    "us-east-1": "N. Virginia",
+                    "us-east-2": "Ohio",
+                    "us-west-1": "N. California",
+                    "us-west-2": "Oregon"
+                };
+                regionLabel.textContent = regionDict[getRegion()];
+            
+                // Adds new tiles
+                for(var counter = 0; counter < templates.length; counter++) {
+                    addTile(counter);
+                }
+            
+                updateColors();
+                displayOverlay(false);
+                loadingTemplates = false;
+            }
         });
-        */
-    
-        // Clears old Template tiles, resets region label
-        const regionDict = {
-            "us-east-1": "N. Virginia",
-            "us-east-2": "Ohio",
-            "us-west-1": "N. California",
-            "us-west-2": "Oregon"
-        };
-        regionLabel.textContent = regionDict[getRegion()];
-        primaryBody.textContent = '';
-    
-        // Adds new tiles
-        for(var counter = 0; counter < templates.length; counter++) {
-            addTile(counter);
-        }
-    
-        updateColors();
-        displayOverlay(false);
-    });
+    }
 }
 
 /**

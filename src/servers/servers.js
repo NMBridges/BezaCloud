@@ -10,7 +10,7 @@ const {
     createInstance, getSecurityGroups, 
     getDefaultVpcId, createMercorSecurityGroup,
     getMercorSecurityGroupId, pemFileExists,
-    addTags, createImage
+    addTags, createImage, genRandom
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
 const homeDir = parent.require('os').homedir();
@@ -23,6 +23,9 @@ var refreshButton = document.getElementById("refreshButton");
 var newServerButton = document.getElementById("newServerButton");
 var primaryBody = document.getElementById("primaryBody");
 var overlay = document.getElementById("overlay");
+
+/** Boolean that stores whether or not the page is currently loading servers. */
+var loadingServers = false;
 
 /**
  * @type {Server[]} The servers belonging to the currently loaded region.
@@ -230,64 +233,68 @@ function newServer(name, ami, cpu) {
  * Pulls all AWS servers from the user's account in the given region.
  */
 function loadServers() {
-    const servJson = getInstances().then(function(data) {
-        servers = [];
-        if(data["Reservations"] != undefined) {
-            for(var index = 0; index < data["Reservations"].length; index++) {
-                const srv = data["Reservations"][index];
-                const newSpecs = splitSpecs(getSpecs(srv));
-                if(getStatus(srv).toLowerCase() != "terminated") {
-                    servers.push(new Server(
-                        getName(srv),
-                        getInstanceId(srv),
-                        (getIPv4(srv) != undefined) ? getIPv4(srv) : "",
-                        getPassword(srv),
-                        getKey(srv),
-                        getStatus(srv),
-                        (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
-                        (newSpecs.length > 2) ? newSpecs[1] : "",
-                        (newSpecs.length > 2) ? newSpecs[2] : ""
-                    ));
+    primaryBody.innerHTML = '';
+    if(!loadingServers) {
+        loadingServers = true;
+        const servJson = getInstances().then(function(data) {
+            servers = [];
+            if(data["Reservations"] != undefined) {
+                for(var index = 0; index < data["Reservations"].length; index++) {
+                    const srv = data["Reservations"][index];
+                    const newSpecs = splitSpecs(getSpecs(srv));
+                    if(getStatus(srv).toLowerCase() != "terminated") {
+                        servers.push(new Server(
+                            getName(srv),
+                            getInstanceId(srv),
+                            (getIPv4(srv) != undefined) ? getIPv4(srv) : "",
+                            getPassword(srv),
+                            getKey(srv),
+                            getStatus(srv),
+                            (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
+                            (newSpecs.length > 2) ? newSpecs[1] : "",
+                            (newSpecs.length > 2) ? newSpecs[2] : ""
+                        ));
+                    }
                 }
             }
-        }
-
-        console.log(data['Reservations']);
-        console.log(servers);
-
-        // Sorts the servers on the dashboard according to their status.
-        // Running servers appear first.
-        const values = {
-            "running": 5,
-            "pending": 4,
-            "stopping": 3,
-            "shutting-down": 2,
-            "stopped": 1,
-            "terminated": 0
-        };
-        servers.sort(function(a, b) {
-            return values[b.status] - values[a.status];
-        })
-
-        // Clears old tiles, resets region label
-        const regionDict = {
-            "us-east-1": "N. Virginia",
-            "us-east-2": "Ohio",
-            "us-west-1": "N. California",
-            "us-west-2": "Oregon"
-        };
-        regionLabel.textContent = regionDict[getRegion()];
-        primaryBody.textContent = '';
-        
-        // Adds new tiles
-        for(var counter = 0; counter < servers.length; counter++) {
-            addTile(counter);
-        }
-
-        // Updates the colors of the new tiles
-        updateColors();
-        displayOverlay(false);
-    });
+    
+            console.log(data['Reservations']);
+            console.log(servers);
+    
+            // Sorts the servers on the dashboard according to their status.
+            // Running servers appear first.
+            const values = {
+                "running": 5,
+                "pending": 4,
+                "stopping": 3,
+                "shutting-down": 2,
+                "stopped": 1,
+                "terminated": 0
+            };
+            servers.sort(function(a, b) {
+                return values[b.status] - values[a.status];
+            })
+    
+            // Clears old tiles, resets region label
+            const regionDict = {
+                "us-east-1": "N. Virginia",
+                "us-east-2": "Ohio",
+                "us-west-1": "N. California",
+                "us-west-2": "Oregon"
+            };
+            regionLabel.textContent = regionDict[getRegion()];
+            
+            // Adds new tiles
+            for(var counter = 0; counter < servers.length; counter++) {
+                addTile(counter);
+            }
+    
+            // Updates the colors of the new tiles
+            updateColors();
+            displayOverlay(false);
+            loadingServers = false;
+        });
+    }
 }
 
 /**
@@ -408,6 +415,44 @@ function addTile(index) {
         }
     });
 
+    // The Create Template button.
+    var newTemplateButton = document.createElement('div');
+    newTemplateButton.className = "createTemplateButton";
+    newTemplateButton.textContent = "Create Template";
+    newTemplateButton.id = "" + index;
+    newTemplateButton.addEventListener('mouseenter', function() {
+        // If the button is active, proceed.
+        if(newTemplateButton.value == "active") {
+            newTemplateButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newTemplateButton.addEventListener('mouseleave', function() {
+        newTemplateButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newTemplateButton.addEventListener('click', function() {
+        // If the button is active, proceed.
+        if(newTemplateButton.value == "active") {
+            if(server.status == "stopped") {
+                // Create new template from instance.
+                displayOverlay(true);
+                const servId = servers[parseInt(newRebootButton.id)].id;
+                const templateName = servers[parseInt(newRebootButton.id)].name.trim() + genRandom(5);
+                createImage(servId, templateName).then(function(data) {
+                    if(data != "ERROR") {
+                        // Good to go
+                        newPopup("Template successfully created", "Template created with name " + templateName, "Close");
+                        loadServers();
+                    } else {
+                        // Error rebooting server
+                    }
+                });
+            } else if(server.status == "running") {
+                // Display window saying server must be stopped
+            }
+        }
+    });
+    newModifyArea.appendChild(newTemplateButton);
+
     // The toggle power button.
     var newPowerButton = document.createElement('div');
     newPowerButton.className = "powerButton";
@@ -520,6 +565,7 @@ function addTile(index) {
     });
     newModifyArea.appendChild(newTerminateButton);
 
+    newTemplateButton.value = "inactive";
     newPowerButton.value = "inactive";
     newRebootButton.value = "inactive";
     newTerminateButton.value = "inactive";
@@ -532,6 +578,8 @@ function addTile(index) {
         newModifyButton.value = "active";
         if(server.status == "running") {
             newConnButton.value = "active";
+        } else {
+            newTemplateButton.value = "active";
         }
     }
 
@@ -822,6 +870,18 @@ function updateColors() {
         for(var count = 0; count < modifyAreas.length; count++) {
             modifyAreas[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
             modifyAreas[count].style.borderColor = Colors.textSecondary();
+        }
+
+        var templateButtons = document.getElementsByClassName("createTemplateButton");
+        for(var count = 0; count < templateButtons.length; count++) {
+            templateButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            // Enable if state is stopped.
+            const state = servers[count].status.toLowerCase();
+            if(state == "stopped") {
+                templateButtons[count].style.color = Colors.textPrimary();
+            } else {
+                templateButtons[count].style.color = Colors.textTertiary();
+            }
         }
 
         var powerButtons = document.getElementsByClassName("powerButton");

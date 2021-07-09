@@ -322,6 +322,23 @@ async function getUserAMIs() {
 };
 
 /**
+ * Returns the image data regarding the given list of AMI IDs.
+ * @param {string[]} amiIds The list of AMI IDs to get data about.
+ * @returns The AMI data, given the AMI IDs.
+ */
+const getAmiData = async (amiIds) => {
+    try {
+        ec2Client = resetEC2Client();
+        const data = await ec2Client.send(new DescribeImagesCommand({ImageIds: amiIds}));
+        console.log("Successfully describe images", data);
+        return data;
+    } catch (err) {
+        console.log("Error describing images", err);
+        return false;
+    }
+}
+
+/**
  * Changes the visibility of an AMI.
  * @param {string} id The AMI ID to alter.
  * @param {string} public Whether the AMI should be made public.
@@ -528,5 +545,5 @@ module.exports =
     getSecurityGroups, getMercorSecurityGroupId, getDefaultVpcId,
     createMercorSecurityGroup, pemFileExists, addTags,
     getUserAMIs, changeAmiVisibility, createImage, deleteImage,
-    copyImage
+    copyImage, getAmiData, genRandom
 };
