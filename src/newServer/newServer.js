@@ -344,7 +344,7 @@ createServerButton.addEventListener('mouseleave', function() {
 
 createServerButton.addEventListener('click', function() {
     // Create server
-    newServer(nameTextBox.value, "ami-082fef828802774de", "t2.micro");
+    newServer(nameTextBox.value, "ami-07ab596baed3e9cff", "t2.micro");
 });
 
 cancelButton.addEventListener('mouseenter', function() {

@@ -10,7 +10,7 @@
 - Fix random passwords [Templates]
 - Revise "+" icon [Servers, Templates, Tasks]
 - Revise New Server window [Servers]
-- Add Create Image option  [Servers]
+- Add attaching .pem keys option [Servers]
 - Add Tasks page [Tasks]
 - Add notifications [Tasks]
 

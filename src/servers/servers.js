@@ -440,7 +440,7 @@ function addTile(index) {
                 createImage(servId, templateName).then(function(data) {
                     if(data != "ERROR") {
                         // Good to go
-                        newPopup("Template successfully created", "Template created with name " + templateName, "Close");
+                        newPopup("Template successfully created", "Template created with name " + templateName + ". Note: Templates based on Servers not made in Mercor Connect may, when used to create Servers, have connection issues.", "Close");
                         loadServers();
                     } else {
                         // Error rebooting server
@@ -448,6 +448,7 @@ function addTile(index) {
                 });
             } else if(server.status == "running") {
                 // Display window saying server must be stopped
+                newPopup("Error", "Servers must be stopped before they can be used to create Templates.", "Close");
             }
         }
     });
@@ -572,14 +573,13 @@ function addTile(index) {
     newConnButton.value = "inactive";
     newModifyButton.value = "inactive";
     if(server.status == "running" || server.status == "stopped") {
+        newTemplateButton.value = "active";
         newPowerButton.value = "active";
         newRebootButton.value = "active";
         newTerminateButton.value = "active";
         newModifyButton.value = "active";
         if(server.status == "running") {
             newConnButton.value = "active";
-        } else {
-            newTemplateButton.value = "active";
         }
     }
 
@@ -875,9 +875,9 @@ function updateColors() {
         var templateButtons = document.getElementsByClassName("createTemplateButton");
         for(var count = 0; count < templateButtons.length; count++) {
             templateButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if state is stopped.
+            // Enable if state is fully running or stopped.
             const state = servers[count].status.toLowerCase();
-            if(state == "stopped") {
+            if(state == "running" || state == "stopped") {
                 templateButtons[count].style.color = Colors.textPrimary();
             } else {
                 templateButtons[count].style.color = Colors.textTertiary();
