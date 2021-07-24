@@ -1,0 +1,89 @@
+@import url(../assets/fonts/fonts.css);
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    margin: auto;
+    font-weight:300;
+    font-style: normal;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+    #dividerBox {
+        padding-left: 20px;
+        padding-right: 20px;
+        width: calc(100% - 40px);
+        height: 100%;
+        background-color: blue;
+        display: grid;
+        grid-template-rows: 70px 140px auto;
+        grid-template-areas:
+            'title'
+            'name'
+            'buttons';
+    }
+        #titleBox {
+            grid-area: title;
+            width: 100%;
+            height: calc(100% - 30px);
+            text-align: center;
+            vertical-align: middle;
+            font-size: 30px;
+            margin-top: 15px;
+        }
+        #amiIdBox {
+            grid-area: name;
+            width: 100%;
+            height: calc(100% - 5px);
+            margin-top: 5px;
+        }
+            #amiIdLabel {
+                width: 100%;
+            }
+            #amiIdTextBox {
+                margin-top: 5px;
+                width: 100%;
+                height: 30px;
+                line-height: 30px;
+            }
+        #buttonBox {
+            grid-area: buttons;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 50% 50%;
+            grid-template-areas:
+                'create cancel';
+        }
+            #addTemplateButton {
+                grid-area: create;
+                grid-row: 1;
+                margin-top: 10px;
+                margin-bottom: 15px;
+                margin-left: 25px;
+                display: inline-block;
+                width: calc(100% - 27px);
+                height: calc(100% - 25px);
+                border: 0px solid blue;
+                border-radius: 6px;
+                font-family: "Segoe UI", sans-serif;
+                font-weight:300;
+                font-style: normal;
+                font-size: 15px;
+            }
+            #cancelButton {
+                grid-area: cancel;
+                grid-row: 1;
+                margin-top: 10px;
+                margin-bottom: 15px;
+                margin-left: 3px;
+                display: inline-block;
+                width: calc(100% - 27px);
+                height: calc(100% - 25px);
+                border: 2px solid blue;
+                border-radius: 6px;
+                font-family: "Segoe UI", sans-serif;
+                font-weight:300;
+                font-style: normal;
+                font-size: 15px;
+            }

@@ -296,9 +296,15 @@ function getCpus() {
                                     if(key != "ERROR") {
                                         createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                             // done
-                                            newPopup("", "Successfully created server.", "Close");
-                                            window.close();
-                                            return true;
+                                            if(instanceId != "ERROR") {
+                                                newPopup("", "Successfully created server.", "Close");
+                                                window.close();
+                                                return true;
+                                            } else {
+                                                newPopup("Error", "Error creating server. Template is potentially invalid.", "Close");
+                                                window.close();
+                                                return true;
+                                            }
                                         });
                                     } else {
                                         // Error
@@ -344,7 +350,7 @@ createServerButton.addEventListener('mouseleave', function() {
 
 createServerButton.addEventListener('click', function() {
     // Create server
-    newServer(nameTextBox.value, "ami-07ab596baed3e9cff", "t2.micro");
+    newServer(nameTextBox.value, "ami-054dc1c0a4617b048", "t2.micro");
 });
 
 cancelButton.addEventListener('mouseenter', function() {

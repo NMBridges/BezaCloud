@@ -4,7 +4,7 @@
 - Add cost pulling [Dashboard]
 - Add option to disable cost pulling [Options]
 - Offline support [all]
-- Add "new external AMI" option [Templates]
+- Add option to remove external templates [Templates]
 - Add "copy AMI to another region" option [Templates]
 - Add Templates icon [Templates]
 - Fix random passwords [Templates]
@@ -19,6 +19,10 @@ Instead of prebuilt AMIs, give the option for basic windows platform, then you c
 save your servers to AMIs
 - Note: need to solve random password problem. Perhaps basic windows platform is not
     pure basic, it is an AMI that is already created
+- Logic:
+    Pulls Templates on startup, those will be used in New Server window until
+    the user loads up the My Templates window. Every time that window is opened,
+    the New Server window's Templates will be updated
 
 Close all the way if no tasks
 

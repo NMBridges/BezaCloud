@@ -30,14 +30,24 @@ function awsDir() {
  * Returns whether or not the user has the AWS CLI installed.
  */
 const hasAwsCliInstalled = async () => {
-    const { stdout, err } = exec("aws --version")
-    if(err != null) {
-        console.log(stderr);
-        console.log("AWS CLI not installed");
-        return false;
+    if(process.platform == "win32") {
+        try {
+            execSync("aws --version");
+            console.log("AWS CLI installed");
+            return true;
+        } catch {
+            console.log("AWS CLI not installed");
+            return false;
+        }
     } else {
-        console.log("AWS CLI installed");
-        return true;
+        const { stdout, err } = exec("aws --version");
+        if(err != null) {
+            console.log("AWS CLI not installed");
+            return false;
+        } else {
+            console.log("AWS CLI installed");
+            return true;
+        }
     }
 }
 
@@ -353,12 +363,22 @@ function openRdpFile() {
     popupHeader = header;
     popupBody = body;
     popupButton = button;
+    if(process.platform == "win32") {
+        updateCache("popupHeader", popupHeader);
+        updateCache("popupBody", popupBody);
+        updateCache("popupButton", popupButton);
+    }
 }
 
 /**
  * @returns The text values for the popup window.
  */
 function getPopupValues() {
+    if(process.platform == "win32") {
+        popupHeader = getCacheValue("popupHeader");
+        popupBody = getCacheValue("popupBody");
+        popupButton = getCacheValue("popupButton");
+    }
     return [popupHeader, popupBody, popupButton];
 }
 

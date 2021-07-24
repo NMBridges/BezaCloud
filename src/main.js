@@ -72,19 +72,59 @@ function newCreateServerWindow() {
       });
     });
   });
+  
+  // When a window calls for popup to be shown, it creates a popup window.
+  createServerWindow.on('showPopup', () => {
+    primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
+      newPopupWindow(result[0], result[1], result[2]);
+    });
+  });
+}
+
+function newAddTemplateWindow() {
+  let templateWindow;
+  
+  templateWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+  templateWindow.loadFile(path.join(__dirname, 'newTemplate/newTemplate.html'));
+  //templateWindow.webContents.openDevTools();
+
+  templateWindow.setResizable(false);
+  
+  templateWindow.webContents.on('ready-to-show', function() {
+    templateWindow.webContents.executeJavaScript('updateColors();').then(function() {
+      templateWindow.webContents.executeJavaScript('resetElements();').then(function() {
+        templateWindow.show();
+      });
+    });
+  });
+
+  // When a window calls for popup to be shown, it creates a popup window.
+  templateWindow.on('showPopup', () => {
+    primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
+      newPopupWindow(result[0], result[1], result[2]);
+    });
+  });
 }
 
 // The main logic function that controls interaction between windows
 function createWindows() {
   // Installs the AWS CLI if it is not already installed.
   hasAwsCliInstalled().then(function(result) {
-    console.log(result);
     if(!result) {
-        installAwsCli().then(function() {
-          if(process.platform != 'win32') {
-            newPopupWindow("AWS CLI is not installed. Please run the following in Terminal:", "sudo installer -pkg " + awsDir() + "/AWSCLIV2.pkg -target /", "Copy and Close");
-          }
-        });
+      installAwsCli().then(function() {
+        if(process.platform != 'win32') {
+          newPopupWindow("AWS CLI is not installed. Please run the following in Terminal:", "sudo installer -pkg " + awsDir() + "/AWSCLIV2.pkg -target /", "Copy and Close");
+        }
+      });
     }
   });
 
@@ -190,6 +230,11 @@ function createWindows() {
   // When a window calls for newServer window, it creates a newServer window.
   primaryWindow.on('newServer', () => {
     newCreateServerWindow();
+  });
+
+  // When a window calls for newTemplate window, it creates a newTemplate window.
+  primaryWindow.on('newTemplate', () => {
+    newAddTemplateWindow();
   });
 
   // ---------------------------------------------------------------------------------------------------//

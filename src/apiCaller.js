@@ -22,7 +22,7 @@ const {
     CopyImageCommand,
 } = require("@aws-sdk/client-ec2");
 const {
-    getRegion
+    getRegion, hasAwsCliInstalled
 } = require("./mercor.js");
 var ec2Client = new EC2Client({ region: "us-east-1"});
 const fs = require('fs');
@@ -316,9 +316,14 @@ const addTags = async (instanceId, tag, value) => {
  * Returns the AMIs that the user owns.
  */
 async function getUserAMIs() {
-    const { stdout, stderr } = await promiseExec("aws ec2 describe-images --owners \"self\" --no-cli-pager --region " + getRegion());
-    console.log("Successfully retrieved user's AMIs", JSON.parse(stdout));
-    return JSON.parse(stdout);
+    const result = await hasAwsCliInstalled();
+    if(result) {
+        const { stdout, stderr } = await promiseExec("aws ec2 describe-images --owners \"self\" --no-cli-pager --region " + getRegion());
+        console.log("Successfully retrieved user's AMIs", JSON.parse(stdout));
+        return JSON.parse(stdout);
+    } else {
+        return "ERROR";
+    }
 };
 
 /**
@@ -475,7 +480,7 @@ const createInstance = async (ami, cpu, name, key, secGroupId) => {
             return instanceId;
         } catch (err) {
             console.log("Error", err);
-            return instanceId;
+            return "ERROR";
         }
     } catch (err) {
         console.log("Error", err);
