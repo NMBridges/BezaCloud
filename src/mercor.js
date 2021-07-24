@@ -255,6 +255,7 @@ function updateCache(key, value) {
  * @returns The cache value for the specified key.
  */
 function getCacheValue(key) {
+    createAwsDir();
     if(!fs.existsSync(awsDir() + "/cache.json")) {
         fs.appendFileSync(awsDir() + "/cache.json", '{}');
         return "ERROR";

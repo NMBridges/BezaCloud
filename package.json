@@ -45,8 +45,8 @@
     }
   },
   "dependencies": {
-    "@aws-sdk/client-ec2": "^3.18.0",
-    "aws-sdk": "^2.932.0",
+    "@aws-sdk/client-ec2": "^3.23.0",
+    "aws-sdk": "^2.953.0",
     "clipboardy": "^2.3.0",
     "electron-squirrel-startup": "^1.0.0",
     "mysql": "^2.18.1",
@@ -54,13 +54,13 @@
     "node-machine-id": "^1.1.12"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.57",
-    "@electron-forge/maker-deb": "^6.0.0-beta.57",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.57",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.57",
-    "@electron-forge/maker-zip": "^6.0.0-beta.57",
+    "@electron-forge/cli": "^6.0.0-beta.58",
+    "@electron-forge/maker-deb": "^6.0.0-beta.58",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.58",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.58",
+    "@electron-forge/maker-zip": "^6.0.0-beta.58",
     "asar": "^3.0.3",
-    "electron": "^13.1.4",
+    "electron": "^13.1.7",
     "electron-builder": "^22.11.7"
   },
   "build": {
