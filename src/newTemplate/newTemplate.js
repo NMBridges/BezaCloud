@@ -1,5 +1,8 @@
 // Supplemental functions
-const { Colors, getTheme, setPopupValues, getCacheValue, updateCache } = require('../mercor.js');
+const {
+    Colors, getTheme, setPopupValues, getCacheValue,
+    updateCache, getRegion
+} = require('../mercor.js');
 const {
     Template, getAmiData
 } = require('../apiCaller.js');
@@ -114,7 +117,7 @@ addTemplateButton.addEventListener('click', function() {
     const newAmiId = amiIdTextBox.value.trim();
 
     // Ensures the AMI ID is not already in the user's list
-    const cachedAmiIds = getCacheValue("templates");
+    const cachedAmiIds = getCacheValue("templates-" + getRegion());
     if(cachedAmiIds != "ERROR") {
         console.log(cachedAmiIds);
 
@@ -135,15 +138,17 @@ addTemplateButton.addEventListener('click', function() {
                 // Good, this is a valid AMI ID
                 newPopup("Success", "Template successfully added.", "Close");
                 cachedAmiIds.push(newAmiId);
-                updateCache("templates", cachedAmiIds);
+                updateCache("templates-" + getRegion(), cachedAmiIds);
                 window.close();
             } else {
                 // Error
-                newPopup("Error", "Error adding Template. Your network connection may be weak, or the AMI ID is potentially invalid.", "Close");
+                newPopup("Error", "Error adding Template. Your network connection may be weak, or the AMI ID is potentially invalid. " +
+                "Please ensure the Template is hosted in this region.", "Close");
             }
         } else {
             // Error
-            newPopup("Error", "Error adding Template. Your network connection may be weak, or the AMI ID is potentially invalid.", "Close");
+            newPopup("Error", "Error adding Template. Your network connection may be weak, or the AMI ID is potentially invalid. " + 
+            "Please ensure the Template is hosted in this region.", "Close");
         }
     });
 });

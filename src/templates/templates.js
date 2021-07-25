@@ -81,7 +81,7 @@ function loadTemplates() {
             console.log(results);
             templates = [];
             // Gets the list of the user's AMIs
-            if(results != "ERROR") {
+            if(results != "ERROR" && results != false) {
                 // create list of templates
                 if('Images' in results) {
                     for(var index = 0; index < results['Images'].length; index++) {
@@ -97,7 +97,7 @@ function loadTemplates() {
             console.log(templates);
             
             // Gets data for the other cached AMIs
-            const cachedAmiIds = getCacheValue("templates");
+            const cachedAmiIds = getCacheValue("templates-" + getRegion());
             if(cachedAmiIds != "ERROR") {
                 console.log(cachedAmiIds);
 
@@ -117,7 +117,7 @@ function loadTemplates() {
                     // Get AMI data about the AMI IDs
                     getAmiData(newTemplatesToPull).then(function(results) {
                         console.log(results);
-                        if(results != "ERROR") {
+                        if(results != "ERROR" && results != false) {
                             // create list of templates
                             if('Images' in results) {
                                 for(var index = 0; index < results['Images'].length; index++) {
@@ -135,7 +135,7 @@ function loadTemplates() {
                         for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
                             templateIds.push(templates[templateIndex].id);
                         }
-                        updateCache("templates", templateIds);
+                        updateCache("templates-" + getRegion(), templateIds);
                     
                         // Clears old Template tiles, resets region label
                         const regionDict = {
@@ -161,7 +161,7 @@ function loadTemplates() {
                     for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
                         templateIds.push(templates[templateIndex].id);
                     }
-                    updateCache("templates", templateIds);
+                    updateCache("templates-" + getRegion(), templateIds);
                 
                     // Clears old Template tiles, resets region label
                     const regionDict = {
@@ -187,7 +187,7 @@ function loadTemplates() {
                 for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
                     templateIds.push(templates[templateIndex].id);
                 }
-                updateCache("templates", templateIds);
+                updateCache("templates-" + getRegion(), templateIds);
             
                 // Clears old Template tiles, resets region label
                 const regionDict = {
@@ -351,6 +351,10 @@ function addTile(index) {
         // If the button is active, proceed.
         if(newCopyButton.value == "active") {
             // Copy the Template to another region
+            updateCache('copyTemplate', [templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName]);
+            const remote = parent.require('electron').remote;
+            let w = remote.getCurrentWindow();
+            w.emit('newCopyTemplate');
             /*copyImage(templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName, "us-east-2").then(function() {
                 loadTemplates();
             });*/
@@ -361,7 +365,11 @@ function addTile(index) {
     // The permadelete Template button.
     var newTerminateButton = document.createElement('div');
     newTerminateButton.className = "terminateButton";
-    newTerminateButton.textContent = "Permadelete";
+    if(template.owner == "self") {
+        newTerminateButton.textContent = "Permadelete";
+    } else {
+        newTerminateButton.textContent = "Remove from My Templates"
+    }
     newTerminateButton.id = "" + index;
     newTerminateButton.addEventListener('mouseenter', function() {
         // If the button is active, proceed.
@@ -375,11 +383,29 @@ function addTile(index) {
     newTerminateButton.addEventListener('click', function() {
         // If the button is active, proceed.
         if(newTerminateButton.value == "active") {
-            // Terminate Template.
-            displayOverlay(true);
-            deleteImage(templates[parseInt(newTerminateButton.id)].id).then(function() {
+            if(templates[parseInt(newTerminateButton.id)].owner == "self") {
+                // Terminate Template.
+                displayOverlay(true);
+                deleteImage(templates[parseInt(newTerminateButton.id)].id).then(function() {
+                    loadTemplates();
+                });
+            } else {
+                // Removes that template from the user's My Templates
+                templates.pop(parseInt(newTerminateButton.id));
+                
+                // Stores templates AMI IDs in Cache
+                var templateIds = [];
+                for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
+                    templateIds.push(templates[templateIndex].id);
+                }
+                
+                // Updates the template ID cache
+                updateCache("templates-" + getRegion(), templateIds);
+
+                // Reload
+                displayOverlay(true);
                 loadTemplates();
-            });
+            }
         }
     });
     newModifyArea.appendChild(newTerminateButton);
@@ -389,9 +415,11 @@ function addTile(index) {
     newCopyButton.value = "inactive";
     newTerminateButton.value = "inactive";
     newModifyButton.value = "inactive";
-    if(template.owner == "self" && template.status == "available") {
-        newVisibilityButton.value = "active";
-        newCopyButton.value = "active";
+    if(template.status == "available") {
+        if(template.owner == "self") {
+            newVisibilityButton.value = "active";
+            newCopyButton.value = "active";
+        }
         newTerminateButton.value = "active";
         newModifyButton.value = "active";
     }
@@ -495,7 +523,7 @@ function updateColors() {
             modifyButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
             // Enable if server is fully running or stopped.
             const state = templates[count].status.toLowerCase();
-            if(state == "available" && templates[count].owner == "self") {
+            if(state == "available") {
                 modifyButtons[count].style.color = Colors.textPrimary();
                 modifyButtons[count].style.borderColor = Colors.textPrimary();
             } else {
@@ -577,7 +605,7 @@ function updateColors() {
             terminateButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
             // Enable if the Template is available and owned by the user.
             const state = templates[count].status.toLowerCase();
-            if(state == "available" && templates[count].owner == "self") {
+            if(state == "available") {
                 terminateButtons[count].style.color = "#cc3333";
             } else {
                 terminateButtons[count].style.color = "#882222";

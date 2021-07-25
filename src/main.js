@@ -113,6 +113,52 @@ function newAddTemplateWindow() {
       newPopupWindow(result[0], result[1], result[2]);
     });
   });
+  
+  // When it closes, it should refresh the My Template list
+  templateWindow.on('close', () => {
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.loadTemplates();');
+  });
+}
+
+function newCopyTemplateWindow() {
+  let copyTemplateWindow;
+  
+  copyTemplateWindow = new BrowserWindow({
+    width: 400,
+    height: 370,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+  copyTemplateWindow.loadFile(path.join(__dirname, 'copyTemplate/copyTemplate.html'));
+  //copyTemplateWindow.webContents.openDevTools();
+
+  copyTemplateWindow.setResizable(false);
+  
+  copyTemplateWindow.webContents.on('ready-to-show', function() {
+    copyTemplateWindow.webContents.executeJavaScript('updateColors();').then(function() {
+      copyTemplateWindow.webContents.executeJavaScript('resetElements();').then(function() {
+        copyTemplateWindow.show();
+      });
+    });
+  });
+
+  // When a window calls for popup to be shown, it creates a popup window.
+  copyTemplateWindow.on('showPopup', () => {
+    primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
+      newPopupWindow(result[0], result[1], result[2]);
+    });
+  });
+  
+  // When it closes, it should refresh the My Template list
+  copyTemplateWindow.on('close', () => {
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.loadTemplates();');
+  });
 }
 
 // The main logic function that controls interaction between windows
@@ -235,6 +281,11 @@ function createWindows() {
   // When a window calls for newTemplate window, it creates a newTemplate window.
   primaryWindow.on('newTemplate', () => {
     newAddTemplateWindow();
+  });
+
+  // When a window calls for copyTemplate window, it creates a newTemplate window.
+  primaryWindow.on('newCopyTemplate', () => {
+    newCopyTemplateWindow();
   });
 
   // ---------------------------------------------------------------------------------------------------//
