@@ -448,7 +448,8 @@ function addTile(index) {
                 });
             } else if(server.status == "running") {
                 // Display window saying server must be stopped
-                newPopup("Error", "Servers must be stopped before they can be used to create Templates.", "Close");
+                newPopup("Error", "Servers should be shut down with Sysprep before they can be used to create Templates. Instructions: Connect to your server --> Go to Start Menu --> " +
+                "EC2LaunchSettings --> Set 'Administrator Password' to 'Random.' Then click 'Shutdown with Sysprep.' Wait for the server to automatically shut down, and then retry creating a Template.", "Close");
             }
         }
     });

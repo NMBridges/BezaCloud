@@ -457,6 +457,8 @@ const createInstance = async (ami, cpu, name, key, secGroupId) => {
             SecurityGroupIds: [secGroupId],
         };
 
+        console.log(instanceParams);
+
         const data = await ec2Client.send(new RunInstancesCommand(instanceParams));
         const instanceId = data.Instances[0].InstanceId;
         console.log("Created instance", instanceId);

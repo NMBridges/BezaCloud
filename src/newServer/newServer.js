@@ -1,7 +1,10 @@
 // Supplemental functions
-const { Colors, getTheme, setPopupValues } = require('../mercor.js');
 const {
-    Template, getUserAMIs, getDefaultVpcId, getSecurityGroups,
+    Colors, getTheme, setPopupValues, getRegion,
+    getCacheValue
+} = require('../mercor.js');
+const {
+    Template, getAmiData, getDefaultVpcId, getSecurityGroups,
     getMercorSecurityGroupId, createKeyPair, createInstance,
     createMercorSecurityGroup
 } = require('../apiCaller.js');
@@ -106,6 +109,39 @@ function updateColors() {
 }
 
 /**
+ * Given an AMI JSON object, it returns a Template object.
+ * @param {string} ami The AMI JSON object to parse.
+ * @param {string} owner The owner of the AMI.
+ */
+ function createTemplateObject(ami, owner) {
+    var tempTemplateName = '';
+    if(ami['Tags'] != undefined) {
+        for(var tagIndex = 0; tagIndex < ami['Tags'].length; tagIndex++) {
+            if(ami['Tags'][tagIndex]['Key'] == "Name") {
+                tempTemplateName = ami['Tags'][tagIndex]['Value'];
+            }
+        }
+    }
+    const templateName = tempTemplateName;
+    const templateId = ami['ImageId'];
+    const templateStatus = ami['State'];
+    const templatePub = ami['Public'];
+    const templateAmiName = ami['Name'];
+    const templatePlat = ami['PlatformDetails'];
+
+    var newTemplate = new Template(
+        templateName,
+        templateId,
+        templateStatus,
+        templatePub,
+        templateAmiName,
+        templatePlat,
+        owner
+    );
+    return newTemplate;
+}
+
+/**
  * Resets the elements of the window to their default values.
  */
 function resetElements() {
@@ -116,18 +152,8 @@ function resetElements() {
     templateSelect.innerHTML = '';
     loadTemplates();
 
-    templateSelect.style.setProperty('--rows', templates.length);
-
-    for(var index = 0; index < templates.length; index++) {
-        addTemplateToList((templates[index].name == "") ? templates[index].amiName : templates[index].name, templates[index].id, index);
-    }
-
     cpuSelect.innerHTML = '';
-    cpuSelect.style.setProperty('--rows', 5);
-
-    for(var index = 0; index < 5; index++) {
-        addCpuToList("CPU " + index, index);
-    }
+    getCpus();
 
     updateColors();
 }
@@ -146,6 +172,7 @@ function addTemplateToList(name, amiId, index) {
 
     var newTemplateButtonSelect = document.createElement('div');
     newTemplateButtonSelect.className = "templateButtonSelect";
+    newTemplateButtonSelect.id = amiId;
     newTemplateOption.appendChild(newTemplateButtonSelect);
 
     var newTemplateNameLabel = document.createElement('div');
@@ -158,9 +185,11 @@ function addTemplateToList(name, amiId, index) {
         var templateButtonSelects = document.getElementsByClassName("templateButtonSelect");
         for(var index = 0; index < templateButtonSelects.length; index++) {
             templateButtonSelects[index].style.backgroundColor = Colors.textTertiary();
+            templateButtonSelects[index].value = "unselected";
         }
         // Highlights selected option
         newTemplateButtonSelect.style.backgroundColor = "#333333";
+        newTemplateButtonSelect.value = "selected";
     });
 
     templateSelect.appendChild(newTemplateOption);
@@ -179,6 +208,7 @@ function addCpuToList(name, index) {
 
     var newCpuButtonSelect = document.createElement('div');
     newCpuButtonSelect.className = "cpuButtonSelect";
+    newCpuButtonSelect.id = name;
     newCpuOption.appendChild(newCpuButtonSelect);
 
     var newCpuNameLabel = document.createElement('div');
@@ -191,9 +221,11 @@ function addCpuToList(name, index) {
         var cpuButtonSelects = document.getElementsByClassName("cpuButtonSelect");
         for(var index = 0; index < cpuButtonSelects.length; index++) {
             cpuButtonSelects[index].style.backgroundColor = Colors.textTertiary();
+            cpuButtonSelects[index].value = "unselected";
         }
         // Highlights selected option
         newCpuButtonSelect.style.backgroundColor = "#333333";
+        newCpuButtonSelect.value = "selected";
     });
 
     cpuSelect.appendChild(newCpuOption);
@@ -203,46 +235,39 @@ function addCpuToList(name, index) {
  * Loads 'templates' with a list of Templates that the user has in their Template library.
  */
 function loadTemplates() {
-    const results = getUserAMIs();
-    console.log(results);
-    templates = [];
-    if(results != "ERROR") {
-        // create list of templates
-        if('Images' in results) {
-            for(var index = 0; index < results['Images'].length; index++) {
-                const ami = results['Images'][index];
+    // Gets data for the cached AMIs
+    const cachedAmiIds = getCacheValue("templates-" + getRegion());
+    if(cachedAmiIds != "ERROR") {
+        console.log(cachedAmiIds);
+        
+        templates = [];
 
-                var tempTemplateName = '';
-                if(ami['Tags'] != undefined) {
-                    for(var tagIndex = 0; tagIndex < ami['Tags'].length; tagIndex++) {
-                        if(ami['Tags'][tagIndex]['Key'] == "Name") {
-                            tempTemplateName = ami['Tags'][tagIndex]['Value'];
+        if(cachedAmiIds.length > 0) {
+            // Get AMI data about the AMI IDs
+            getAmiData(cachedAmiIds).then(function(results) {
+                console.log(results);
+                if(results != "ERROR" && results != false) {
+                    // create list of templates
+                    if('Images' in results) {
+                        for(var index = 0; index < results['Images'].length; index++) {
+                            templates.push(createTemplateObject(results['Images'][index], "other"));
                         }
+
+                        templateSelect.style.setProperty('--rows', templates.length);
+
+                        for(var index = 0; index < templates.length; index++) {
+                            addTemplateToList((templates[index].name == "") ? templates[index].amiName : templates[index].name, templates[index].id, index);
+                        }
+
+                        updateColors();
+                    } else {
+                        // Error
                     }
+                } else {
+                    // Error
                 }
-                const templateName = tempTemplateName;
-                const templateId = ami['ImageId'];
-                const templateStatus = ami['State'];
-                const templatePub = ami['Public'];
-                const templateAmiName = ami['Name'];
-                const templatePlat = ami['Platform'];
-
-                var newTemplate = new Template(
-                    templateName,
-                    templateId,
-                    templateStatus,
-                    templatePub,
-                    templateAmiName,
-                    templatePlat
-                );
-
-                templates.push(newTemplate);
-            }
-        } else {
-            // Error
+            });
         }
-    } else {
-        // Error
     }
 }
 
@@ -250,7 +275,16 @@ function loadTemplates() {
  * @returns A list of CPUs that the user can use for that region.
  */
 function getCpus() {
-    
+    const cpuTypes = [
+        "t2.micro",
+        "c5ad.xlarge"
+    ];
+
+    cpuSelect.style.setProperty('--rows', cpuTypes.length);
+
+    for(var index = 0; index < cpuTypes.length; index++) {
+        addCpuToList(cpuTypes[index], index);
+    }
 }
 
 // --------------------------- Server Creating Functions ------------------------ //
@@ -350,7 +384,30 @@ createServerButton.addEventListener('mouseleave', function() {
 
 createServerButton.addEventListener('click', function() {
     // Create server
-    newServer(nameTextBox.value, "ami-054dc1c0a4617b048", "t2.micro");
+    var amiId = "";
+    var cpuType = "";
+
+    // Checks if a Template option is selected
+    var templateButtonSelects = document.getElementsByClassName("templateButtonSelect");
+    for(var index = 0; index < templateButtonSelects.length; index++) {
+        if(templateButtonSelects[index].value == "selected") {
+            amiId = templateButtonSelects[index].id;
+        }
+    }
+
+    // Checks if a CPU option is selected
+    var cpuButtonSelects = document.getElementsByClassName("cpuButtonSelect");
+    for(var index = 0; index < cpuButtonSelects.length; index++) {
+        if(cpuButtonSelects[index].value == "selected") {
+            cpuType = cpuButtonSelects[index].id;
+        }
+    }
+
+    if(amiId == "" || cpuType == "") {
+        // don't run
+    } else {
+        newServer(nameTextBox.value, amiId, cpuType);
+    }
 });
 
 cancelButton.addEventListener('mouseenter', function() {

@@ -29,8 +29,8 @@ var templates = [];
 var loadingTemplates = false;
 
 window.onload = function() {
-    //loadTemplates();
     updateColors();
+    loadTemplates();
 
 
 };
