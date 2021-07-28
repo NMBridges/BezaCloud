@@ -5,3 +5,7 @@
 - Mercor Connect may not be able to connect to certain servers if they were created
   outside of Mercor Connect. It may be necessary for you to manually input the password
   a single time, and then Mercor Connect will be able to connect to it any time after.
+
+
+npm run dist
+npm run package (mac)
