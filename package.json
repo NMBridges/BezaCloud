@@ -46,7 +46,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.23.0",
+    "atob": "^2.1.2",
     "aws-sdk": "^2.953.0",
+    "btoa": "^1.2.1",
     "clipboardy": "^2.3.0",
     "electron-squirrel-startup": "^1.0.0",
     "mysql": "^2.18.1",

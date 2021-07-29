@@ -51,6 +51,10 @@ function connect(index) {
     const decodedPassword = atob(encodedPassword);
     const ipv4 = server.ipv4;
 
+    const remote = parent.require('electron').remote;
+    let w = remote.getCurrentWindow();
+    w.emit('newConnection');
+
     // Add password popup.
     if(decodedPassword == "") {
         if(server.key == undefined) {

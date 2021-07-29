@@ -4,8 +4,6 @@
 - Add cost pulling [Dashboard]
 - Add option to disable cost pulling [Options]
 - Offline support [all]
-- Add option to remove external templates [Templates]
-- Add "copy AMI to another region" option [Templates]
 - Add Templates icon [Templates]
 - Fix random passwords [Templates]
 - Revise "+" icon [Servers, Templates, Tasks]
@@ -13,6 +11,7 @@
 - Add attaching .pem keys option [Servers]
 - Add Tasks page [Tasks]
 - Add notifications [Tasks]
+- Replace default colors [all]
 
 
 Instead of prebuilt AMIs, give the option for basic windows platform, then you can

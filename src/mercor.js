@@ -4,6 +4,8 @@ const { machineIdSync } = require("node-machine-id/index.js");
 var mysql = require('mysql-await');
 const { Address } = require('@aws-sdk/client-ec2');
 const { exec, execSync } = require('child_process');
+var atob = require("atob");
+var btoa = require("btoa");
 
 /** Global variable that holds information for the popup window header. */
 var popupHeader = "";
@@ -96,18 +98,16 @@ function setPage(newPage) {
  * @returns The cached license key from the user's file system
  */
 function cachedLicenseKey() {
-    var cachedKey = "";
-    if(!fs.existsSync(awsDir() + "/licenseKey2.txt")) {
-        return "";
-    }
-    var keyDir = awsDir() + "/licenseKey2.txt";
-    try {
-        cachedKey = fs.readFileSync(keyDir, 'utf-8');
-        cachedKey = cachedKey.substr(4).trim();
-    } catch(err) {
-        console.log(err);
-    }
+    var cachedKey = getCacheValue("licenseKey");
     return cachedKey;
+}
+
+/** 
+ * Updates the license key cache.
+ */ 
+ function updateKeyCache(newKey) {
+    updateCache("licenseKey", newKey);
+    return;
 }
 
 /**
@@ -231,11 +231,8 @@ function createAwsDir() {
         fs.mkdirSync(awsDir());
         fs.mkdirSync(awsDir() + "/connections");
     }
-    if(!fs.existsSync(awsDir() + "/licenseKey2.txt")) {
-        fs.appendFileSync(awsDir() + "/licenseKey2.txt", "key=");
-    }
     if(!fs.existsSync(awsDir() + "/cache.json")) {
-        fs.appendFileSync(awsDir() + "/cache.json", '{}');
+        fs.appendFileSync(awsDir() + "/cache.json", btoa('{}'));
     }
     // add other sections as needed
 }
@@ -247,13 +244,13 @@ function createAwsDir() {
  */
 function updateCache(key, value) {
     if(!fs.existsSync(awsDir() + "/cache.json")) {
-        fs.appendFileSync(awsDir() + "/cache.json", '{}');
+        fs.appendFileSync(awsDir() + "/cache.json", btoa('{}'));
     }
 
     const raw = fs.readFileSync(awsDir() + "/cache.json");
-    const jsonObj = JSON.parse(raw);
+    const jsonObj = JSON.parse(atob(atob(raw)));
     jsonObj[key] = value;
-    fs.writeFileSync(awsDir() + "/cache.json", JSON.stringify(jsonObj), err => {
+    fs.writeFileSync(awsDir() + "/cache.json", btoa(JSON.stringify(jsonObj)), err => {
         if (err) {
             console.log("Error writing file:", err);
         }
@@ -267,11 +264,11 @@ function updateCache(key, value) {
 function getCacheValue(key) {
     createAwsDir();
     if(!fs.existsSync(awsDir() + "/cache.json")) {
-        fs.appendFileSync(awsDir() + "/cache.json", '{}');
+        fs.appendFileSync(awsDir() + "/cache.json", btoa('{}'));
         return "ERROR";
     }
     const raw = fs.readFileSync(awsDir() + "/cache.json");
-    const jsonObj = JSON.parse(raw);
+    const jsonObj = JSON.parse(atob(atob(raw)));
     if(key in jsonObj) {
         return jsonObj[key];
     } else {
@@ -315,17 +312,6 @@ function getTheme() {
 function setTheme(newTheme) {
     theme = newTheme;
     updateCache("theme", newTheme);
-}
-
-/** 
- * Updates the license key cache.
- */ 
-function updateKeyCache(newKey) {
-    if(!fs.existsSync(awsDir() + "/licenseKey2.txt")) {
-        fs.appendFileSync(awsDir() + "/licenseKey2.txt", "key=" + newKey);
-    } else {
-        fs.writeFileSync(awsDir() + "/licenseKey2.txt", "key=" + newKey);
-    }
 }
 
 /** 

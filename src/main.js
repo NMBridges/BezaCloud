@@ -161,6 +161,33 @@ function newCopyTemplateWindow() {
   });
 }
 
+function newConnectionWindow() {
+  let connectionWindow;
+  
+  connectionWindow = new BrowserWindow({
+    width: 400,
+    height: 500,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+  connectionWindow.loadFile(path.join(__dirname, 'newConnection/newConnection.html'));
+  //connectionWindow.webContents.openDevTools();
+
+  connectionWindow.setResizable(false);
+  
+  connectionWindow.webContents.on('ready-to-show', function() {
+    connectionWindow.webContents.executeJavaScript('updateColors();').then(function() {
+      connectionWindow.webContents.executeJavaScript('updateElements();').then(function() {
+        connectionWindow.show();
+      });
+    });
+  });
+}
+
 // The main logic function that controls interaction between windows
 function createWindows() {
   // Installs the AWS CLI if it is not already installed.
@@ -266,11 +293,16 @@ function createWindows() {
     primaryWindow.setSize(1201, 800);
   });
 
-  // When a window calls for popup to be shown, it creates a popup window.
+  // When a window calls for a popup to be shown, it creates a popup window.
   primaryWindow.on('showPopup', () => {
     primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
       newPopupWindow(result[0], result[1], result[2]);
     });
+  });
+
+  // When a window calls for a newConnection winodw to be shown, it creates a newConnection window.
+  primaryWindow.on('newConnection', () => {
+    newConnectionWindow();
   });
 
   // When a window calls for newServer window, it creates a newServer window.
