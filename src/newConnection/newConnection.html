@@ -6,19 +6,19 @@
     <body>
         <div id="dividerBox">
             <div id="titleBox">Connect to Server</div>
-            <div id="nameBox">
-                <div id="nameLabel">Name</div>
-                <input id="nameTextBox"></input>
-            </div>
-            <div id="templateBox">
-                <div id="templateLabel">Template</div>
-                <div style="--rows: 5;" id="templateSelect">
+            <div id="pemBox" class="box">
+                <div id="pemDivBox" class="divBox">
+                    <div id="pemButton" class="selectButton"></div>
+                    <div id="pemLabel" class="divLabel">Use .pem key to connect</div>
                 </div>
+                <div id="fileSelectButton">Select .pem File</div>
             </div>
-            <div id="cpuBox">
-                <div id="cpuLabel">CPU</div>
-                <div style="--rows: 5;" id="cpuSelect">
+            <div id="passBox" class="box">
+                <div id="passDivBox" class="divBox">
+                    <div id="passButton" class="selectButton"></div>
+                    <div id="passLabel" class="divLabel">Use manually inputted password</div>
                 </div>
+                <input id="manualPassTextBox"></input>
             </div>
             <div id="buttonBox">
                 <button id="connectButton">Connect</button>

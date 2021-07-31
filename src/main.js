@@ -166,7 +166,7 @@ function newConnectionWindow() {
   
   connectionWindow = new BrowserWindow({
     width: 400,
-    height: 500,
+    height: 380,
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,

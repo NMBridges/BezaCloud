@@ -16,12 +16,11 @@ body {
         height: 100%;
         background-color: blue;
         display: grid;
-        grid-template-rows: 55px 70px 150px 140px auto;
+        grid-template-rows: 75px 115px 95px auto;
         grid-template-areas:
             'title'
-            'name'
-            'template'
-            'cpu'
+            'pem'
+            'pass'
             'buttons';
     }
         #titleBox {
@@ -33,135 +32,75 @@ body {
             font-size: 30px;
             margin-top: 15px;
         }
-        #nameBox {
-            grid-area: name;
-            width: 100%;
-            height: calc(100% - 5px);
-            margin-top: 5px;
+        .box {
+            display: grid;
+            grid-template-rows: 25px auto;
+            grid-template-areas:
+                'divBox'
+                'fileBut';
         }
-            #nameLabel {
+            .divBox {
                 width: 100%;
+                height: 100%;
+                display: grid;
+                grid-area: divBox;
+                grid-template-columns: 25px auto;
+                grid-template-areas: 
+                    'pemBut pemLab';
             }
-            #nameTextBox {
-                margin-top: 5px;
-                width: 100%;
+                .selectButton {
+                    margin: 5px;
+                    width: 8px;
+                    height: 8px;
+                    margin: 10px;
+                    background-color: brown;
+                    grid-area: pemBut;
+                    display: inline-block;
+                    border-radius: 12px;
+                    border: 3px solid black;
+                }
+                .divLabel {
+                    color: white;
+                    display: inline-block;
+                    height: 100%;
+                    grid-area: pemLab;
+                    line-height: 25px;
+                    margin-top: 4px;
+                    margin-left: 12px;
+                }
+            #fileSelectButton {
+                grid-area: fileBut;
+                width: calc(100% - 160px);
                 height: 30px;
-                line-height: 30px;
+                margin-top: 20px;
+                margin-left: 80px;
+                margin-right: 80px;
+                border-radius: 8px;
+                text-align: center;
+                vertical-align: middle;
+                background-color: brown;
+                color: white;
+                padding-top: 5px;
             }
-        #templateBox {
-            grid-area: template;
-            width: calc(100% - 10px);
-            height: 100%;
+            #manualPassTextBox {
+                width: calc(100% - 20px);
+                height: 25px;
+                margin-top: 20px;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+        #pemBox {
+            grid-area: pem;
+            width: 100%;
+            height: calc(100% - 10px);
+            background-color: aqua;
         }
-            #templateLabel {
-                width: 100%;
-            }
-            #templateSelect {
-                margin-top: 5px;
-                width: 100%;
-                height: 100px;
-                padding: 5px;
-                display: grid;
-                grid-gap: 0px;
-                grid-template-rows: repeat(var(--rows), 25px);
-                overflow-y: scroll;
-            }
-                .templateOption {
-                    width: 100%;
-                    height: 25px;
-                    margin: 0px;
-                    padding: 0px;
-                    grid-column: 1;
-                    grid-row: var(--row);
-                    border: 0px solid blue;
-                    font-family: "Segoe UI", sans-serif;
-                    font-weight:300;
-                    font-style: normal;
-                    font-size: 15px;
-                    display: grid;
-                    grid-template-columns: 25px auto;
-                    grid-template-areas:
-                        'TEMBUT TNL';
-                }
-                    .templateButtonSelect {
-                        grid-area: TEMBUT;
-                        grid-column: 1;
-                        grid-row: 1;
-                        width: 7px;
-                        height: 7px;
-                        margin: 6px;
-                        border: 3px solid white;
-                        border-radius: 6px;
-                    }
-                    .templateNameLabel {
-                        grid-area: TNL;
-                        grid-column: 2;
-                        grid-row: 1;
-                        margin-top: 1px;
-                        margin-bottom: 0px;
-                        margin-left: 5px;
-                        margin-right: 0px;
-                        width: calc(100% - 5px);
-                        height: 24px;
-                        text-align: left;
-                    }
-        #cpuBox {
-            grid-area: cpu;
-            width: calc(100% - 10px);
-            height: 100%;
+        #passBox {
+            grid-area: pass;
+            width: 100%;
+            height: calc(100% - 10px);
+            background-color: bisque;
         }
-            #cpuLabel {
-                width: 100%;
-            }
-            #cpuSelect {
-                width: 100%;
-                height: 100px;
-                margin-top: 5px;
-                padding: 5px;
-                display: grid;
-                grid-gap: 0px;
-                grid-template-rows: repeat(var(--rows), 25px);
-                overflow-y: scroll;
-            }
-                .cpuOption {
-                    width: 100%;
-                    height: 25px;
-                    margin: 0px;
-                    grid-column: 1;
-                    grid-row: var(--row);
-                    display: grid;
-                    border: 0px solid blue;
-                    font-family: "Segoe UI", sans-serif;
-                    font-weight:300;
-                    font-style: normal;
-                    font-size: 15px;
-                    padding: 0px;
-                    grid-template-columns: 25px auto;
-                    grid-template-areas:
-                        'CPUBUT CNL';
-                }
-                    .cpuButtonSelect {
-                        grid-area: CPUBUT;
-                        grid-column: 1;
-                        grid-row: 1;
-                        width: 7px;
-                        height: 7px;
-                        margin: 6px;
-                        border: 3px solid white;
-                        border-radius: 6px;
-                    }
-                    .cpuNameLabel {
-                        grid-area: CNL;
-                        grid-column: 2;
-                        grid-row: 1;
-                        margin-top: 1px;
-                        margin-bottom: 0px;
-                        margin-left: 5px;
-                        margin-right: 0px;
-                        width: calc(100% - 5px);
-                        height: 24px;
-                        text-align: left;
-                    }
         #buttonBox {
             grid-area: buttons;
             width: 100%;

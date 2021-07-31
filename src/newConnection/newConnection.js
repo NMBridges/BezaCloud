@@ -14,18 +14,6 @@ const {
 var dividerBox = document.getElementById('dividerBox');
 /** The first section; contains the title. */
 var titleBox = document.getElementById('titleBox');
-/** The label that describes the name text box. */
-var nameLabel = document.getElementById('nameLabel');
-/** The name text box/field. */
-var nameTextBox = document.getElementById('nameTextBox');
-/** The label that describes the Template selection field. */
-var templateLabel = document.getElementById('templateLabel');
-/** The Template selection field bounding box. */
-var templateSelect = document.getElementById('templateSelect');
-/** The label that describes the CPU selection field. */
-var cpuLabel = document.getElementById('cpuLabel');
-/** The CPU selection field bounding box. */
-var cpuSelect = document.getElementById('cpuSelect');
 /** The button that connects to a server, if parameters are valid, when clicked. */
 var connectButton = document.getElementById('connectButton');
 /** The button that closes the window and cancels the operation when clicked. */
@@ -52,6 +40,7 @@ function updateColors() {
         cancelButton.style.backgroundColor = Colors.backgroundPrimary();
         cancelButton.style.color = Colors.backgroundSecondary();
         cancelButton.style.borderColor = Colors.backgroundSecondary();
+        document.getElementById("fileSelectButton").style.backgroundColor = Colors.backgroundSecondary();
     } else {
         titleBox.style.color = Colors.textPrimary();
         connectButton.style.backgroundColor = Colors.textPrimary();
@@ -59,102 +48,29 @@ function updateColors() {
         cancelButton.style.backgroundColor = Colors.backgroundPrimary();
         cancelButton.style.color = Colors.textPrimary();
         cancelButton.style.borderColor = Colors.textPrimary();
+        document.getElementById("fileSelectButton").style.backgroundColor = Colors.textPrimary();
     }
 
-    nameLabel.style.color = Colors.textSecondary();
-    templateLabel.style.color = Colors.textSecondary();
-    cpuLabel.style.color = Colors.textSecondary();
-    
-    templateSelect.style.backgroundColor = Colors.backgroundPrimaryAccent();
-    cpuSelect.style.backgroundColor = Colors.backgroundPrimaryAccent();
-
-    var templateOptions = document.getElementsByClassName("templateOption");
-    for(var index = templateOptions.length - 1; index >= 0; index--) {
-        if((templateOptions.length - 1 - index) % 2 == 0) {
-            templateOptions[index].style.backgroundColor = Colors.backgroundPrimaryDoubleAccent();
-        } else {
-            templateOptions[index].style.backgroundColor = Colors.backgroundPrimaryAccent();}
+    var elements = document.getElementsByClassName("box");
+    for(var index = 0; index < elements.length; index++) {
+        elements[index].style.backgroundColor = Colors.backgroundPrimaryAccent();
     }
 
-    var cpuOptions = document.getElementsByClassName("cpuOption");
-    for(var index = cpuOptions.length - 1; index >= 0; index--) {
-        if((cpuOptions.length - 1 - index) % 2 == 0) {
-            cpuOptions[index].style.backgroundColor = Colors.backgroundPrimaryDoubleAccent();
-        } else {
-            cpuOptions[index].style.backgroundColor = Colors.backgroundPrimaryAccent();}
+    var elements = document.getElementsByClassName("selectButton");
+    for(var index = 0; index < elements.length; index++) {
+        elements[index].style.backgroundColor = Colors.textTertiary();
+        elements[index].style.borderColor = Colors.textTertiary();
     }
 
-    var templateNameLabels = document.getElementsByClassName("templateNameLabel");
-    for(var index = 0; index < templateNameLabels.length; index++) {
-        templateNameLabels[index].style.color = Colors.textTertiary();
-    }
-
-    var templateButtonSelects = document.getElementsByClassName("templateButtonSelect");
-    for(var index = 0; index < templateButtonSelects.length; index++) {
-        templateButtonSelects[index].style.backgroundColor = Colors.textTertiary();
-        templateButtonSelects[index].style.borderColor = Colors.textTertiary();
-    }
-
-    var cpuNameLabels = document.getElementsByClassName("cpuNameLabel");
-    for(var index = 0; index < cpuNameLabels.length; index++) {
-        cpuNameLabels[index].style.color = Colors.textTertiary();
-    }
-
-    var cpuButtonSelects = document.getElementsByClassName("cpuButtonSelect");
-    for(var index = 0; index < cpuButtonSelects.length; index++) {
-        cpuButtonSelects[index].style.backgroundColor = Colors.textTertiary();
-        cpuButtonSelects[index].style.borderColor = Colors.textTertiary();
-    }
-
-}
-
-/**
- * Given an AMI JSON object, it returns a Template object.
- * @param {string} ami The AMI JSON object to parse.
- * @param {string} owner The owner of the AMI.
- */
- function createTemplateObject(ami, owner) {
-    var tempTemplateName = '';
-    if(ami['Tags'] != undefined) {
-        for(var tagIndex = 0; tagIndex < ami['Tags'].length; tagIndex++) {
-            if(ami['Tags'][tagIndex]['Key'] == "Name") {
-                tempTemplateName = ami['Tags'][tagIndex]['Value'];
-            }
-        }
-    }
-    const templateName = tempTemplateName;
-    const templateId = ami['ImageId'];
-    const templateStatus = ami['State'];
-    const templatePub = ami['Public'];
-    const templateAmiName = ami['Name'];
-    const templatePlat = ami['PlatformDetails'];
-
-    var newTemplate = new Template(
-        templateName,
-        templateId,
-        templateStatus,
-        templatePub,
-        templateAmiName,
-        templatePlat,
-        owner
-    );
-    return newTemplate;
+    // then select the second one if there is a password, first otherwise
 }
 
 /**
  * Resets the elements of the window to their default values.
  */
 function updateElements() {
-    nameTextBox.value = "";
+    //nameTextBox.value = "";
     
-    // Clears the Templates and CPUs of any list items, then retrieves the
-    // user's Templates and available CPUs
-    templateSelect.innerHTML = '';
-    loadTemplates();
-
-    cpuSelect.innerHTML = '';
-    getCpus();
-
     updateColors();
 }
 
