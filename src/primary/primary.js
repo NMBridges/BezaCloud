@@ -249,6 +249,8 @@ function to(page) {
     }
     if(page == "Tasks") {
         task.hidden = false;
+        task.contentWindow.displayOverlay(true);
+        task.contentWindow.loadTasks();
     } else {
         task.hidden = true;
     }

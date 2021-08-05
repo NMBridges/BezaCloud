@@ -544,10 +544,27 @@ class Server {
     }
 }
 
+/**
+ * Class that stores the necessary information for each Task.
+ */
+ class Task {
+    /**
+     * Constructs a new Task object.
+     * @param {string} id The server ID for the Task to modify.
+     * @param {string} type The type of Task. Either 'start' or 'stop'.
+     * @param {number} time The Unix time at which the Task should be executed.
+     */
+    constructor(id, type, time) {
+        this.id = id;
+        this.type = type;
+        this.time = time;
+    }
+}
+
 module.exports = 
 { 
-    Server, Template, connectionTest, getInstances, startInstance, 
-    stopInstance, rebootInstance, terminateInstance, 
+    Server, Template, Task, connectionTest, getInstances,
+    startInstance, stopInstance, rebootInstance, terminateInstance, 
     createKeyPair, getInstancePasswordData, createInstance,
     getSecurityGroups, getMercorSecurityGroupId, getDefaultVpcId,
     createMercorSecurityGroup, pemFileExists, addTags,

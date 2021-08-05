@@ -1,1 +1,243 @@
 @import url(../assets/fonts/fonts.css);
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    margin: auto;
+    font-weight:300;
+    font-style: normal;
+    max-width: 100%;
+    max-height: 100%;
+}
+    #overlay {
+        position: fixed;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 2;
+        cursor: pointer;
+    }
+    .mainGridContainer {
+        width:100%;
+        height:100%;
+        display: grid;
+        grid-template-rows: 50px auto;
+        grid-gap: 0px;
+        margin: 0px;
+        grid-template-areas:
+            'topBar'
+            'primaryBody';
+    }
+        #topBar {
+            min-width: 400px;
+            grid-area: topBar;
+            width: 100%;
+            height: 100%;
+            background-color: aqua;
+            display: grid;
+            grid-gap: 0px;
+            grid-template-columns: auto auto 50px;
+            grid-template-areas:
+                'mainLabel regionLabel newTask';
+        }
+            #mainPageLabel {
+                grid-area: mainLabel;
+                display: inline-block;
+                line-height: 50px;
+                font-size: 25px;
+                margin-left: 15px;
+                color: white;
+            }
+            #regionLabel {
+                grid-area: regionLabel;
+                display: inline-block;
+                line-height: 50px;
+                font-size: 20px;
+                margin-left: 15px;
+                color: #999999;
+                margin-right: 15px;
+                text-align: right;
+            }
+            #newTaskButton {
+                grid-area: newTask;
+                display: inline-block;
+                width: 50px;
+                height: 99%;
+                color: white;
+                border: 0px solid black;
+                margin: 0px;
+                font-size: 35px;
+            }
+        #primaryBody {
+            min-width: 800px;
+            min-height: 600px;
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
+            grid-area: primaryBody;
+            display: grid;
+            padding: 5px;
+            grid-gap: 0px;
+            grid-template-columns: 33% 33% 34%;
+            grid-template-rows: 252px;
+            overflow-y: scroll;
+        }
+            .tile {
+                width: calc(100% - 32px);
+                height: 220px;
+                background-color: black;
+                border-radius: 10px;
+                border: 1px solid gray;
+                margin:5px;
+                padding: 10px;
+                text-overflow: ellipsis;
+                position: relative;
+            }
+                .taskName {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    max-width: 80%;
+                    font-size: 25px;
+                    color: white;
+                    font-weight: 600;
+                    line-height: 30px;
+                    height: 35px;
+                }
+                .statusIcon {
+                    position: absolute;
+                    top: 17px;
+                    right: 17px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 10px;
+                    background-color: green;
+                }
+                    .statusIcon .statusPopup {
+                        color: white;
+                        display: none;
+                        font-family: "Segoe UI", sans-serif;
+                        font-weight:300;
+                        font-style: normal;
+                        font-size: 10px;
+                        text-align: center;
+                        margin-top: 25px;
+                        margin-left: -8px;
+                    }
+                    .statusIcon:hover .statusPopup {
+                        display: block;
+                    }
+                .templateId {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    font-size: 15px;
+                    line-height: 20px;
+                    color: gray;
+                    font-weight: 200;
+                }
+                .templateTagName {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    font-size: 15px;
+                    line-height: 20px;
+                    color: gray;
+                    font-weight: 200;
+                }
+                .platformLabel {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    margin-top: 10px;
+                    max-width: 80%;
+                    font-size: 20px;
+                    line-height: 25px;
+                    height: 25px;
+                    color: white;
+                    font-weight: normal;
+                }
+                .templatePlatform {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow:hidden;
+                    font-size: 15px;
+                    margin-top: 5px;
+                    line-height: 20px;
+                    color: gray;
+                    font-weight: 200;
+                }
+                .modifyButton {
+                    position:absolute;
+                    right: 10px;
+                    bottom: 10px;
+                    width: calc(100% - 20px);
+                    height: 35px;
+                    line-height: 15px;
+                    border: 1px solid gray;
+                    background-color: gray;
+                    color: gray;
+                    border-radius: 5px;
+                    font-family: "Segoe UI", sans-serif;
+                    font-size: 15px;
+                    font-style: normal;
+                    font-weight: 200;
+                    cursor:pointer;
+                }
+                .modifyArea {
+                    position: absolute;
+                    height: 105px;
+                    bottom: 44px;
+                    left: 10px;
+                    right: 10px;
+                    border-radius: 5px;
+                    border: 1px solid gray;
+                }
+                    .visibilityButton {
+                        overflow: hidden;
+                        width: 100%;
+                        height: 35px;
+                        line-height: 35px;
+                        background-color: red;
+                        font-family: "Segoe UI", sans-serif;
+                        font-size: 15px;
+                        font-style: normal;
+                        font-weight: 200;
+                        text-align: center;
+                        vertical-align: center;
+                        border-radius: 5px;
+                        cursor:pointer;
+                    }
+                    .copyButton {
+                        overflow: hidden;
+                        width: 100%;
+                        height: 35px;
+                        line-height: 35px;
+                        background-color: red;
+                        font-family: "Segoe UI", sans-serif;
+                        font-size: 15px;
+                        font-style: normal;
+                        font-weight: 200;
+                        text-align: center;
+                        vertical-align: center;
+                        border-radius: 5px;
+                        cursor:pointer;
+                    }
+                    .terminateButton {
+                        overflow: hidden;
+                        width: 100%;
+                        height: 34px;
+                        line-height: 34px;
+                        background-color: red;
+                        font-family: "Segoe UI", sans-serif;
+                        font-size: 15px;
+                        font-style: normal;
+                        font-weight: 200;
+                        text-align: center;
+                        vertical-align: center;
+                        border-radius: 5px;
+                        cursor:pointer;
+                    }
