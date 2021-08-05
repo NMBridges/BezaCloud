@@ -357,22 +357,18 @@ function openRdpFile() {
     popupHeader = header;
     popupBody = body;
     popupButton = button;
-    if(process.platform == "win32") {
-        updateCache("popupHeader", popupHeader);
-        updateCache("popupBody", popupBody);
-        updateCache("popupButton", popupButton);
-    }
+    updateCache("popupHeader", popupHeader);
+    updateCache("popupBody", popupBody);
+    updateCache("popupButton", popupButton);
 }
 
 /**
  * @returns The text values for the popup window.
  */
 function getPopupValues() {
-    if(process.platform == "win32") {
-        popupHeader = getCacheValue("popupHeader");
-        popupBody = getCacheValue("popupBody");
-        popupButton = getCacheValue("popupButton");
-    }
+    popupHeader = getCacheValue("popupHeader");
+    popupBody = getCacheValue("popupBody");
+    popupButton = getCacheValue("popupButton");
     return [popupHeader, popupBody, popupButton];
 }
 
