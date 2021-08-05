@@ -81,6 +81,14 @@ const installAwsCli = async () => {
 }
 
 /**
+ * Runs an inputted command. Used asynchronously by windows that are about to close.
+ * @param {string} inpCmd The inputted command to be executed.
+ */
+function mercorExec(inpCmd) {
+    exec(inpCmd);
+}
+
+/**
  * @returns The current page.
  */
 function getPage() {
@@ -587,5 +595,5 @@ module.exports = {
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
     installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled,
-    setRegion, getRegion, updateCache, getCacheValue
+    setRegion, getRegion, updateCache, getCacheValue, mercorExec
 };

@@ -186,6 +186,19 @@ function newConnectionWindow() {
       });
     });
   });
+  
+  // When a window calls for a popup to be shown, it creates a popup window.
+  connectionWindow.on('showPopup', () => {
+    primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
+      newPopupWindow(result[0], result[1], result[2]);
+    });
+  });
+
+  // When the window is close, it will reload the primary window.
+  connectionWindow.on('close', () => {
+    primaryWindow.webContents.executeJavaScript('serv.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('serv.contentWindow.loadServers();');
+  });
 }
 
 // The main logic function that controls interaction between windows

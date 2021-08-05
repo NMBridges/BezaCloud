@@ -1,7 +1,7 @@
 // Supplemental functions
 const { 
     Colors, createRdpFile, openRdpFile, setPopupValues,
-    getPopupValues, awsDir, getRegion
+    getPopupValues, awsDir, getRegion, updateCache
 } = parent.require("../mercor.js");
 const { 
     getInstances, startInstance, stopInstance, 
@@ -46,110 +46,11 @@ window.onload = function() {
  * @param {number} index The index of 'servers' that holds the server to connect to.
  */
 function connect(index) {
-    const server = servers[index];
-    const encodedPassword = server.password;
-    const decodedPassword = atob(encodedPassword);
-    const ipv4 = server.ipv4;
+    updateCache("newConnection", servers[index]);
 
     const remote = parent.require('electron').remote;
     let w = remote.getCurrentWindow();
     w.emit('newConnection');
-
-    // Add password popup.
-    if(decodedPassword == "") {
-        if(server.key == undefined) {
-            // It appears that this server was not made using Mercor Connect or an error occurred,
-            // as the server does not have an attached key pair. You must provide the password manually.
-            console.log("It appears that this server was not made using Mercor Connect or an error occurred, " +
-                    "as the server does not have an attached key pair. You must provide the password manually.");
-            newPopup("Error", "It appears that this server was not made using Mercor Connect or an error occurred, " +
-            "as the server does not have an attached key pair. You must provide the password manually.", "Close");
-            displayOverlay(false);
-        } else {
-            getInstancePasswordData(server.id).then(function(result) {
-                if(pemFileExists(server.key)) {
-                    if(result == "" || result == "ERROR") {
-                        // Server is not available yet
-                        console.log("Server is not available yet.");
-                        newPopup("Error", "Server is not available yet. Servers may take up to 10 minutes to become available.", "Close");
-                        displayOverlay(false);
-                    } else {
-                        // Decode password data
-                        const decryptCmd = "aws ec2 get-password-data --region " + getRegion() + " --instance-id " + server.id + " --priv-launch-key " + awsDir() + "/connections/" + server.key + ".pem";
-                        const stdout = execSync(decryptCmd).toString();
-                        const out = JSON.parse(stdout);
-                        if("PasswordData" in out) {
-                            const newPassword = out['PasswordData'];
-                            console.log(newPassword);
-                            if(newPassword != "") {
-                                // Add new encoded password tag
-                                if(addTags(server.id, "Cert", btoa(newPassword))) {
-                                    // Successfully added tags
-                                } else {
-                                    // Oh well, try again next time.
-                                }
-
-                                // Run Microsoft Remote Desktop
-                                if(parent.process.platform == 'win32') {
-                                    const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
-                                    const e = execSync(cmd1);
-                                    const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-                                    exec(cmd2);
-                                    displayOverlay(false);
-                                    // Should be running Remote Desktop
-                                } else {
-                                    // Mac
-                                    newPopup("The password to your server is", newPassword, "Copy and Continue");
-                                    const cmd1 = "touch " + awsDir() + "/connections/server.rdp";
-                                    const e1 = execSync(cmd1);
-                                    const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/connections/server.rdp";
-                                    const e2 = execSync(cmd2);
-                                    displayOverlay(false);
-                                }
-                            } else {
-                                console.log("There was an error retrieving the password. No password found.");
-                                newPopup("Error", "There was an error retrieving the server password. Servers may take 10 or more minutes after creation to become available.", "Close");
-                                displayOverlay(false);
-                            }
-                        } else {
-                            console.log("There was an error retrieving the password.");
-                            newPopup("Error", "There was an error retrieving the server password.", "Close");
-                            displayOverlay(false);
-                        }
-                    }
-                } else {
-                    // It appears that this server was not created with Mercor Connect or
-                    // the .pem file associated with the server's key pair has been deleted.
-                    console.log("It appears that this server was not created with Mercor Connect or " +
-                    "the .pem file associated with the server's key pair has been deleted.");
-                    newPopup("Error", "It appears that this server was not created with Mercor Connect or " +
-                    "the .pem file associated with the server's key pair is not in the correct location. Please resolve this " + 
-                    "by attaching the appropriate .pem file to the server in the My Servers page.", "Close");
-                    displayOverlay(false);
-                }
-            });
-        }
-    } else {
-        // Run Microsoft Remote Desktop
-        if(parent.process.platform == 'win32') {
-            // Windows
-            const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + decodedPassword + "\"";
-            const e = execSync(cmd1);
-            const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-            exec(cmd2);
-            // Should be running Remote Desktop
-            displayOverlay(false);
-        } else {
-            // Mac
-            newPopup("The password to your server is", decodedPassword, "Copy and Continue");
-            const cmd1 = "touch " + awsDir() + "/connections/server.rdp";
-            const e1 = execSync(cmd1);
-            const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/connections/server.rdp";
-            const e2 = execSync(cmd2);
-            displayOverlay(false);
-        }
-    }
-    console.log(decodedPassword);
 }
 
 /**
