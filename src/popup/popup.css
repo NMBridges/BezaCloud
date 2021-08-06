@@ -19,7 +19,7 @@ body {
         border-radius: 0px;
         border: 0px solid blue;
         display: grid;
-        grid-template-rows: 20% auto 100px;
+        grid-template-rows: 25% calc(75% - 100px) 100px;
         grid-template-areas: 
             'header'
             'body'

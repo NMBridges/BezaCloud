@@ -25,8 +25,9 @@ function newPopupWindow(header, body, button) {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
-    }
+      enableRemoteModule: true,
+    },
+    focusable: true
   });
   popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));
   //popupWindow.webContents.openDevTools();
@@ -175,7 +176,7 @@ function newConnectionWindow() {
     }
   });
   connectionWindow.loadFile(path.join(__dirname, 'newConnection/newConnection.html'));
-  //connectionWindow.webContents.openDevTools();
+  sconnectionWindow.webContents.openDevTools();
 
   connectionWindow.setResizable(false);
   
@@ -294,7 +295,7 @@ function createWindows() {
     show: false
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
-  //primaryWindow.webContents.openDevTools();
+  primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {

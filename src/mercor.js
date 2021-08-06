@@ -4,6 +4,7 @@ const { machineIdSync } = require("node-machine-id/index.js");
 var mysql = require('mysql-await');
 const { Address } = require('@aws-sdk/client-ec2');
 const { exec, execSync } = require('child_process');
+const promiseExec = require('util').promisify(exec);
 var atob = require("atob");
 var btoa = require("btoa");
 
@@ -42,13 +43,13 @@ const hasAwsCliInstalled = async () => {
             return false;
         }
     } else {
-        const { stdout, err } = exec("aws --version");
-        if(err != null) {
-            console.log("AWS CLI not installed");
-            return false;
-        } else {
+        try {
+            const { stdout, stderr } = await promiseExec("aws --version");
             console.log("AWS CLI installed");
             return true;
+        } catch(err) {
+            console.log("AWS CLI not installed", err);
+            return false;
         }
     }
 }
@@ -202,33 +203,38 @@ async function tryLicenseKey(inputKey) {
     var machId = machineIdSync({original: true});
 
     // check if license key is valid
-    const result = await con.awaitQuery("SELECT * FROM activationTable WHERE licenseKey=?", [inputKey]);
+    try {
+        const result = await con.awaitQuery("SELECT * FROM activationTable WHERE licenseKey=?", [inputKey]);
+        
+        if(result.length == 0) {
+            // license key does not exist
+            // cannot proceed
+            console.log("Invalid license key.");
+        } else if(result[0]['hardwareId'] != null && result[0]['hardwareId'] != machId) {
+            // license key is registered on another device
+            // cannot proceed
+            console.log("License key is registered on another device.");
+        } else if(result[0]['hardwareId'] == machId) {
+            // license key is registered by the current device
+            // proceed
+            console.log("License key is valid.");
+            keyIsValid = true;
+        } else {
+            // license key is valid and unused
+            // register this license key for this device and proceed
+            const result2 = await con.awaitQuery("UPDATE activationTable SET hardwareId =? WHERE licenseKey =?", [machId, inputKey]);
+            await con.awaitCommit();
+            console.log("License key registered successfully.");
+            keyIsValid = true;
+        }
     
-    if(result.length == 0) {
-        // license key does not exist
-        // cannot proceed
+        await con.awaitEnd();
+    
+        return keyIsValid;
+    } catch {
         console.log("Invalid license key.");
-    } else if(result[0]['hardwareId'] != null && result[0]['hardwareId'] != machId) {
-        // license key is registered on another device
-        // cannot proceed
-        console.log("License key is registered on another device.");
-    } else if(result[0]['hardwareId'] == machId) {
-        // license key is registered by the current device
-        // proceed
-        console.log("License key is valid.");
-        keyIsValid = true;
-    } else {
-        // license key is valid and unused
-        // register this license key for this device and proceed
-        const result2 = await con.awaitQuery("UPDATE activationTable SET hardwareId =? WHERE licenseKey =?", [machId, inputKey]);
-        await con.awaitCommit();
-        console.log("License key registered successfully.");
-        keyIsValid = true;
+        return false;
     }
-
-    await con.awaitEnd();
-
-    return keyIsValid;
 }
 
 /**

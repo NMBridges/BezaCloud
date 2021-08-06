@@ -550,14 +550,18 @@ class Server {
  class Task {
     /**
      * Constructs a new Task object.
+     * @param {string} name The name of the server for the Task to modify.
      * @param {string} id The server ID for the Task to modify.
      * @param {string} type The type of Task. Either 'start' or 'stop'.
      * @param {number} time The Unix time at which the Task should be executed.
+     * @param {string} region The region the Task should be executed in.
      */
-    constructor(id, type, time) {
+    constructor(name, id, type, time, region) {
+        this.name = name;
         this.id = id;
         this.type = type;
         this.time = time;
+        this.region = region;
     }
 }
 

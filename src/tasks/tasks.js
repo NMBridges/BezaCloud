@@ -17,17 +17,274 @@ var newTaskButton = document.getElementById("newTaskButton");
 var primaryBody = document.getElementById("primaryBody");
 var overlay = document.getElementById("overlay");
 
+/** @type {Task[]} The list of Tasks set by the user. */
+var tasks = [];
+
 /** Called when the window is first loaded. */
 window.onload = function() {
     updateColors();
 }
 
+// ---------------------------  Task loading functions  ---------------------------- //
+
+/**
+ * Given a JSON object, it will return a Task object with the same values.
+ * @param {any} obj The JSON object to parse.
+ * @param {string} reg The region of the Task.
+ */
+function convertTask(obj, reg) {
+    return new Task(obj.name, obj.id, obj.type, obj.time, reg);
+}
+
+/**
+ * Adds a tile to the background with the appropriate Task details.
+ * @param {number} index The index of the Task in 'tasks' to add.
+ */
+ function addTile(index) {
+    const task = tasks[index];
+    // The main tile block.
+    var newTile = document.createElement('div');
+    newTile.className = "tile";
+
+    // The task name descriptor element.
+    var newName = document.createElement('div');
+    newName.className = "taskName";
+    newName.textContent = task.amiName;
+    newTile.appendChild(newName);
+
+    // The server IP address descriptor element.
+    if(task.name != "") {
+        var newTagName = document.createElement('div');
+        newTagName.className = "taskTagName";
+        newTagName.textContent = "Given Name: " + task.name;
+        newTile.appendChild(newTagName);
+    }
+
+    // The task AMI ID descriptor element.
+    var newId = document.createElement('div');
+    newId.className = "taskId";
+    newId.textContent = "ID: " + task.id;
+    newTile.appendChild(newId);
+
+    // The task status icon.
+    var newStatus = document.createElement('div');
+    newStatus.className = "statusIcon";
+    var newStatusLabel = document.createElement('div');
+    newStatusLabel.className = "statusPopup";
+    newStatusLabel.textContent = task.status;
+    newStatus.appendChild(newStatusLabel);
+    newTile.appendChild(newStatus);
+
+    // The task visibility label element.
+    var newPlatformLabel = document.createElement('div');
+    newPlatformLabel.className = "platformLabel";
+    newPlatformLabel.textContent = "Platform";
+    newTile.appendChild(newPlatformLabel);
+
+    // The task visibility descriptor element.
+    var newTaskVisibility = document.createElement('div');
+    newTaskVisibility.className = "templatePlatform";
+    newTaskVisibility.textContent = template.plat;
+    newTile.appendChild(newTaskVisibility);
+
+    // The modify Task button.
+    var newModifyButton = document.createElement('button');
+    newModifyButton.className = "modifyButton";
+    newModifyButton.textContent = "Modify";
+    newModifyButton.addEventListener('mouseenter', function() {
+        // If button is active, proceed.
+        if(newModifyButton.value == "active") {
+            newModifyButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newModifyButton.addEventListener('mouseleave', function() {
+        newModifyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newTile.appendChild(newModifyButton);
+
+    // The popup area that contains the modification buttons.
+    var newModifyArea = document.createElement('div');
+    newModifyArea.className = "modifyArea";
+    newModifyArea.hidden = true;
+    newModifyButton.addEventListener('click', function() {
+        newModifyArea.focus();
+        if(newModifyButton.value == "active") {
+            newModifyArea.hidden = !newModifyArea.hidden;
+        }
+    });
+
+    // The toggle visibility button.
+    var newVisibilityButton = document.createElement('div');
+    newVisibilityButton.className = "visibilityButton";
+    newVisibilityButton.textContent = "Make Public";
+    if(template.pub) {
+        newVisibilityButton.textContent = "Make Private";
+    }
+    newVisibilityButton.id = "" + index;
+    newVisibilityButton.addEventListener('mouseenter', function() {
+        // If the button is active, proceed.
+        if(newVisibilityButton.value == "active") {
+            newVisibilityButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newVisibilityButton.addEventListener('mouseleave', function() {
+        newVisibilityButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newVisibilityButton.addEventListener('click', function() {
+        // If the button is active, proceed.
+        if(newVisibilityButton.value == "active") {
+            if(template.pub) {
+                // Make the server private.
+                displayOverlay(true);
+
+                changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, false).then(function(result) {
+                    if(result == "ERROR") {
+                        console.log("ERROR");
+                    }
+                    loadTemplates();
+                });
+            } else {
+                // Make the server public.
+                displayOverlay(true);
+                
+                changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, true).then(function(result) {
+                    if(result == "ERROR") {
+                        console.log("ERROR");
+                    }
+                    loadTemplates();
+                });
+            }
+        }
+    });
+    newModifyArea.appendChild(newVisibilityButton);
+
+    // The toggle visibility button.
+    var newCopyButton = document.createElement('div');
+    newCopyButton.className = "copyButton";
+    newCopyButton.textContent = "Copy to Different Region";
+    newCopyButton.id = "" + index;
+    newCopyButton.addEventListener('mouseenter', function() {
+        // If the button is active, proceed.
+        if(newCopyButton.value == "active") {
+            newCopyButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newCopyButton.addEventListener('mouseleave', function() {
+        newCopyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newCopyButton.addEventListener('click', function() {
+        // If the button is active, proceed.
+        if(newCopyButton.value == "active") {
+            // Copy the Template to another region
+            updateCache('copyTemplate', [templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName]);
+            const remote = parent.require('electron').remote;
+            let w = remote.getCurrentWindow();
+            w.emit('newCopyTemplate');
+            /*copyImage(templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName, "us-east-2").then(function() {
+                loadTemplates();
+            });*/
+        }
+    });
+    newModifyArea.appendChild(newCopyButton);
+    
+    // The permadelete Template button.
+    var newTerminateButton = document.createElement('div');
+    newTerminateButton.className = "terminateButton";
+    if(template.owner == "self") {
+        newTerminateButton.textContent = "Permadelete";
+    } else {
+        newTerminateButton.textContent = "Remove from My Templates"
+    }
+    newTerminateButton.id = "" + index;
+    newTerminateButton.addEventListener('mouseenter', function() {
+        // If the button is active, proceed.
+        if(newTerminateButton.value == "active") {
+            newTerminateButton.style.backgroundColor = Colors.backgroundPrimary();
+        }
+    });
+    newTerminateButton.addEventListener('mouseleave', function() {
+        newTerminateButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    newTerminateButton.addEventListener('click', function() {
+        // If the button is active, proceed.
+        if(newTerminateButton.value == "active") {
+            if(templates[parseInt(newTerminateButton.id)].owner == "self") {
+                // Terminate Template.
+                displayOverlay(true);
+                deleteImage(templates[parseInt(newTerminateButton.id)].id).then(function() {
+                    loadTemplates();
+                });
+            } else {
+                // Removes that template from the user's My Templates
+                templates.pop(parseInt(newTerminateButton.id));
+                
+                // Stores templates AMI IDs in Cache
+                var templateIds = [];
+                for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
+                    templateIds.push(templates[templateIndex].id);
+                }
+                
+                // Updates the template ID cache
+                updateCache("templates-" + getRegion(), templateIds);
+
+                // Reload
+                displayOverlay(true);
+                loadTemplates();
+            }
+        }
+    });
+    newModifyArea.appendChild(newTerminateButton);
+
+
+    newVisibilityButton.value = "inactive";
+    newCopyButton.value = "inactive";
+    newTerminateButton.value = "inactive";
+    newModifyButton.value = "inactive";
+    if(template.status == "available") {
+        if(template.owner == "self") {
+            newVisibilityButton.value = "active";
+            newCopyButton.value = "active";
+        }
+        newTerminateButton.value = "active";
+        newModifyButton.value = "active";
+    }
+
+    newTile.appendChild(newModifyArea);
+    primaryBody.appendChild(newTile);
+}
+
 /** Reloads the Task tiles on the page. */
 function loadTasks() {
+    updateCache("tasks-us-east-1", [new Task("BIG BOY SERVER", "serverIDDD", "start", 13939243922, "us-east-1")]);
+
+    tasks = [];
+
+    const regions = [
+        'us-east-1', 'us-east-2',
+        'us-west-1', 'us-west-2'
+    ]
+
+    for(var regIndex = 0; regIndex < regions.length; regIndex++) {
+        const cacheTasks = getCacheValue('tasks-' + regions[regIndex]);
+        if(cacheTasks != "ERROR") {
+            for(var index = 0; index < cacheTasks.length; index++) {
+                tasks.push(convertTask(cacheTasks[index], regions[regIndex]));
+            }
+        }
+    }
+
+    console.log(tasks);
+
+    // Add Tasks in current region to GUI
+    for(var index = 0; index < tasks.length; index++) {
+
+    }
 
     displayOverlay(false);
     updateColors();
 }
+
+// --------------------------------------------------------------------------------- //
 
 // ---------------------------- newTaskButton functions ---------------------------- //
 
