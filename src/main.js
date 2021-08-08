@@ -176,7 +176,7 @@ function newConnectionWindow() {
     }
   });
   connectionWindow.loadFile(path.join(__dirname, 'newConnection/newConnection.html'));
-  sconnectionWindow.webContents.openDevTools();
+  //connectionWindow.webContents.openDevTools();
 
   connectionWindow.setResizable(false);
   
@@ -204,6 +204,11 @@ function newConnectionWindow() {
 
 // The main logic function that controls interaction between windows
 function createWindows() {
+  /*
+    ---------   ---------   ---------   ---------   ---------   ---------   ---
+      No longer necessary due to AWS resolving issues with the JavaScript SDK.
+    ---   ---------   ---------   ---------   ---------   ---------   ---------
+
   // Installs the AWS CLI if it is not already installed.
   hasAwsCliInstalled().then(function(result) {
     if(!result) {
@@ -213,7 +218,7 @@ function createWindows() {
         }
       });
     }
-  });
+  });*/
 
   // ------------------------------      licenseKeyWindow     ----------------------------------------// 
   
@@ -295,7 +300,7 @@ function createWindows() {
     show: false
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
-  primaryWindow.webContents.openDevTools();
+  //primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {

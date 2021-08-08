@@ -53,7 +53,8 @@
     "electron-squirrel-startup": "^1.0.0",
     "mysql": "^2.18.1",
     "mysql-await": "^2.1.8",
-    "node-machine-id": "^1.1.12"
+    "node-machine-id": "^1.1.12",
+    "node-rsa": "^1.1.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.58",

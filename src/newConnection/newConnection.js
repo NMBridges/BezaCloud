@@ -10,6 +10,9 @@ const {
 const fs = require('fs');
 const { exec, execSync } = require('child_process');
 
+// .pem key decryption
+const crypto = require('crypto');
+
 // Page element references
 /** The main divider box that divides the page into sections. */
 var dividerBox = document.getElementById('dividerBox');
@@ -285,61 +288,54 @@ function buttonUp() {
             // Checks if it is a valid file.
             if(fs.existsSync(pemFileLabel.textContent)) {
                 getInstancePasswordData(server.id).then(function(result) {
-                    if(result == "" || result == "ERROR") {
+                    if(result == "ERROR" || result.PasswordData == "") {
                         // Server is not available yet
                         console.log("Server is not available yet.");
                         newPopup("Error", "Server is not available yet. Servers may take up to 10 minutes to become available.", "Close");
                         buttonUp();
                     } else {
                         // Decode password data
-                        const decryptCmd = "aws ec2 get-password-data --region " + getRegion() + " --instance-id " + server.id + " --priv-launch-key " + pemFileLabel.textContent;
                         try {
-                            const stdout = execSync(decryptCmd).toString();
-                            const out = JSON.parse(stdout);
-                            if("PasswordData" in out) {
-                                const newPassword = out['PasswordData'];
-                                console.log(newPassword);
-                                if(newPassword != "") {
-                                    // Add new encoded password tag
-                                    addTags(server.id, "Cert", btoa(newPassword)).then(function(success) {
-                                        if(success) {
-                                            // Successfully added tags.
-                                        } else {
-                                            // Oh well, try again next time.
-                                        }
-                                        
-                                        // Run Microsoft Remote Desktop
-                                        if(parent.process.platform == 'win32') {
-                                            const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
-                                            const e = execSync(cmd1);
-                                            const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-                                            mercorExec(cmd2);
-                                            // Should be running Remote Desktop
-                                            //window.close();
-                                        } else {
-                                            // Mac
-                                            newPopup("The password to your server is", newPassword, "Copy and Continue");
-                                            const cmd1 = "touch " + awsDir() + "/connections/server.rdp";
-                                            const e1 = execSync(cmd1);
-                                            const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " 
-                                                + awsDir() + "/connections/server.rdp";
-                                            const e2 = execSync(cmd2);
-                                            window.close();
-                                        }
-                                    });
-                                } else {
-                                    console.log("There was an error retrieving the password. No password found.");
-                                    newPopup("Error", "There was an error retrieving the server password." + 
-                                        " Servers may take 10 or more minutes after creation to become available.", "Close");
-                                    buttonUp();
-                                }
+                            var pemFile = fs.readFileSync(pemFileLabel.textContent, "utf-8");
+                            var buffer = Buffer.from(result.PasswordData, "base64");
+                            var newPassword = crypto.privateDecrypt({key: pemFile, padding: crypto.constants.RSA_PKCS1_PADDING}, buffer).toString('utf-8');
+
+                            if(newPassword != "") {
+                                // Add new encoded password tag
+                                addTags(server.id, "Cert", btoa(newPassword)).then(function(success) {
+                                    if(success) {
+                                        // Successfully added tags.
+                                    } else {
+                                        // Oh well, try again next time.
+                                    }
+                                    
+                                    // Run Microsoft Remote Desktop
+                                    if(parent.process.platform == 'win32') {
+                                        const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
+                                        const e = execSync(cmd1);
+                                        const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
+                                        mercorExec(cmd2);
+                                        // Should be running Remote Desktop
+                                        //window.close();
+                                    } else {
+                                        // Mac
+                                        newPopup("The password to your server is", newPassword, "Copy and Continue");
+                                        const cmd1 = "touch " + awsDir() + "/connections/server.rdp";
+                                        const e1 = execSync(cmd1);
+                                        const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " 
+                                            + awsDir() + "/connections/server.rdp";
+                                        const e2 = execSync(cmd2);
+                                        window.close();
+                                    }
+                                });
                             } else {
-                                console.log("There was an error retrieving the password.");
-                                newPopup("Error", "There was an error retrieving the server password.", "Close");
+                                console.log("There was an error retrieving the password. No password found.");
+                                newPopup("Error", "There was an error retrieving the server password." + 
+                                    " Servers may take 10 or more minutes after creation to become available.", "Close");
                                 buttonUp();
                             }
                         } catch(err) {
-                            console.log("There was an error retrieving the password.");
+                            console.log("There was an error retrieving the password.", err);
                             newPopup("Error", "There was an error retrieving the server password.", "Close");
                             buttonUp();
                         }
