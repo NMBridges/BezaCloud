@@ -60,13 +60,13 @@ function convertTask(obj) {
     // The task visibility label element.
     var newTypeLabel = document.createElement('div');
     newTypeLabel.className = "typeLabel";
-    newTypeLabel.textContent = "Type";
+    newTypeLabel.textContent = "Task Type";
     newTile.appendChild(newTypeLabel);
 
     // The task visibility descriptor element.
     var newTaskVisibility = document.createElement('div');
     newTaskVisibility.className = "taskType";
-    newTaskVisibility.textContent = task.type;
+    newTaskVisibility.textContent = "Server " + task.type;
     newTile.appendChild(newTaskVisibility);
 
     // The modify Task button.
