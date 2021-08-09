@@ -107,30 +107,7 @@ body {
                     line-height: 30px;
                     height: 35px;
                 }
-                .statusIcon {
-                    position: absolute;
-                    top: 17px;
-                    right: 17px;
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 10px;
-                    background-color: green;
-                }
-                    .statusIcon .statusPopup {
-                        color: white;
-                        display: none;
-                        font-family: "Segoe UI", sans-serif;
-                        font-weight:300;
-                        font-style: normal;
-                        font-size: 10px;
-                        text-align: center;
-                        margin-top: 25px;
-                        margin-left: -8px;
-                    }
-                    .statusIcon:hover .statusPopup {
-                        display: block;
-                    }
-                .templateId {
+                .taskId {
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     overflow:hidden;
@@ -139,16 +116,7 @@ body {
                     color: gray;
                     font-weight: 200;
                 }
-                .templateTagName {
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    overflow:hidden;
-                    font-size: 15px;
-                    line-height: 20px;
-                    color: gray;
-                    font-weight: 200;
-                }
-                .platformLabel {
+                .typeLabel {
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     overflow:hidden;
@@ -160,7 +128,7 @@ body {
                     color: white;
                     font-weight: normal;
                 }
-                .templatePlatform {
+                .taskType {
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     overflow:hidden;
@@ -189,43 +157,13 @@ body {
                 }
                 .modifyArea {
                     position: absolute;
-                    height: 105px;
+                    height: 35px;
                     bottom: 44px;
                     left: 10px;
                     right: 10px;
                     border-radius: 5px;
                     border: 1px solid gray;
                 }
-                    .visibilityButton {
-                        overflow: hidden;
-                        width: 100%;
-                        height: 35px;
-                        line-height: 35px;
-                        background-color: red;
-                        font-family: "Segoe UI", sans-serif;
-                        font-size: 15px;
-                        font-style: normal;
-                        font-weight: 200;
-                        text-align: center;
-                        vertical-align: center;
-                        border-radius: 5px;
-                        cursor:pointer;
-                    }
-                    .copyButton {
-                        overflow: hidden;
-                        width: 100%;
-                        height: 35px;
-                        line-height: 35px;
-                        background-color: red;
-                        font-family: "Segoe UI", sans-serif;
-                        font-size: 15px;
-                        font-style: normal;
-                        font-weight: 200;
-                        text-align: center;
-                        vertical-align: center;
-                        border-radius: 5px;
-                        cursor:pointer;
-                    }
                     .terminateButton {
                         overflow: hidden;
                         width: 100%;

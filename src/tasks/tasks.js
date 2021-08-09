@@ -30,10 +30,9 @@ window.onload = function() {
 /**
  * Given a JSON object, it will return a Task object with the same values.
  * @param {any} obj The JSON object to parse.
- * @param {string} reg The region of the Task.
  */
-function convertTask(obj, reg) {
-    return new Task(obj.name, obj.id, obj.type, obj.time, reg);
+function convertTask(obj) {
+    return new Task(obj.name, obj.id, obj.type, obj.time, obj.reg);
 }
 
 /**
@@ -49,16 +48,8 @@ function convertTask(obj, reg) {
     // The task name descriptor element.
     var newName = document.createElement('div');
     newName.className = "taskName";
-    newName.textContent = task.amiName;
+    newName.textContent = task.name;
     newTile.appendChild(newName);
-
-    // The server IP address descriptor element.
-    if(task.name != "") {
-        var newTagName = document.createElement('div');
-        newTagName.className = "taskTagName";
-        newTagName.textContent = "Given Name: " + task.name;
-        newTile.appendChild(newTagName);
-    }
 
     // The task AMI ID descriptor element.
     var newId = document.createElement('div');
@@ -66,25 +57,16 @@ function convertTask(obj, reg) {
     newId.textContent = "ID: " + task.id;
     newTile.appendChild(newId);
 
-    // The task status icon.
-    var newStatus = document.createElement('div');
-    newStatus.className = "statusIcon";
-    var newStatusLabel = document.createElement('div');
-    newStatusLabel.className = "statusPopup";
-    newStatusLabel.textContent = task.status;
-    newStatus.appendChild(newStatusLabel);
-    newTile.appendChild(newStatus);
-
     // The task visibility label element.
-    var newPlatformLabel = document.createElement('div');
-    newPlatformLabel.className = "platformLabel";
-    newPlatformLabel.textContent = "Platform";
-    newTile.appendChild(newPlatformLabel);
+    var newTypeLabel = document.createElement('div');
+    newTypeLabel.className = "typeLabel";
+    newTypeLabel.textContent = "Type";
+    newTile.appendChild(newTypeLabel);
 
     // The task visibility descriptor element.
     var newTaskVisibility = document.createElement('div');
-    newTaskVisibility.className = "templatePlatform";
-    newTaskVisibility.textContent = template.plat;
+    newTaskVisibility.className = "taskType";
+    newTaskVisibility.textContent = task.type;
     newTile.appendChild(newTaskVisibility);
 
     // The modify Task button.
@@ -112,89 +94,11 @@ function convertTask(obj, reg) {
             newModifyArea.hidden = !newModifyArea.hidden;
         }
     });
-
-    // The toggle visibility button.
-    var newVisibilityButton = document.createElement('div');
-    newVisibilityButton.className = "visibilityButton";
-    newVisibilityButton.textContent = "Make Public";
-    if(template.pub) {
-        newVisibilityButton.textContent = "Make Private";
-    }
-    newVisibilityButton.id = "" + index;
-    newVisibilityButton.addEventListener('mouseenter', function() {
-        // If the button is active, proceed.
-        if(newVisibilityButton.value == "active") {
-            newVisibilityButton.style.backgroundColor = Colors.backgroundPrimary();
-        }
-    });
-    newVisibilityButton.addEventListener('mouseleave', function() {
-        newVisibilityButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
-    });
-    newVisibilityButton.addEventListener('click', function() {
-        // If the button is active, proceed.
-        if(newVisibilityButton.value == "active") {
-            if(template.pub) {
-                // Make the server private.
-                displayOverlay(true);
-
-                changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, false).then(function(result) {
-                    if(result == "ERROR") {
-                        console.log("ERROR");
-                    }
-                    loadTemplates();
-                });
-            } else {
-                // Make the server public.
-                displayOverlay(true);
-                
-                changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, true).then(function(result) {
-                    if(result == "ERROR") {
-                        console.log("ERROR");
-                    }
-                    loadTemplates();
-                });
-            }
-        }
-    });
-    newModifyArea.appendChild(newVisibilityButton);
-
-    // The toggle visibility button.
-    var newCopyButton = document.createElement('div');
-    newCopyButton.className = "copyButton";
-    newCopyButton.textContent = "Copy to Different Region";
-    newCopyButton.id = "" + index;
-    newCopyButton.addEventListener('mouseenter', function() {
-        // If the button is active, proceed.
-        if(newCopyButton.value == "active") {
-            newCopyButton.style.backgroundColor = Colors.backgroundPrimary();
-        }
-    });
-    newCopyButton.addEventListener('mouseleave', function() {
-        newCopyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
-    });
-    newCopyButton.addEventListener('click', function() {
-        // If the button is active, proceed.
-        if(newCopyButton.value == "active") {
-            // Copy the Template to another region
-            updateCache('copyTemplate', [templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName]);
-            const remote = parent.require('electron').remote;
-            let w = remote.getCurrentWindow();
-            w.emit('newCopyTemplate');
-            /*copyImage(templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName, "us-east-2").then(function() {
-                loadTemplates();
-            });*/
-        }
-    });
-    newModifyArea.appendChild(newCopyButton);
     
     // The permadelete Template button.
     var newTerminateButton = document.createElement('div');
     newTerminateButton.className = "terminateButton";
-    if(template.owner == "self") {
-        newTerminateButton.textContent = "Permadelete";
-    } else {
-        newTerminateButton.textContent = "Remove from My Templates"
-    }
+    newTerminateButton.textContent = "Delete";
     newTerminateButton.id = "" + index;
     newTerminateButton.addEventListener('mouseenter', function() {
         // If the button is active, proceed.
@@ -208,46 +112,22 @@ function convertTask(obj, reg) {
     newTerminateButton.addEventListener('click', function() {
         // If the button is active, proceed.
         if(newTerminateButton.value == "active") {
-            if(templates[parseInt(newTerminateButton.id)].owner == "self") {
-                // Terminate Template.
-                displayOverlay(true);
-                deleteImage(templates[parseInt(newTerminateButton.id)].id).then(function() {
-                    loadTemplates();
-                });
-            } else {
-                // Removes that template from the user's My Templates
-                templates.pop(parseInt(newTerminateButton.id));
-                
-                // Stores templates AMI IDs in Cache
-                var templateIds = [];
-                for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
-                    templateIds.push(templates[templateIndex].id);
-                }
-                
-                // Updates the template ID cache
-                updateCache("templates-" + getRegion(), templateIds);
+            // Removes that template from the user's My Templates
+            tasks.pop(parseInt(newTerminateButton.id));
+            
+            // Updates the template ID cache
+            updateCache("tasks-" + getRegion(), tasks);
 
-                // Reload
-                displayOverlay(true);
-                loadTemplates();
-            }
+            // Reload
+            displayOverlay(true);
+            loadTasks();
         }
     });
     newModifyArea.appendChild(newTerminateButton);
 
 
-    newVisibilityButton.value = "inactive";
-    newCopyButton.value = "inactive";
-    newTerminateButton.value = "inactive";
-    newModifyButton.value = "inactive";
-    if(template.status == "available") {
-        if(template.owner == "self") {
-            newVisibilityButton.value = "active";
-            newCopyButton.value = "active";
-        }
-        newTerminateButton.value = "active";
-        newModifyButton.value = "active";
-    }
+    newTerminateButton.value = "active";
+    newModifyButton.value = "active";
 
     newTile.appendChild(newModifyArea);
     primaryBody.appendChild(newTile);
@@ -268,16 +148,17 @@ function loadTasks() {
         const cacheTasks = getCacheValue('tasks-' + regions[regIndex]);
         if(cacheTasks != "ERROR") {
             for(var index = 0; index < cacheTasks.length; index++) {
-                tasks.push(convertTask(cacheTasks[index], regions[regIndex]));
+                tasks.push(convertTask(cacheTasks[index]));
             }
         }
     }
 
     console.log(tasks);
 
-    // Add Tasks in current region to GUI
+    // Clears and adds Tasks in current region to GUI.
+    primaryBody.innerHTML = '';
     for(var index = 0; index < tasks.length; index++) {
-
+        addTile(index);
     }
 
     displayOverlay(false);
@@ -344,51 +225,26 @@ newTaskButton.addEventListener('mouseleave', function() {
         var modifyButtons = document.getElementsByClassName("modifyButton");
         for(var count = 0; count < modifyButtons.length; count++) {
             modifyButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if server is fully running or stopped.
-            const state = templates[count].status.toLowerCase();
-            if(state == "available") {
-                modifyButtons[count].style.color = Colors.textPrimary();
-                modifyButtons[count].style.borderColor = Colors.textPrimary();
-            } else {
-                modifyButtons[count].style.color = Colors.textTertiary();
-                modifyButtons[count].style.borderColor = Colors.textTertiary();
-            }
+            modifyButtons[count].style.color = Colors.textPrimary();
+            modifyButtons[count].style.borderColor = Colors.textPrimary();
         }
 
-        var templateNames = document.getElementsByClassName("templateName");
+        var templateNames = document.getElementsByClassName("taskName");
         for(var count = 0; count < templateNames.length; count++) {
             templateNames[count].style.color = Colors.textPrimary();
         }
-
-        var statusIcons = document.getElementsByClassName("statusIcon");
-        for(var count = 0; count < statusIcons.length; count++) {
-            // Adjusts the color depending on the server's status.
-            const state = templates[count].status.toLowerCase();
-            if(state == "available") {
-                statusIcons[count].style.backgroundColor = "#33cc33";
-            } else if(state == "shutting-down" || state == "pending" || state == "stopping") {
-                statusIcons[count].style.backgroundColor = "#cccc33";
-            } else {
-                statusIcons[count].style.backgroundColor = "#cc3333";
-            }
-        }
         
-        var templateIds = document.getElementsByClassName("templateId");
+        var templateIds = document.getElementsByClassName("taskId");
         for(var count = 0; count < templateIds.length; count++) {
             templateIds[count].style.color = Colors.textSecondary();
         }
-        
-        var templateTagNames = document.getElementsByClassName("templateTagName");
-        for(var count = 0; count < templateTagNames.length; count++) {
-            templateTagNames[count].style.color = Colors.textSecondary();
-        }
 
-        var platformLabels = document.getElementsByClassName("platformLabel");
+        var platformLabels = document.getElementsByClassName("typeLabel");
         for(var count = 0; count < platformLabels.length; count++) {
             platformLabels[count].style.color = Colors.textPrimary();
         }
         
-        var templatePlatforms = document.getElementsByClassName("templatePlatform");
+        var templatePlatforms = document.getElementsByClassName("taskType");
         for(var count = 0; count < templatePlatforms.length; count++) {
             templatePlatforms[count].style.color = Colors.textSecondary();
         }
@@ -399,40 +255,10 @@ newTaskButton.addEventListener('mouseleave', function() {
             modifyAreas[count].style.borderColor = Colors.textSecondary();
         }
 
-        var visibilityButtons = document.getElementsByClassName("visibilityButton");
-        for(var count = 0; count < visibilityButtons.length; count++) {
-            visibilityButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if the Template is available and owned by the user.
-            const state = templates[count].status.toLowerCase();
-            if(state == "available" && templates[count].owner == "self") {
-                visibilityButtons[count].style.color = Colors.textPrimary();
-            } else {
-                visibilityButtons[count].style.color = Colors.textTertiary();
-            }
-        }
-
-        var copyButtons = document.getElementsByClassName("copyButton");
-        for(var count = 0; count < copyButtons.length; count++) {
-            copyButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if the Template is available and owned by the user.
-            const state = templates[count].status.toLowerCase();
-            if(state == "available" && templates[count].owner == "self") {
-                copyButtons[count].style.color = Colors.textPrimary();
-            } else {
-                copyButtons[count].style.color = Colors.textTertiary();
-            }
-        }
-
         var terminateButtons = document.getElementsByClassName("terminateButton");
         for(var count = 0; count < terminateButtons.length; count++) {
             terminateButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            // Enable if the Template is available and owned by the user.
-            const state = templates[count].status.toLowerCase();
-            if(state == "available") {
-                terminateButtons[count].style.color = "#cc3333";
-            } else {
-                terminateButtons[count].style.color = "#882222";
-            }
+            terminateButtons[count].style.color = "#cc3333";
         }
     }
 }
