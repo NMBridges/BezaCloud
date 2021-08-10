@@ -23,6 +23,7 @@ var refreshButton = document.getElementById("refreshButton");
 var newServerButton = document.getElementById("newServerButton");
 var primaryBody = document.getElementById("primaryBody");
 var overlay = document.getElementById("overlay");
+var loader = document.getElementById("loader");
 
 /** Boolean that stores whether or not the page is currently loading servers. */
 var loadingServers = false;
@@ -138,7 +139,6 @@ function newServer(name, ami, cpu) {
  * Pulls all AWS servers from the user's account in the given region.
  */
 function loadServers() {
-    primaryBody.innerHTML = '';
     if(!loadingServers) {
         loadingServers = true;
         const servJson = getInstances().then(function(data) {
@@ -189,7 +189,8 @@ function loadServers() {
             };
             regionLabel.textContent = regionDict[getRegion()];
             
-            // Adds new tiles
+            // Clears old tiles and adds new tiles
+            primaryBody.innerHTML = '';
             for(var counter = 0; counter < servers.length; counter++) {
                 addTile(counter);
             }
@@ -652,8 +653,10 @@ newServerButton.addEventListener('mouseleave', function() {
  function displayOverlay(to) {
     if(to) {
         overlay.style.display = "block";
+        loader.style.display = "block";
     } else {
         overlay.style.display = "none";
+        loader.style.display = "none";
     }
     const contenta = overlay.innerHTML;
     overlay.innerHTML = contenta;

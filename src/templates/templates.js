@@ -19,6 +19,7 @@ var refreshButton = document.getElementById("refreshButton");
 var newTemplateButton = document.getElementById("newTemplateButton");
 var primaryBody = document.getElementById("primaryBody");
 var overlay = document.getElementById("overlay");
+var loader = document.getElementById("loader");
 
 /**
  * @type {Template[]} The servers belonging to the currently loaded region.
@@ -74,7 +75,6 @@ function createTemplateObject(ami, owner) {
  * Pulls all AWS AMIs from the user's account in the given region.
  */
 function loadTemplates() {
-    primaryBody.innerHTML = '';
     if(!loadingTemplates) {
         loadingTemplates = true;
         getUserAMIs().then(function(results) {
@@ -147,6 +147,7 @@ function loadTemplates() {
                         regionLabel.textContent = regionDict[getRegion()];
                     
                         // Adds new tiles
+                        primaryBody.innerHTML = '';
                         for(var counter = 0; counter < templates.length; counter++) {
                             addTile(counter);
                         }
@@ -173,6 +174,7 @@ function loadTemplates() {
                     regionLabel.textContent = regionDict[getRegion()];
                 
                     // Adds new tiles
+                    primaryBody.innerHTML = '';
                     for(var counter = 0; counter < templates.length; counter++) {
                         addTile(counter);
                     }
@@ -199,6 +201,7 @@ function loadTemplates() {
                 regionLabel.textContent = regionDict[getRegion()];
             
                 // Adds new tiles
+                primaryBody.innerHTML = '';
                 for(var counter = 0; counter < templates.length; counter++) {
                     addTile(counter);
                 }
@@ -474,8 +477,10 @@ newTemplateButton.addEventListener('mouseleave', function() {
  function displayOverlay(to) {
     if(to) {
         overlay.style.display = "block";
+        loader.style.display = "block";
     } else {
         overlay.style.display = "none";
+        loader.style.display = "none";
     }
     const contenta = overlay.innerHTML;
     overlay.innerHTML = contenta;

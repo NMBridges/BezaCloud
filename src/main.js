@@ -202,6 +202,46 @@ function newConnectionWindow() {
   });
 }
 
+function newTaskWindow() {
+  let taskWindow;
+  
+  taskWindow = new BrowserWindow({
+    width: 400,
+    height: 380,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+  taskWindow.loadFile(path.join(__dirname, 'newTask/newTask.html'));
+  //taskWindow.webContents.openDevTools();
+
+  taskWindow.setResizable(false);
+  
+  taskWindow.webContents.on('ready-to-show', function() {
+    taskWindow.webContents.executeJavaScript('updateColors();').then(function() {
+      taskWindow.webContents.executeJavaScript('updateElements();').then(function() {
+        taskWindow.show();
+      });
+    });
+  });
+  
+  // When a window calls for a popup to be shown, it creates a popup window.
+  taskWindow.on('showPopup', () => {
+    primaryWindow.webContents.executeJavaScript("getPopupValues();").then(function(result) {
+      newPopupWindow(result[0], result[1], result[2]);
+    });
+  });
+
+  // When the window is close, it will reload the primary window.
+  taskWindow.on('close', () => {
+    primaryWindow.webContents.executeJavaScript('task.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('task.contentWindow.loadTasks();');
+  });
+}
+
 // The main logic function that controls interaction between windows
 function createWindows() {
   /*
@@ -322,6 +362,11 @@ function createWindows() {
   // When a window calls for a newConnection winodw to be shown, it creates a newConnection window.
   primaryWindow.on('newConnection', () => {
     newConnectionWindow();
+  });
+
+  // When a window calls for newServer window, it creates a newServer window.
+  primaryWindow.on('newTask', () => {
+    newTaskWindow();
   });
 
   // When a window calls for newServer window, it creates a newServer window.

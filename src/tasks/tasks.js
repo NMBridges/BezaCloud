@@ -16,6 +16,7 @@ var regionLabel = document.getElementById("regionLabel");
 var newTaskButton = document.getElementById("newTaskButton");
 var primaryBody = document.getElementById("primaryBody");
 var overlay = document.getElementById("overlay");
+var loader = document.getElementById("loader");
 
 /** @type {Task[]} The list of Tasks set by the user. */
 var tasks = [];
@@ -45,29 +46,35 @@ function convertTask(obj) {
     var newTile = document.createElement('div');
     newTile.className = "tile";
 
-    // The task name descriptor element.
+    // The Task name descriptor element.
     var newName = document.createElement('div');
     newName.className = "taskName";
     newName.textContent = task.name;
     newTile.appendChild(newName);
 
-    // The task AMI ID descriptor element.
+    // The Task server ID descriptor element.
     var newId = document.createElement('div');
     newId.className = "taskId";
     newId.textContent = "ID: " + task.id;
     newTile.appendChild(newId);
 
-    // The task visibility label element.
+    // The Task description label element.
     var newTypeLabel = document.createElement('div');
     newTypeLabel.className = "typeLabel";
-    newTypeLabel.textContent = "Task Type";
+    newTypeLabel.textContent = "Task Description";
     newTile.appendChild(newTypeLabel);
 
-    // The task visibility descriptor element.
-    var newTaskVisibility = document.createElement('div');
-    newTaskVisibility.className = "taskType";
-    newTaskVisibility.textContent = "Server " + task.type;
-    newTile.appendChild(newTaskVisibility);
+    // The Task type descriptor element.
+    var newTaskType = document.createElement('div');
+    newTaskType.className = "taskType";
+    newTaskType.textContent = "Action: " + task.type.substr(0,1).toUpperCase() + task.type.substr(1) + " server";
+    newTile.appendChild(newTaskType);
+
+    // The Task time descriptor element.
+    var newTaskTime = document.createElement('div');
+    newTaskTime.className = "taskTime";
+    newTaskTime.textContent = "Time: " + unixToDate(task.time);
+    newTile.appendChild(newTaskTime);
 
     // The modify Task button.
     var newModifyButton = document.createElement('button');
@@ -135,7 +142,7 @@ function convertTask(obj) {
 
 /** Reloads the Task tiles on the page. */
 function loadTasks() {
-    updateCache("tasks-us-east-1", [new Task("BIG BOY SERVER", "serverIDDD", "start", 13939243922, "us-east-1")]);
+    updateCache("tasks-us-east-1", [new Task("BIG BOY SERVER", "serverIDDD", "start", 1628633092, "us-east-1")]);
 
     tasks = [];
 
@@ -188,14 +195,47 @@ newTaskButton.addEventListener('mouseleave', function() {
 // ---------------------------------------------------------------------------------- //
 
 /**
+ * Converts a unix time code to the date/time format.
+ * @param {number} unix The given unix time code.
+ * @returns The unix time code in date/time format.
+ */
+function unixToDate(unix){
+    var datetime = new Date(unix * 1000);
+    var months = [
+        "Jan","Feb","Mar",
+        "Apr","May","Jun",
+        "Jul","Aug","Sep",
+        "Oct","Nov","Dec"
+    ];
+    var year = datetime.getFullYear();
+    var month = months[datetime.getMonth()];
+    var day = datetime.getDate();
+    var hour = datetime.getHours();
+    var min = datetime.getMinutes();
+    var sec = datetime.getSeconds();
+    var formatted = month + " " + day + ", " + year + " " + twoDig(hour % 12) + ":" + twoDig(min) + ":" + twoDig(sec) + (hour > 12 ? " PM" : " AM");
+    return formatted;
+}
+
+/**
+ * Adds a 0 before the number if it is less than two digits.
+ * @param {number} num The original number.
+ */
+function twoDig(num) {
+    return ((("" + num).length > 1) ? "" : "0") + num;
+}
+
+/**
  * Turns the overlay on or off.
  * @param {boolean} to Boolean representing turning the overlay on (true) or off (false)
  */
  function displayOverlay(to) {
     if(to) {
         overlay.style.display = "block";
+        loader.style.display = "block";
     } else {
         overlay.style.display = "none";
+        loader.style.display = "none";
     }
     const contenta = overlay.innerHTML;
     overlay.innerHTML = contenta;
@@ -216,49 +256,54 @@ newTaskButton.addEventListener('mouseleave', function() {
     {
         primaryBody.style.backgroundColor = Colors.backgroundPrimary();
 
-        var tiles = document.getElementsByClassName("tile");
-        for(var count = 0; count < tiles.length; count++) {
-            tiles[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            tiles[count].style.borderColor = Colors.textSecondary();
+        var items = document.getElementsByClassName("tile");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            items[count].style.borderColor = Colors.textSecondary();
         }
 
-        var modifyButtons = document.getElementsByClassName("modifyButton");
-        for(var count = 0; count < modifyButtons.length; count++) {
-            modifyButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            modifyButtons[count].style.color = Colors.textPrimary();
-            modifyButtons[count].style.borderColor = Colors.textPrimary();
+        items = document.getElementsByClassName("modifyButton");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            items[count].style.color = Colors.textPrimary();
+            items[count].style.borderColor = Colors.textPrimary();
         }
 
-        var templateNames = document.getElementsByClassName("taskName");
-        for(var count = 0; count < templateNames.length; count++) {
-            templateNames[count].style.color = Colors.textPrimary();
+        items = document.getElementsByClassName("taskName");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.color = Colors.textPrimary();
         }
         
-        var templateIds = document.getElementsByClassName("taskId");
-        for(var count = 0; count < templateIds.length; count++) {
-            templateIds[count].style.color = Colors.textSecondary();
+        items = document.getElementsByClassName("taskId");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.color = Colors.textSecondary();
         }
 
-        var platformLabels = document.getElementsByClassName("typeLabel");
-        for(var count = 0; count < platformLabels.length; count++) {
-            platformLabels[count].style.color = Colors.textPrimary();
+        items = document.getElementsByClassName("typeLabel");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.color = Colors.textPrimary();
         }
         
-        var templatePlatforms = document.getElementsByClassName("taskType");
-        for(var count = 0; count < templatePlatforms.length; count++) {
-            templatePlatforms[count].style.color = Colors.textSecondary();
+        items = document.getElementsByClassName("taskType");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.color = Colors.textSecondary();
+        }
+        
+        items = document.getElementsByClassName("taskTime");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.color = Colors.textSecondary();
         }
 
-        var modifyAreas = document.getElementsByClassName("modifyArea");
-        for(var count = 0; count < modifyAreas.length; count++) {
-            modifyAreas[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            modifyAreas[count].style.borderColor = Colors.textSecondary();
+        items = document.getElementsByClassName("modifyArea");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            items[count].style.borderColor = Colors.textSecondary();
         }
 
-        var terminateButtons = document.getElementsByClassName("terminateButton");
-        for(var count = 0; count < terminateButtons.length; count++) {
-            terminateButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
-            terminateButtons[count].style.color = "#cc3333";
+        items = document.getElementsByClassName("terminateButton");
+        for(var count = 0; count < items.length; count++) {
+            items[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            items[count].style.color = "#cc3333";
         }
     }
 }
