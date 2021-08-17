@@ -207,7 +207,7 @@ function newTaskWindow() {
   
   taskWindow = new BrowserWindow({
     width: 400,
-    height: 380,
+    height: 485,
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
