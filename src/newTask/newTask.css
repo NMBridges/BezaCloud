@@ -35,16 +35,16 @@ body {
         }
         #serverBox {
             grid-area: server;
-            width: calc(100% - 10px);
-            height: calc(100% - 10px);
+            width: 100%;
+            height: 100%;
         }
             #serverLabel {
                 width: 100%;
             }
             #serverSelect {
                 margin-top: 5px;
-                width: 100%;
-                height: 100px;
+                width: calc(100% - 10px);
+                height: calc(100% - 47px);
                 padding: 5px;
                 display: grid;
                 grid-gap: 0px;

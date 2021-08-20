@@ -34,6 +34,8 @@ var stopButton = document.getElementById('stopButton');
 var stopLabel = document.getElementById('stopLabel');
 /** The text box that is used for the stop option. */
 var stopTextBox = document.getElementById('stopTextBox');
+/** The box that is used to keep the server list. */
+var serverSelect = document.getElementById('serverSelect');
 
 /** @type {Template[]} The list of Templates available to the user. */
 var templates = [];
@@ -73,13 +75,35 @@ function updateColors() {
         elements[index].style.backgroundColor = Colors.backgroundPrimaryAccent();
     }
 
-    var elements = document.getElementsByClassName("selectButton");
+    elements = document.getElementsByClassName("selectButton");
     for(var index = 0; index < elements.length; index++) {
         elements[index].style.backgroundColor = Colors.textTertiary();
         elements[index].style.borderColor = Colors.textTertiary();
     }
 
-    // then select the second one if there is a password, first otherwise
+    document.getElementById("serverLabel").style.color = Colors.textSecondary();
+    document.getElementById("serverLabel").style.backgroundColor = Colors.backgroundPrimary();
+    document.getElementById("serverSelect").style.backgroundColor = Colors.backgroundPrimaryAccent();
+
+    elements = document.getElementsByClassName("serverOption");
+    for(var index = elements.length - 1; index >= 0; index--) {
+        if((elements.length - 1 - index) % 2 == 0) {
+            elements[index].style.backgroundColor = Colors.backgroundPrimaryDoubleAccent();
+        } else {
+            elements[index].style.backgroundColor = Colors.backgroundPrimaryAccent();}
+    }
+
+    elements = document.getElementsByClassName("serverNameLabel");
+    for(var index = 0; index < elements.length; index++) {
+        elements[index].style.color = Colors.textTertiary();
+    }
+
+    elements = document.getElementsByClassName("serverButtonSelect");
+    for(var index = 0; index < elements.length; index++) {
+        elements[index].style.backgroundColor = Colors.textTertiary();
+        elements[index].style.borderColor = Colors.textTertiary();
+    }
+
 }
 
 /**
@@ -89,6 +113,56 @@ function updateElements() {
     updateColors();
 
     
+}
+
+/**
+ * Creates a new Server option and adds it to the list of available Servers.
+ * @param {string} name The name of the Server.
+ * @param {string} id The ID of the Server.
+ * @param {number} index The index of the Server in the list.
+ */
+ function addTemplateToList(name, id, index) {
+    var newServerOption = document.createElement('button');
+    newServerOption.className = "serverOption";
+    newServerOption.id = id;
+    newServerOption.style.setProperty('--row', index + 1);
+
+    var newServerButtonSelect = document.createElement('div');
+    newServerButtonSelect.className = "serverButtonSelect";
+    newServerButtonSelect.id = id;
+    newServerOption.appendChild(newServerButtonSelect);
+
+    var newServerNameLabel = document.createElement('div');
+    newServerNameLabel.className = "serverNameLabel";
+    newServerNameLabel.textContent = name;
+    newTemplateOption.appendChild(newServerNameLabel);
+
+    newServerOption.addEventListener('click', function() {
+        // Resets colors of all other options
+        var serverButtonSelects = document.getElementsByClassName("serverButtonSelect");
+        for(var index = 0; index < serverButtonSelects.length; index++) {
+            serverButtonSelects[index].style.backgroundColor = Colors.textTertiary();
+            serverButtonSelects[index].value = "unselected";
+        }
+        // Highlights selected option
+        newServerButtonSelect.style.backgroundColor = "#333333";
+        newServerButtonSelect.value = "selected";
+    });
+
+    serverSelect.appendChild(newTemplateOption);
+}
+
+/**
+ * Loads the list of servers that the user can select from.
+ */
+function loadServers() {
+
+
+    cpuSelect.style.setProperty('--rows', cpuTypes.length);
+
+    for(var index = 0; index < cpuTypes.length; index++) {
+        addCpuToList(cpuTypes[index], index);
+    }
 }
 
 // -------------------------------  createButton functions  -------------------------------- //
