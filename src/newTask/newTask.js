@@ -4,7 +4,7 @@ const {
     getCacheValue, awsDir, mercorExec
 } = require('../mercor.js');
 const {
-    Server, Task
+    Server, Task, getInstances
 } = require('../apiCaller.js');
 const fs = require('fs');
 const { exec, execSync } = require('child_process');
@@ -37,8 +37,8 @@ var stopTextBox = document.getElementById('stopTextBox');
 /** The box that is used to keep the server list. */
 var serverSelect = document.getElementById('serverSelect');
 
-/** @type {Template[]} The list of Templates available to the user. */
-var templates = [];
+/** @type {Server[]} The list of Servers available to the user. */
+var servers = [];
 
 /** @type {Server} Object containing information on the server to connect to. */
 var server = new Server();
@@ -110,9 +110,7 @@ function updateColors() {
  * Resets the elements of the window to their default values.
  */
 function updateElements() {
-    updateColors();
-
-    
+    loadServers();    
 }
 
 /**
@@ -121,7 +119,7 @@ function updateElements() {
  * @param {string} id The ID of the Server.
  * @param {number} index The index of the Server in the list.
  */
- function addTemplateToList(name, id, index) {
+ function addServerToList(name, id, index) {
     var newServerOption = document.createElement('button');
     newServerOption.className = "serverOption";
     newServerOption.id = id;
@@ -134,8 +132,8 @@ function updateElements() {
 
     var newServerNameLabel = document.createElement('div');
     newServerNameLabel.className = "serverNameLabel";
-    newServerNameLabel.textContent = name;
-    newTemplateOption.appendChild(newServerNameLabel);
+    newServerNameLabel.textContent = name + " (" + id + ")";
+    newServerOption.appendChild(newServerNameLabel);
 
     newServerOption.addEventListener('click', function() {
         // Resets colors of all other options
@@ -149,20 +147,157 @@ function updateElements() {
         newServerButtonSelect.value = "selected";
     });
 
-    serverSelect.appendChild(newTemplateOption);
+    serverSelect.appendChild(newServerOption);
 }
 
 /**
  * Loads the list of servers that the user can select from.
  */
 function loadServers() {
+    const servJson = getInstances().then(function(data) {
+        servers = [];
+        if(data != "ERROR" && data["Reservations"] != undefined) {
+            for(var index = 0; index < data["Reservations"].length; index++) {
+                const srv = data["Reservations"][index];
+                const newSpecs = splitSpecs(getSpecs(srv));
+                if(getStatus(srv).toLowerCase() != "terminated") {
+                    servers.push(new Server(
+                        getName(srv),
+                        getInstanceId(srv),
+                        (getIPv4(srv) != undefined) ? getIPv4(srv) : "",
+                        getPassword(srv),
+                        getKey(srv),
+                        getStatus(srv),
+                        (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
+                        (newSpecs.length > 2) ? newSpecs[1] : "",
+                        (newSpecs.length > 2) ? newSpecs[2] : ""
+                    ));
+                }
+            }
 
+            serverSelect.style.setProperty('--rows', servers.length);
+        
+            for(var index = 0; index < servers.length; index++) {
+                addServerToList(servers[index].name, servers[index].id, index);
+            }
+        } else {
+            console.log("Error retrieving servers.");
+            newPopup("Error", "Error retrieving servers.", "Close");
+        }
+        
+        updateColors();
+    });
+}
 
-    cpuSelect.style.setProperty('--rows', cpuTypes.length);
-
-    for(var index = 0; index < cpuTypes.length; index++) {
-        addCpuToList(cpuTypes[index], index);
+/**
+ * Returns the name of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+ function getName(json) {
+    if("Tags" in json["Instances"][0]) {
+        if(json["Instances"][0]["Tags"] != undefined) {
+            for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+                if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Name") {
+                    return json["Instances"][0]["Tags"][tagIndex]["Value"];
+                }
+            }
+        }
     }
+    return "[Not Named]";
+}
+
+/**
+ * Returns the status of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getStatus(json) {
+    return json["Instances"][0]["State"]["Name"];
+}
+
+/**
+ * Returns the ID of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getInstanceId(json) {
+    return json["Instances"][0]["InstanceId"];
+}
+
+/**
+ * Returns the public IPv4 of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getIPv4(json) {
+    if("PublicIpAddress" in json["Instances"][0]) {
+        return json["Instances"][0]["PublicIpAddress"];
+    }
+    return "";
+}
+
+/**
+ * Returns the encoded password of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getPassword(json) {
+    if("Tags" in json["Instances"][0]) {
+        if(json["Instances"][0]["Tags"] != undefined) {
+            for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+                if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Cert") {
+                    return json["Instances"][0]["Tags"][tagIndex]["Value"];
+                }
+            }
+        }
+    }
+    return "";
+}
+
+/**
+ * Returns the key of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getKey(json) {
+    if("Tags" in json["Instances"][0]) {
+        if(json["Instances"][0]["Tags"] != undefined) {
+            for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+                if("KeyName" in json["Instances"][0]) {
+                    return json["Instances"][0]["KeyName"];
+                }
+            }
+        }
+    }
+    return "";
+}
+
+/**
+ * Returns the CPU type of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getCpuType(json) {
+    return json["Instances"][0]["InstanceType"];
+}
+
+/**
+ * Returns the specs of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getSpecs(json) {
+    if("Tags" in json["Instances"][0]) {
+        if(json["Instances"][0]["Tags"] != undefined) {
+            for(var tagIndex = 0; tagIndex < json["Instances"][0]["Tags"].length; tagIndex++) {
+                if(json["Instances"][0]["Tags"][tagIndex]["Key"] == "Specifications") {
+                    return json["Instances"][0]["Tags"][tagIndex]["Value"];
+                }
+            }
+        }
+    }
+    return "";
+}
+
+/**
+ * Splits the specifications into 3 separate strings.
+ * @param {string} str The inputted string specs to be split.
+ */
+function splitSpecs(str) {
+    return str.split(" / ");
 }
 
 // -------------------------------  createButton functions  -------------------------------- //
