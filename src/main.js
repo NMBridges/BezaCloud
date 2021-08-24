@@ -117,8 +117,9 @@ function newAddTemplateWindow() {
   
   // When it closes, it should refresh the My Template list
   templateWindow.on('close', () => {
-    primaryWindow.webContents.executeJavaScript('temp.contentWindow.displayOverlay(true);');
-    primaryWindow.webContents.executeJavaScript('temp.contentWindow.loadTemplates();');
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.displayOverlay(true);').then(function() {
+      primaryWindow.webContents.executeJavaScript('temp.contentWindow.loadTemplates();');
+    });
   });
 }
 

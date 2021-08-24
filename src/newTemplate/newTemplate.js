@@ -117,7 +117,7 @@ addTemplateButton.addEventListener('click', function() {
     const newAmiId = amiIdTextBox.value.trim();
 
     // Ensures the AMI ID is not already in the user's list
-    const cachedAmiIds = getCacheValue("templates-" + getRegion());
+    var cachedAmiIds = getCacheValue("templates-" + getRegion());
     if(cachedAmiIds != "ERROR") {
         console.log(cachedAmiIds);
 
@@ -136,10 +136,15 @@ addTemplateButton.addEventListener('click', function() {
         if(results != "ERROR" && results != false) {
             if('Images' in results) {
                 // Good, this is a valid AMI ID
-                newPopup("Success", "Template successfully added.", "Close");
-                cachedAmiIds.push(newAmiId);
-                updateCache("templates-" + getRegion(), cachedAmiIds);
-                window.close();
+                try {
+                    newPopup("Success", "Template successfully added.", "Close");
+                    cachedAmiIds.push(newAmiId);
+                    updateCache("templates-" + getRegion(), cachedAmiIds);
+                    console.log(getCacheValue("templates-" + getRegion()));
+                    window.close();
+                } catch {
+                    window.close();
+                }
             } else {
                 // Error
                 newPopup("Error", "Error adding Template. Your network connection may be weak, or the AMI ID is potentially invalid. " +

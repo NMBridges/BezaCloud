@@ -103,12 +103,29 @@ function loadTemplates() {
 
                 var newTemplatesToPull = [];
 
+                // Compares AMI IDs of cached Templates with those of the account
+                // to ensure that no Templates are duplicates.
                 for(var cacheIndex = 0; cacheIndex < cachedAmiIds.length; cacheIndex++) {
-                    for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
-                        if(templates[templateIndex].id == cachedAmiIds[cacheIndex]) {
+                    if(templates.length == 0) {
+                        newTemplatesToPull.push(cachedAmiIds[cacheIndex]);
+                    } else {
+                        for(var templateIndex = 0; templateIndex < templates.length; templateIndex++) {
+                            if(templates[templateIndex].id == cachedAmiIds[cacheIndex]) {
+                                break;
+                            } else if(templateIndex == templates.length - 1) {
+                                newTemplatesToPull.push(cachedAmiIds[cacheIndex]);
+                            }
+                        }
+                    }
+                }
+
+                // Adds the default mercor-starter Template if it doesn't already exist.
+                for(var templateIndex = -1; templateIndex < templates.length; templateIndex++) {
+                    if(templateIndex == templates.length - 1) {
+                        if(templateIndex != -1 && templates[templateIndex].id == "ami-054dc1c0a4617b048") {
                             break;
-                        } else if(templateIndex == templates.length - 1) {
-                            newTemplatesToPull.push(cachedAmiIds[cacheIndex]);
+                        } else if(!newTemplatesToPull.includes("ami-054dc1c0a4617b048")) {
+                            newTemplatesToPull.push("ami-054dc1c0a4617b048");
                         }
                     }
                 }
