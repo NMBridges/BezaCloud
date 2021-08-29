@@ -189,10 +189,10 @@ async function tryLicenseKey(inputKey) {
     // Connects to MySQL server - in future pull this data from
     // s3 bucket using 'getSqlServer()'
     const con = mysql.createConnection({
-        host: "3.221.75.247",
-        user: "typaCC",
-        password: "sM1L6::@",
-        database: "licensemanager"
+        host: "license-keys.cbwk6xh9szjx.us-east-1.rds.amazonaws.com",
+        user: "admin",
+        password: "H#XCiFUG%sTzNF",
+        database: "licensekeys"
     });
 
     var keyIsValid = false;
