@@ -1,7 +1,7 @@
 // Suplemental functions
 const { 
     Colors, getTheme, setTheme, setRegion,
-    getRegion
+    getRegion, updateCache, getCacheValue
 } = parent.require("../mercor.js");
 
 // Page elements
@@ -10,8 +10,10 @@ var headerBarLabel = document.getElementById('optionsHeaderBarLabel');
 var primaryBody = document.getElementById('optionsPrimaryBody');
 var regionButton = document.getElementById('regionButton');
 var themeButton = document.getElementById('themeButton');
+var costButton = document.getElementById('costButton');
 var regionSelect = document.getElementById('regionSelect');
 var themeSelect = document.getElementById('themeSelect');
+var costSelect = document.getElementById('costSelect');
 
 window.onload = function() {
     initElements();
@@ -60,6 +62,25 @@ function initElements() {
 
     // --------------------------------------------------------------------------- //
 
+    // -------------------------  costButton functions  -------------------------- //
+
+    costButton.addEventListener('mouseenter', function() {
+        costButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    costButton.addEventListener('mouseleave', function() {
+        costButton.style.backgroundColor = Colors.backgroundPrimary();
+    });
+    costButton.addEventListener('click', function() {
+        costSelect.style.visibility = "hidden";
+        if(costSelect.style.visibility != "visible") {
+            costSelect.style.visibility = "visible";
+        } else {
+            costSelect.style.visibility = "hidden";
+        }
+    });
+
+    // --------------------------------------------------------------------------- //
+
     // ----------------------  themeSelectButton functions  ---------------------- //
 
     themeSelectButtons = document.getElementsByClassName('themeSelectButton');
@@ -97,6 +118,25 @@ function initElements() {
     }
 
     // --------------------------------------------------------------------------- //
+    
+    // ----------------------  costSelectButton functions  ----------------------- //
+
+    costSelectButtons = document.getElementsByClassName('costSelectButton');
+    for(var index = 0; index < costSelectButtons.length; index++) {
+        const csbi = costSelectButtons[index];
+        csbi.addEventListener('mouseenter', function() {
+            csbi.style.backgroundColor = Colors.backgroundPrimaryAccent();
+        });
+        csbi.addEventListener('mouseleave', function() {
+            csbi.style.backgroundColor = Colors.backgroundPrimary();
+        });
+        csbi.addEventListener('click', function() {
+            // Changes the cache for whether it pulls cost usage or not.
+            updateCostPulling(csbi.id == "costYes");
+        });
+    }
+
+    // --------------------------------------------------------------------------- //
 
 }
 
@@ -127,6 +167,19 @@ function updateRegion(newRegion) {
     regionSelect.style.visibility = "hidden";
 }
 
+/**
+ * Updates whether cost pulling should be ran on start.
+ * @param {string} newSetting The new boolean value to switch to.
+ */
+function updateCostPulling(newSetting) {
+    updateCache("pullCost", newSetting ? "On" : "Off");
+    costButton.textContent = newSetting ? "On" : "Off";
+    costSelect.style.visibility = "hidden";
+}
+
+/**
+ * Resets the buttons' values to be in accordance with the cache.
+ */
 function resetElements() {
     // Pull current region and theme from cache
     const regionDict = {
@@ -137,9 +190,18 @@ function resetElements() {
     };
     regionButton.textContent = regionDict[getRegion()];
     themeButton.textContent = getTheme();
+    
+    const costVal = getCacheValue("pullCost");
+    if(costVal == "ERROR") {
+        costButton.textContent = "On";
+        updateCache("pullCost", "On");
+    } else {
+        costButton.textContent = costVal;
+    }
 
     regionSelect.style.visibility = "hidden";
     themeSelect.style.visibility = "hidden";
+    costSelect.style.visibility = "hidden";
 }
 
 /**
@@ -155,9 +217,12 @@ function updateColors() {
         regionButton.style.color = Colors.textPrimary();
         themeButton.style.backgroundColor = Colors.backgroundPrimary();
         themeButton.style.color = Colors.textPrimary();
+        costButton.style.backgroundColor = Colors.backgroundPrimary();
+        costButton.style.color = Colors.textPrimary();
 
         regionSelect.style.borderColor = Colors.textTertiary();
         themeSelect.style.borderColor = Colors.textTertiary();
+        costSelect.style.borderColor = Colors.textTertiary();
 
         regionSelectButtons = document.getElementsByClassName('regionSelectButton');
         for(var index = 0; index < regionSelectButtons.length; index++) {
@@ -169,6 +234,12 @@ function updateColors() {
         for(var index = 0; index < themeSelectButtons.length; index++) {
             themeSelectButtons[index].style.color = Colors.textSecondary();
             themeSelectButtons[index].style.backgroundColor = Colors.backgroundPrimary();
+        }
+
+        costSelectButtons = document.getElementsByClassName('costSelectButton');
+        for(var index = 0; index < costSelectButtons.length; index++) {
+            costSelectButtons[index].style.color = Colors.textSecondary();
+            costSelectButtons[index].style.backgroundColor = Colors.backgroundPrimary();
         }
 
         resetElements();

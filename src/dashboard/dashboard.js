@@ -1,5 +1,7 @@
 // Supplemental functions
-const { Colors } = parent.require("../mercor.js");
+const {
+    Colors, getCacheValue
+ } = parent.require("../mercor.js");
 const {
     Expenditure, getSpending
 } = parent.require("../apiCaller.js");
@@ -24,9 +26,27 @@ var dailyExpenditures = [];
 /** @type {Expenditure[]} The expenditures of the previous 11, and current, months. */
 var monthlyExpenditures = [];
 
+/** @type {boolean} The current status of whether the file is loading spending. */
+var loadingSpending = false;
+
 window.addEventListener('load', function() {
 
-    loadSpending();
+    if(getCacheValue("pullCost") == "On") {
+        if(!loadingSpending) {
+            loadSpending();
+        }
+    } else {
+        barChart.textContent = '';
+
+        var noPullLabel = document.createElement('div');
+        noPullLabel.textContent = "Spending chart disabled in Options.";
+        noPullLabel.style.color = Colors.textSecondary();
+        noPullLabel.style.width = "calc(100vw - 70px)";
+        noPullLabel.style.margin = "auto";
+        noPullLabel.style.marginTop = "calc(45vh - 140px)";
+        noPullLabel.style.textAlign = "center";
+        barChart.appendChild(noPullLabel);
+    }
 
 });
 
@@ -34,6 +54,13 @@ window.addEventListener('load', function() {
  * Loads the chart with the appropriate spending information.
  */
 function loadChart() {
+    // Clears the old chart of any children.
+    barChart.textContent = '';
+    var chartLine = document.createElement('div');
+    chartLine.className = "outline";
+    chartLine.style.backgroundColor = Colors.textTertiary();
+    barChart.appendChild(chartLine);
+
     /** @type {Expenditure[]} The expenditures to base the chart on. */
     var selectedExpenditures = [];
 
@@ -52,12 +79,12 @@ function loadChart() {
         }
     }
 
-    maxSpending *= 1.25;
+    maxSpending *= 1.15;
 
     const newLength = selectedExpenditures.length;
     barChart.style = "--cols:" + newLength + ";";
     for(var counter = 0; counter < newLength; counter++) {
-        addChildToChart(selectedExpenditures[counter].spending / maxSpending, counter + 1);
+        addChildToChart(selectedExpenditures[counter], maxSpending, counter + 1);
     }
 
     updateColors();
@@ -68,6 +95,8 @@ function loadChart() {
  * Calls loadChart() when finished.
  */
 function loadSpending() {
+    loadingSpending = true;
+
     // Clears the old chart of any children.
     barChart.textContent = '';
 
@@ -82,6 +111,7 @@ function loadSpending() {
         if(result != "ERROR") {
             if("ResultsByTime" in result) {
                 const spending = result["ResultsByTime"];
+                var spendingInLastYear = 0.0;
                 
                 // Loops through spending periods and adds them to the spending array.
                 for(var index = 0; index < spending.length; index++) {
@@ -125,6 +155,7 @@ function loadSpending() {
                         if("BlendedCost" in expenditure["Total"]) {
                             if("Amount" in expenditure["Total"]["BlendedCost"]) {
                                 amount = expenditure["Total"]["BlendedCost"]["Amount"];
+                                spendingInLastYear += parseFloat(amount);
                             }
 
                             if("Unit" in expenditure["Total"]["BlendedCost"]) {
@@ -138,7 +169,10 @@ function loadSpending() {
 
                 console.log("Monthly ", monthlyExpenditures);
                 completionCounter++;
+                yearlySpendings.textContent = (monthlyExpenditures[0].currency == "USD" ? "$" : "") + spendingInLastYear.toFixed(2)
+                                                    + " " + (monthlyExpenditures[0].currency == "USD" ? "" : monthlyExpenditures[0].currency);
                 if(completionCounter > 1) {
+                    loadingSpending = false;
                     loadChart();
                 }
             }
@@ -152,6 +186,7 @@ function loadSpending() {
         if(result != "ERROR") {
             if("ResultsByTime" in result) {
                 const spending = result["ResultsByTime"];
+                var spendingInLastMonth = 0.0;
                 
                 // Loops through spending periods and adds them to the spending array.
                 for(var index = 0; index < spending.length; index++) {
@@ -195,6 +230,7 @@ function loadSpending() {
                         if("BlendedCost" in expenditure["Total"]) {
                             if("Amount" in expenditure["Total"]["BlendedCost"]) {
                                 amount = expenditure["Total"]["BlendedCost"]["Amount"];
+                                spendingInLastMonth += parseFloat(amount);
                             }
 
                             if("Unit" in expenditure["Total"]["BlendedCost"]) {
@@ -208,7 +244,10 @@ function loadSpending() {
 
                 console.log("Daily ", dailyExpenditures);
                 completionCounter++;
+                monthlySpendings.textContent = (dailyExpenditures[0].currency == "USD" ? "$" : "") + spendingInLastMonth.toFixed(2)
+                                                + " " + (dailyExpenditures[0].currency == "USD" ? "" : dailyExpenditures[0].currency);
                 if(completionCounter > 1) {
+                    loadingSpending = false;
                     loadChart();
                 }
             }
@@ -220,13 +259,22 @@ function loadSpending() {
 
 /**
  * Appends a new bar to the bar chart.
- * @param {number} height The height, or value, of the new bar on the chart.
+ * @param {Expenditure} expenditure The Expenditure object for the new bar on the chart.
+ * @param {number} maxSpending The max spending of any Expenditure object on the chart.
  * @param {number} index The column index of the new bar, used for placement.
  */
-function addChildToChart(height, index) {
+function addChildToChart(expenditure, maxSpending, index) {
     var newChild = document.createElement('div');
-    newChild.style = "--col:" + index + ";--hei:" + height + ";";
+    newChild.style = "--col:" + index + ";--hei:" + (expenditure.spending / maxSpending) + ";";
     newChild.className = "bar";
+    
+    var newChildStatus = document.createElement('div');
+    newChildStatus.className = "barPopup";
+    newChildStatus.textContent = (spendingView == "daily" ? expenditure.start : expenditure.start.substring(3)) + "\n"
+                                + (expenditure.currency == "USD" ? "$" : "") + parseFloat(expenditure.spending).toFixed(2)
+                                     + (expenditure.currency != "USD" ? " " + expenditure.currency : "");
+    newChild.appendChild(newChildStatus);
+    
     barChart.appendChild(newChild);
 }
 
@@ -246,7 +294,16 @@ dailyButton.addEventListener('mouseleave', function() {
 
 dailyButton.addEventListener('click', function() {
     spendingView = "daily";
-    updateColors();
+    monthlyButton.style.backgroundColor = Colors.backgroundPrimary();
+    if(getCacheValue("pullCost") == "On") {
+        if(barChart.children.length < 5) {
+            loadSpending();
+        } else {
+            loadChart();
+        }
+    } else if(barChart.children.length >= 12) {
+        loadChart();
+    }
 });
 
 // --------------------------------------------------------------------------- //
@@ -267,8 +324,38 @@ monthlyButton.addEventListener('mouseleave', function() {
 
 monthlyButton.addEventListener('click', function() {
     spendingView = "monthly";
-    updateColors();
+    dailyButton.style.backgroundColor = Colors.backgroundPrimary();
+    if(getCacheValue("pullCost") == "On") {
+        if(barChart.children.length < 5) {
+            loadSpending();
+        } else {
+            loadChart();
+        }
+    } else if(barChart.children.length >= 12) {
+        loadChart();
+    }
 });
+
+// --------------------------------------------------------------------------- //
+
+// --------------------------------------------------------------------------- //
+
+/**
+ * Loads the chart when dashboard is switched to.
+ */
+function loadOnSwitch() {
+    if(!loadingSpending) {
+        if(getCacheValue("pullCost") == "On") {
+            if(barChart.children.length < 5) {
+                loadSpending();
+            } else {
+                loadChart();
+            }
+        } else if(barChart.children.length >= 12) {
+            loadChart();
+        }
+    }
+}
 
 // --------------------------------------------------------------------------- //
 
@@ -298,6 +385,8 @@ function updateColors() {
     headerBar.style.backgroundColor = Colors.backgroundPrimaryAccent();
 
     for(var count = 0; count < barChart.children.length; count++) {
-        barChart.children[count].style.backgroundColor = Colors.chartColor();
+        if(barChart.children[count].className == "bar") {
+            barChart.children[count].style.backgroundColor = Colors.chartColor();
+        }
     }
 }

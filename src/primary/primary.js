@@ -237,6 +237,7 @@ function to(page) {
     // Hides each iframe if it is not the desired page.
     if(page == "Dashboard") {
         dash.hidden = false;
+        dash.contentWindow.loadOnSwitch();
     } else {
         dash.hidden = true;
     }

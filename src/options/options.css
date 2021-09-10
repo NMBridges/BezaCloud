@@ -127,3 +127,56 @@ body {
                         border-radius: 8px;
                         border: 0px solid white;
                     }
+            #costLabel {
+                position: absolute;
+                top: 245px;
+                left: 20px;
+                font-size: 25px;
+                color: white;
+            }
+            #costButton {
+                position: absolute;
+                top: 290px;
+                left: 20px;
+                font-size: 15px;
+                font-family: "Segoe UI", sans-serif;
+                font-weight:300;
+                font-style: normal;
+                border: 1px solid white;
+                color: white;
+                border-radius: 8px;
+                width: 125px;
+                height: 40px;
+            }
+                #costSelect {
+                    position: absolute;
+                    top: 290px;
+                    left: 145px;
+                    margin: 0px;
+                    padding: 0px;
+                    width: 250px;
+                    height: 38px;
+                    display: grid;
+                    grid-template-columns: repeat(2, 125px);
+                    border-radius: 8px;
+                    border: 1px solid white;
+                }
+                    .costSelectButton {
+                        grid-row: 1;
+                        font-size: 15px;
+                        font-family: "Segoe UI", sans-serif;
+                        font-weight:300;
+                        font-style: normal;
+                        margin: 0px;
+                        width: 125px;
+                        height: 100%;
+                        border-radius: 8px;
+                        border: 0px solid white;
+                    }  
+            #costNoticeLabel {
+                position: absolute;
+                top: 335px;
+                left: 20px;
+                font-size: 10px;
+                color: #999999;
+            }
