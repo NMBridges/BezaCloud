@@ -354,6 +354,20 @@ function openRdpFile() {
 }
 
 /**
+ * Converts a unix time code to the date/time format.
+ * @param {number} unix The given unix time code.
+ * @returns The unix time code in date/time format.
+ */
+ function unixToDate(unix){
+    var datetime = new Date(unix * 1000);
+    var year = datetime.getFullYear();
+    var month = datetime.getMonth();
+    var day = datetime.getDate();
+    var formatted = year + "-" + (month < 9 ? "0" : "") + (month + 1) + "-" + (day < 10 ? "0" : "") + day;
+    return formatted;
+}
+
+/**
  * Sets the values for the popup window.
  * @param {string} header The header text.
  * @param {string} body The body text.
@@ -597,5 +611,6 @@ module.exports = {
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
     installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled,
-    setRegion, getRegion, updateCache, getCacheValue, mercorExec
+    setRegion, getRegion, updateCache, getCacheValue, mercorExec,
+    unixToDate
 };

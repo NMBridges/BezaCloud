@@ -13,20 +13,20 @@ body {
 
 .menu {
   grid-area: menuBar;
-  background-color: red;
+  background-color: white;
   width: 50px;
   position: relative;
 }
 .header {
   grid-area: headerBar;
-  background-color: green;
+  background-color: white;
   height: 50px;
   position: relative;
   margin: 0;
 }
 #primaryBody {
   grid-area: primaryBody;
-  background-color: blue;
+  background-color: white;
   margin: 0;
 }
 .grid-container-1 {
@@ -36,43 +36,43 @@ body {
   grid-template-areas:
     'menuBar primaryBody';
   grid-gap: 0px;
-  background-color: #2196F3;
+  background-color: white;
   grid-template-columns: 50px auto;
 }
 #dashboardButton {
-  background-color: #2196F3;
+  background-color: white;
   width: 100%;
   height: 50px;
-  border: 0 solid black;
+  border: 0 solid white;
 }
 #serversButton {
   width: 100%;
   height: 50px;
-  border: 0 solid black;
+  border: 0 solid white;
 }
 #tasksButton {
-  background-color: maroon;
+  background-color: white;
   width: 100%;
   height: 50px;
-  border: 0 solid black;
+  border: 0 solid white;
 }
 #optionsButton {
-  background-color: yellow;
+  background-color: white;
   width: 100%;
   height: 50px;
-  border: 0 solid black;
+  border: 0 solid white;
 }
 #templatesButton {
-  background-color: yellow;
+  background-color: white;
   width: 100%;
   height: 50px;
-  border: 0 solid black;
+  border: 0 solid white;
 }
 #signOutButton {
-  background-color: yellow;
+  background-color: white;
   width: 100%;
   height: 50px;
-  border: 0 solid black;
+  border: 0 solid white;
   bottom: 0;
   left:0;
   position: absolute;

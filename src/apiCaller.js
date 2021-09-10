@@ -22,9 +22,13 @@ const {
     CopyImageCommand,
 } = require("@aws-sdk/client-ec2");
 const {
-    getRegion
+    GetCostAndUsageCommand, CostExplorerClient
+} = require("@aws-sdk/client-cost-explorer");
+const {
+    getRegion, unixToDate
 } = require("./mercor.js");
 var ec2Client = new EC2Client({ region: "us-east-1"});
+var ceClient = new CostExplorerClient({ region: "us-east-1"});
 const fs = require('fs');
 const homeDir = require('os').homedir();
 const { exec, execSync } = require('child_process');
@@ -37,8 +41,20 @@ const promiseExec = require('util').promisify(exec);
     return homeDir + "/.aws";
 }
 
+/**
+ * Resets the ec2Client variable to have the correct region.
+ * @returns a version of the client with the correct region.
+ */
 function resetEC2Client() {
     return new EC2Client({ region: getRegion()});
+}
+
+/**
+ * Resets the ceClient variable to have the correct region.
+ * @returns a version of the client with the correct region.
+ */
+function resetCEClient() {
+    return new CostExplorerClient({ region: getRegion()});
 }
 
 /**
@@ -442,6 +458,67 @@ const deleteImage = async (id) => {
 };
 
 /**
+ * @param {string} gran The granularity of the spending. Either "DAILY" or "MONTHLY".
+ * @returns The spending 
+ */
+const getSpending = async (gran) => {
+    try {
+        ceClient = resetCEClient();
+
+        // Set the parameters
+        var startDate = "";
+        var endDate = "";
+        if(gran == "MONTHLY") {
+            endDate = unixToDate((Date.now()) / 1000);
+            startDate = unixToDate((Date.now() - 31536000000) / 1000);
+
+            if(endDate.substr(8) != "01") {
+                var month = "" + ((parseInt(endDate.substr(5, 7)) + 1) % 12);
+                if(month.length < 2) { month = "0" + month; }
+                
+                endDate = endDate.substr(0,4) + "-" + month + "-01";
+                startDate = startDate.substr(0,4) + "-" + month + "-01";
+            }
+        } else if(gran == "DAILY") {
+            endDate = unixToDate((Date.now()) / 1000);
+            startDate = unixToDate((Date.now() - 2592000000) / 1000);
+        }
+
+        console.log(startDate);
+        console.log(endDate);
+
+        const ceParams = {
+            Granularity: gran,
+            Metrics: ["BlendedCost"],
+            TimePeriod: {
+                End: endDate,
+                Start: startDate
+            },
+            Filter: {
+                Not: {
+                    Dimensions: {
+                        Key: "RECORD_TYPE",
+                        Values: [
+                            "Refund",
+                            "Credit"
+                        ],
+                        Include: true,
+                        Children: null
+                    }
+                }
+            }
+        };
+        
+        const data = await ceClient.send(new GetCostAndUsageCommand(ceParams));
+        console.log("Successfully retrieved spending data", data);
+        return data;
+    } catch(err) {
+        console.log("Error", err);
+        return "ERROR";
+    }
+};
+
+/**
  * Creates an AWS instance.
  */
 const createInstance = async (ami, cpu, name, key, secGroupId) => {
@@ -566,13 +643,32 @@ class Server {
     }
 }
 
+/**
+ * Class that stores the necessary information for each cost usage 'Expenditure'.
+ */
+ class Expenditure {
+    /**
+     * Constructs a new Expenditure object.
+     * @param {string} start The start date of the Expenditure section.
+     * @param {string} end The end date of the Expenditure section.
+     * @param {number} spending The amount of spending for the Expenditure section.
+     * @param {string} currency The currency of the spending.
+     */
+    constructor(start, end, spending, currency) {
+        this.start = start;
+        this.end = end;
+        this.spending = spending;
+        this.currency = currency;
+    }
+}
+
 module.exports = 
 { 
-    Server, Template, Task, connectionTest, getInstances,
+    Server, Template, Task, Expenditure, connectionTest, getInstances,
     startInstance, stopInstance, rebootInstance, terminateInstance, 
     createKeyPair, getInstancePasswordData, createInstance,
     getSecurityGroups, getMercorSecurityGroupId, getDefaultVpcId,
     createMercorSecurityGroup, pemFileExists, addTags,
     getUserAMIs, changeAmiVisibility, createImage, deleteImage,
-    copyImage, getAmiData, genRandom
+    copyImage, getAmiData, genRandom, getSpending
 };

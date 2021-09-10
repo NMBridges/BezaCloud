@@ -7,6 +7,9 @@
 - Add Tasks page [Tasks]
 - Add notifications [Tasks]
 - Replace default colors [all]
+- New version updates [all]
+- Don't load costs, servers, etc. before sign in. [all]
+- Implement auto sign in [all]
 
 
 Instead of prebuilt AMIs, give the option for basic windows platform, then you can

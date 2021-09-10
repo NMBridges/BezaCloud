@@ -1,5 +1,8 @@
 // Supplemental functions
 const { Colors } = parent.require("../mercor.js");
+const {
+    Expenditure, getSpending
+} = parent.require("../apiCaller.js");
 
 // Document items
 var mainGridContainer = document.getElementById("mainGridContainer");
@@ -13,26 +16,206 @@ var barChart = document.getElementById("barChart");
 var mainPageLabel = document.getElementById("mainPageLabel");
 var headerBar = document.getElementById("headerBar");
 
+/** @type {string} Holds the type of chart that the dashboard should display. */
 var spendingView = "daily";
+
+/** @type {Expenditure[]} The expenditures of the last 30 days. */
+var dailyExpenditures = [];
+/** @type {Expenditure[]} The expenditures of the previous 11, and current, months. */
+var monthlyExpenditures = [];
 
 window.addEventListener('load', function() {
 
-    loadChart();
-    
+    loadSpending();
+
 });
 
 /**
  * Loads the chart with the appropriate spending information.
  */
 function loadChart() {
-    // Clears the old chart of any children
-    barChart.textContent = '';
+    /** @type {Expenditure[]} The expenditures to base the chart on. */
+    var selectedExpenditures = [];
 
-    const newLength = 30;
+    if(spendingView == "daily") {
+        selectedExpenditures = dailyExpenditures;
+    } else {
+        selectedExpenditures = monthlyExpenditures;
+    }
+
+    /** @type {number} The maximum spending in a single day. */
+    var maxSpending = 0.01;
+    for(var index = 0; index < selectedExpenditures.length; index++) {
+        const tempSpending = parseFloat(selectedExpenditures[index].spending);
+        if(tempSpending > maxSpending) {
+            maxSpending = tempSpending;
+        }
+    }
+
+    maxSpending *= 1.25;
+
+    const newLength = selectedExpenditures.length;
     barChart.style = "--cols:" + newLength + ";";
     for(var counter = 0; counter < newLength; counter++) {
-        addChildToChart(Math.random(), counter + 1);
+        addChildToChart(selectedExpenditures[counter].spending / maxSpending, counter + 1);
     }
+
+    updateColors();
+}
+
+/**
+ * Clears the old barChart and loads data for the new chart.
+ * Calls loadChart() when finished.
+ */
+function loadSpending() {
+    // Clears the old chart of any children.
+    barChart.textContent = '';
+
+    // Resets the Expenditure lists.
+    dailyExpenditures = [];
+    monthlyExpenditures = [];
+
+    var completionCounter = 0;
+
+    // Gets the spending for the previous 11, and current, month.
+    getSpending("MONTHLY").then(function(result) {
+        if(result != "ERROR") {
+            if("ResultsByTime" in result) {
+                const spending = result["ResultsByTime"];
+                
+                // Loops through spending periods and adds them to the spending array.
+                for(var index = 0; index < spending.length; index++) {
+                    const expenditure = spending[index];
+                    var timeStart = "n/a";
+                    var timeEnd = "n/a";
+                    var amount = 0.00;
+                    var currency = "n/a";
+
+                    // Gets the time periods.
+                    if("TimePeriod" in expenditure) {
+                        if("Start" in expenditure["TimePeriod"]) {
+                            const startDate = expenditure["TimePeriod"]["Start"];
+                            const day = startDate.substring(8, 10);
+                            const mo = startDate.substring(5,7);
+                            const yr = startDate.substring(0,4);
+                            const months = [
+                                "Jan", "Feb", "Mar", "Apr",
+                                "May", "Jun", "Jul", "Aug",
+                                "Sep", "Oct", "Nov", "Dec"
+                            ];
+                            timeStart = day + " " + months[mo - 1] + " " + yr;
+                        }
+
+                        if("End" in expenditure["TimePeriod"]) {
+                            const endDate = expenditure["TimePeriod"]["End"];
+                            const day = endDate.substring(8, 10);
+                            const mo = endDate.substring(5,7);
+                            const yr = endDate.substring(0,4);
+                            const months = [
+                                "Jan", "Feb", "Mar", "Apr",
+                                "May", "Jun", "Jul", "Aug",
+                                "Sep", "Oct", "Nov", "Dec"
+                            ];
+                            timeEnd = day + " " + months[mo - 1] + " " + yr;
+                        }
+                    }
+
+                    // Gets the cost usage.
+                    if("Total" in expenditure) {
+                        if("BlendedCost" in expenditure["Total"]) {
+                            if("Amount" in expenditure["Total"]["BlendedCost"]) {
+                                amount = expenditure["Total"]["BlendedCost"]["Amount"];
+                            }
+
+                            if("Unit" in expenditure["Total"]["BlendedCost"]) {
+                                currency = expenditure["Total"]["BlendedCost"]["Unit"];
+                            }
+                        }
+                    }
+
+                    monthlyExpenditures.push(new Expenditure(timeStart, timeEnd, amount, currency));
+                }
+
+                console.log("Monthly ", monthlyExpenditures);
+                completionCounter++;
+                if(completionCounter > 1) {
+                    loadChart();
+                }
+            }
+        } else {
+            
+        }
+    });
+
+    // Gets the spending for the previous 30 days.
+    getSpending("DAILY").then(function(result) {
+        if(result != "ERROR") {
+            if("ResultsByTime" in result) {
+                const spending = result["ResultsByTime"];
+                
+                // Loops through spending periods and adds them to the spending array.
+                for(var index = 0; index < spending.length; index++) {
+                    const expenditure = spending[index];
+                    var timeStart = "n/a";
+                    var timeEnd = "n/a";
+                    var amount = 0.00;
+                    var currency = "n/a";
+
+                    // Gets the time periods.
+                    if("TimePeriod" in expenditure) {
+                        if("Start" in expenditure["TimePeriod"]) {
+                            const startDate = expenditure["TimePeriod"]["Start"];
+                            const day = startDate.substring(8, 10);
+                            const mo = startDate.substring(5,7);
+                            const yr = startDate.substring(0,4);
+                            const months = [
+                                "Jan", "Feb", "Mar", "Apr",
+                                "May", "Jun", "Jul", "Aug",
+                                "Sep", "Oct", "Nov", "Dec"
+                            ];
+                            timeStart = day + " " + months[mo - 1] + " " + yr;
+                        }
+
+                        if("End" in expenditure["TimePeriod"]) {
+                            const endDate = expenditure["TimePeriod"]["End"];
+                            const day = endDate.substring(8, 10);
+                            const mo = endDate.substring(5,7);
+                            const yr = endDate.substring(0,4);
+                            const months = [
+                                "Jan", "Feb", "Mar", "Apr",
+                                "May", "Jun", "Jul", "Aug",
+                                "Sep", "Oct", "Nov", "Dec"
+                            ];
+                            timeEnd = day + " " + months[mo - 1] + " " + yr;
+                        }
+                    }
+
+                    // Gets the cost usage.
+                    if("Total" in expenditure) {
+                        if("BlendedCost" in expenditure["Total"]) {
+                            if("Amount" in expenditure["Total"]["BlendedCost"]) {
+                                amount = expenditure["Total"]["BlendedCost"]["Amount"];
+                            }
+
+                            if("Unit" in expenditure["Total"]["BlendedCost"]) {
+                                currency = expenditure["Total"]["BlendedCost"]["Unit"];
+                            }
+                        }
+                    }
+
+                    dailyExpenditures.push(new Expenditure(timeStart, timeEnd, amount, currency));
+                }
+
+                console.log("Daily ", dailyExpenditures);
+                completionCounter++;
+                if(completionCounter > 1) {
+                    loadChart();
+                }
+            }
+        } else {
+            
+        }
+    });
 }
 
 /**

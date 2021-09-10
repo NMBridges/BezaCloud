@@ -266,7 +266,7 @@ function buttonUp() {
                     const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
                     mercorExec(cmd2);
                     // Should be running Remote Desktop
-                    //window.close();
+                    window.close();
                 } else {
                     // Mac
                     newPopup("The password to your server is", newPassword, "Copy and Continue");
@@ -316,7 +316,7 @@ function buttonUp() {
                                         const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
                                         mercorExec(cmd2);
                                         // Should be running Remote Desktop
-                                        //window.close();
+                                        window.close();
                                     } else {
                                         // Mac
                                         newPopup("The password to your server is", newPassword, "Copy and Continue");

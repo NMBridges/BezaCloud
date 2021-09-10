@@ -14,7 +14,7 @@ body {
         padding-right: 20px;
         width: calc(100% - 40px);
         height: 100%;
-        background-color: blue;
+        background-color: white;
         display: grid;
         grid-template-rows: 55px 70px 150px 140px auto;
         grid-template-areas:
@@ -73,7 +73,7 @@ body {
                     padding: 0px;
                     grid-column: 1;
                     grid-row: var(--row);
-                    border: 0px solid blue;
+                    border: 0px solid white;
                     font-family: "Segoe UI", sans-serif;
                     font-weight:300;
                     font-style: normal;
@@ -130,7 +130,7 @@ body {
                     grid-column: 1;
                     grid-row: var(--row);
                     display: grid;
-                    border: 0px solid blue;
+                    border: 0px solid white;
                     font-family: "Segoe UI", sans-serif;
                     font-weight:300;
                     font-style: normal;
@@ -180,7 +180,7 @@ body {
                 display: inline-block;
                 width: calc(100% - 27px);
                 height: calc(100% - 25px);
-                border: 0px solid blue;
+                border: 0px solid white;
                 border-radius: 6px;
                 font-family: "Segoe UI", sans-serif;
                 font-weight:300;
@@ -196,7 +196,7 @@ body {
                 display: inline-block;
                 width: calc(100% - 27px);
                 height: calc(100% - 25px);
-                border: 2px solid blue;
+                border: 2px solid white;
                 border-radius: 6px;
                 font-family: "Segoe UI", sans-serif;
                 font-weight:300;

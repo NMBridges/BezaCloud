@@ -14,7 +14,7 @@ body {
         padding-right: 20px;
         width: calc(100% - 40px);
         height: 100%;
-        background-color: blue;
+        background-color: white;
         display: grid;
         grid-template-rows: 75px 115px 95px auto;
         grid-template-areas:
@@ -54,11 +54,11 @@ body {
                     width: 8px;
                     height: 8px;
                     margin: 10px;
-                    background-color: brown;
+                    background-color: white;
                     grid-area: pemBut;
                     display: inline-block;
                     border-radius: 12px;
-                    border: 3px solid black;
+                    border: 3px solid white;
                 }
                 .divLabel {
                     color: white;
@@ -79,7 +79,7 @@ body {
                 border-radius: 8px;
                 text-align: center;
                 vertical-align: middle;
-                background-color: brown;
+                background-color: white;
                 color: white;
                 padding-top: 5px;
             }
@@ -104,13 +104,13 @@ body {
             grid-area: pem;
             width: 100%;
             height: calc(100% - 10px);
-            background-color: aqua;
+            background-color: white;
         }
         #passBox {
             grid-area: pass;
             width: 100%;
             height: calc(100% - 10px);
-            background-color: bisque;
+            background-color: white;
         }
         #buttonBox {
             grid-area: buttons;
@@ -130,7 +130,7 @@ body {
                 display: inline-block;
                 width: calc(100% - 27px);
                 height: calc(100% - 25px);
-                border: 0px solid blue;
+                border: 0px solid white;
                 border-radius: 6px;
                 font-family: "Segoe UI", sans-serif;
                 font-weight:300;
@@ -146,7 +146,7 @@ body {
                 display: inline-block;
                 width: calc(100% - 27px);
                 height: calc(100% - 25px);
-                border: 2px solid blue;
+                border: 2px solid white;
                 border-radius: 6px;
                 font-family: "Segoe UI", sans-serif;
                 font-weight:300;

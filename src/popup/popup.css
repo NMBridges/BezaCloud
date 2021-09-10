@@ -9,7 +9,7 @@ body {
     height: 100%;
 }
     #boundingBox {
-        background-color: red;
+        background-color: white;
         height: 100%;
         margin-left: 0px;
         margin-right: 0px;
@@ -17,7 +17,7 @@ body {
         margin-bottom: 0px;
         text-align: center;
         border-radius: 0px;
-        border: 0px solid blue;
+        border: 0px solid white;
         display: grid;
         grid-template-rows: 25% calc(75% - 100px) 100px;
         grid-template-areas: 
