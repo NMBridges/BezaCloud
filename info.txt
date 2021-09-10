@@ -7,7 +7,7 @@
   a single time, and then Mercor Connect will be able to connect to it any time after.
 
 [Windows]
-npm run dist
+npm run dist y
 
 [Mac]
 npm run make
