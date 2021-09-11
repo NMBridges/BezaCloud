@@ -88,3 +88,4 @@ typings/
 # Electron-Forge
 out/
 build/
+.AWSCLIV2.pkg.icloud
