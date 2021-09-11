@@ -98,6 +98,7 @@ function resetElements() {
 }
 
 addTemplateButton.addEventListener('mouseenter', function() {
+    if(addTemplateButton.value == "selected") { return; }
     if(getTheme() == "Dark") {
         addTemplateButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
@@ -106,6 +107,7 @@ addTemplateButton.addEventListener('mouseenter', function() {
 });
 
 addTemplateButton.addEventListener('mouseleave', function() {
+    if(addTemplateButton.value == "selected") { return; }
     if(getTheme() == "Dark") {
         addTemplateButton.style.backgroundColor = Colors.backgroundSecondary();
     } else {
@@ -113,7 +115,23 @@ addTemplateButton.addEventListener('mouseleave', function() {
     }
 });
 
+/**
+ * Resets the appearance and functionality of the addTemplateButton.
+ */
+function resetAddTemplateButton() {
+    addTemplateButton.value = "";
+    if(getTheme() == "Dark") {
+        addTemplateButton.style.backgroundColor = Colors.backgroundSecondary();
+    } else {
+        addTemplateButton.style.backgroundColor = Colors.textPrimary();
+    }
+}
+
 addTemplateButton.addEventListener('click', function() {
+    if(addTemplateButton.value == "selected") { return; }
+    addTemplateButton.value = "selected";
+    addTemplateButton.style.backgroundColor = "#555555";
+
     const newAmiId = amiIdTextBox.value.trim();
 
     // Ensures the AMI ID is not already in the user's list
@@ -125,6 +143,7 @@ addTemplateButton.addEventListener('click', function() {
             if(cachedAmiIds[cacheIndex] == newAmiId) {
                 // User already has it 
                 newPopup("Error", "You already have this Template in your Template library.", "Close");
+                resetAddTemplateButton();
                 //window.close();
                 return;
             }
@@ -141,19 +160,23 @@ addTemplateButton.addEventListener('click', function() {
                     cachedAmiIds.push(newAmiId);
                     updateCache("templates-" + getRegion(), cachedAmiIds);
                     console.log(getCacheValue("templates-" + getRegion()));
+                    resetAddTemplateButton();
                     window.close();
                 } catch {
+                    resetAddTemplateButton();
                     window.close();
                 }
             } else {
                 // Error
                 newPopup("Error", "Error adding Template. Your network connection may be weak, or the AMI ID is potentially invalid. " +
                 "Please ensure the Template is hosted in this region.", "Close");
+                resetAddTemplateButton();
             }
         } else {
             // Error
             newPopup("Error", "Error adding Template. Your network connection may be weak, or the AMI ID is potentially invalid. " + 
             "Please ensure the Template is hosted in this region.", "Close");
+            resetAddTemplateButton();
         }
     });
 });

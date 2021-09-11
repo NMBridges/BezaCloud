@@ -3,7 +3,8 @@ const EventEmitter = require('events');
 const path = require('path');
 const {
   tryLicenseKey, cachedLicenseKey, createAwsDir,
-  installAwsCli, hasAwsCliInstalled, awsDir
+  installAwsCli, hasAwsCliInstalled, awsDir,
+  cachedAwsCredentials
 } = require("./mercor.js");
 
 let licenseKeyWindow;
@@ -341,7 +342,7 @@ function createWindows() {
     show: false
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
-  primaryWindow.webContents.openDevTools();
+  //primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {
@@ -385,6 +386,14 @@ function createWindows() {
     newCopyTemplateWindow();
   });
 
+  // When the window calls for logOut, it logs the user out of AWS.
+  primaryWindow.on('logOut', () => {
+    primaryWindow.hide();
+    loginWindow.webContents.executeJavaScript("updateColors();").then(function() {
+      loginWindow.show();
+    });
+  });
+
   // ---------------------------------------------------------------------------------------------------//
 
   // Hides all windows
@@ -401,8 +410,15 @@ function createWindows() {
   const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
     console.log("License key result for " + cachedLicenseKey() + ":", exists);
     if(exists) {
-      licenseKeyWindow.hide();
-      loginWindow.show();
+      // If logic for AWS credentials.
+      loginWindow.webContents.executeJavaScript("accessKeyIdField.focus();").then(function() {
+        loginWindow.webContents.executeJavaScript("loginClicked();").then(function(success) {
+          if(!success) {
+            licenseKeyWindow.hide();
+            loginWindow.show();
+          }
+        });
+      });
     } else {
       licenseKeyWindow.show();
     }

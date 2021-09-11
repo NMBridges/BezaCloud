@@ -1,11 +1,11 @@
 - Offline support [all]
 - Revise "+" icon [Servers, Templates, Tasks]
 - Revise New Server window [Servers]
-- Style login and licenseKey pages [Login, LicenseKey]
+- Style licenseKey page [LicenseKey]
 - New version updates [all]
 - Don't load costs, servers, etc. before sign in. [all]
-- Implement auto sign in [all]
-- Button disabling while loading [all]
+- Renaming server functionality [Servers]
+- Make sure everyone has mercor-starter by default [Templates]
 
 
 Instead of prebuilt AMIs, give the option for basic windows platform, then you can

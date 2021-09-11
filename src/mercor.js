@@ -85,7 +85,7 @@ const installAwsCli = async () => {
  * Runs an inputted command. Used asynchronously by windows that are about to close.
  * @param {string} inpCmd The inputted command to be executed.
  */
-function mercorExec(inpCmd) {
+const mercorExec = (inpCmd) => {
     exec(inpCmd);
 }
 
@@ -405,6 +405,7 @@ function hex(r, g, b) {
 /** Colors class that controls which colors are used based on the theme. */
 class Colors {
     static textPrimary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
         } else if (theme == "Mercor") {
@@ -413,6 +414,7 @@ class Colors {
         return "D90166";
     }
     static menuTextPrimary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
         } else if (theme == "Mercor") {
@@ -421,6 +423,7 @@ class Colors {
         return "D90166";
     }
     static textSecondary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(192,192,192);
         } else if (theme == "Mercor") {
@@ -429,6 +432,7 @@ class Colors {
         return "D90166";
     }
     static textTertiary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(152,152,152);
         } else if (theme == "Mercor") {
@@ -437,6 +441,7 @@ class Colors {
         return "D90166";
     }
     static backgroundPrimary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
         } else if (theme == "Mercor") {
@@ -445,6 +450,7 @@ class Colors {
         return "D90166";
     }
     static mainBorderColor() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(32,43,58);
         } else if (theme == "Mercor") {
@@ -453,6 +459,7 @@ class Colors {
         return "D90166";
     }
     static backgroundSecondary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(247, 150, 37);
         } else if (theme == "Mercor") {
@@ -461,6 +468,7 @@ class Colors {
         return "D90166";
     }
     static topBarColor() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
         } else if (theme == "Mercor") {
@@ -469,6 +477,7 @@ class Colors {
         return "D90166";
     }
     static chartColor() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
         } else if (theme == "Mercor") {
@@ -477,6 +486,7 @@ class Colors {
         return "D90166";
     }
     static helpLinkColor() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
         } else if (theme == "Mercor") {
@@ -485,6 +495,7 @@ class Colors {
         return "D90166";
     }
     static backgroundPrimaryAccent() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(45,57,74);
         } else if (theme == "Mercor") {
@@ -493,6 +504,7 @@ class Colors {
         return "D90166";
     }
     static backgroundPrimaryDoubleAccent() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(55,67,84);
         } else if (theme == "Mercor") {
@@ -501,6 +513,7 @@ class Colors {
         return "D90166";
     }
     static backgroundSecondaryMouseHover() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(222,121,35);
         } else if (theme == "Mercor") {
@@ -509,6 +522,7 @@ class Colors {
         return "D90166";
     }
     static backgroundSecondarySelected() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(202,111,33);
         } else if (theme == "Mercor") {
@@ -517,6 +531,7 @@ class Colors {
         return "D90166";
     }
     static backgroundSecondaryToggleMenuBackground() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(255,165,40);
         } else if (theme == "Mercor") {
@@ -525,6 +540,7 @@ class Colors {
         return "D90166";
     }
     static awsLink() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(158,163,247);
         } else if (theme == "Mercor") {
@@ -533,6 +549,7 @@ class Colors {
         return "D90166";
     }
     static loginColor() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
         } else if (theme == "Mercor") {
@@ -541,6 +558,7 @@ class Colors {
         return "D90166";
     }
     static loginSecondary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
         } else if (theme == "Mercor") {
@@ -549,6 +567,7 @@ class Colors {
         return "D90166";
     }
     static loginLabelPrimary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
         } else if (theme == "Mercor") {
@@ -557,6 +576,7 @@ class Colors {
         return "D90166";
     }
     static loginLabelSecondary() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
         } else if (theme == "Mercor") {
@@ -565,6 +585,7 @@ class Colors {
         return "D90166";
     }
     static cellTile1() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
         } else if (theme == "Mercor") {
@@ -573,6 +594,7 @@ class Colors {
         return "D90166";
     }
     static cellTile2() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(37,49,65);
         } else if (theme == "Mercor") {
@@ -581,6 +603,7 @@ class Colors {
         return "D90166";
     }
     static cellTile3() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(36,48,64);
         } else if (theme == "Mercor") {
@@ -589,6 +612,7 @@ class Colors {
         return "D90166";
     }
     static cellTile4() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(38,50,66);
         } else if (theme == "Mercor") {
@@ -597,6 +621,7 @@ class Colors {
         return "D90166";
     }
     static cellTileHighlight() {
+        theme = getTheme();
         if (theme == "Dark") {
             return hex(50,60,70);
         } else if (theme == "Mercor") {

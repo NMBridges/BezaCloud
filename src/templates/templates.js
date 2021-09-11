@@ -56,7 +56,7 @@ function createTemplateObject(ami, owner) {
     const templateId = ami['ImageId'];
     const templateStatus = ami['State'];
     const templatePub = ami['Public'];
-    const templateAmiName = ami['Name'];
+    const templateAmiName = (ami['Name'] == null || ami['Name'] == "") ? "[Not Named]" : ami['Name'];
     const templatePlat = ami['PlatformDetails'];
 
     var newTemplate = new Template(

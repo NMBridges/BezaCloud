@@ -312,6 +312,7 @@ function splitSpecs(str) {
 // -------------------------------  createButton functions  -------------------------------- //
 
 createButton.addEventListener('mouseenter', function() {
+    if(createButton.value == "selected") { return; }
     if(getTheme() == "Dark") {
         createButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
@@ -320,6 +321,7 @@ createButton.addEventListener('mouseenter', function() {
 });
 
 createButton.addEventListener('mouseleave', function() {
+    if(createButton.value == "selected") { return; }
     if(getTheme() == "Dark") {
         createButton.style.backgroundColor = Colors.backgroundSecondary();
     } else {
@@ -328,6 +330,7 @@ createButton.addEventListener('mouseleave', function() {
 });
 
 createButton.addEventListener('click', function() {
+    if(createButton.value == "selected") { return; }
     parseNewTask();
 });
 
@@ -400,6 +403,7 @@ stopBox.addEventListener('click', function() {
  function buttonDown() {
     createButton.style.backgroundColor = "#333333";
     createButton.focus();
+    createButton.value = "selected";
 }
 
 /**
@@ -412,6 +416,7 @@ function buttonUp() {
         createButton.style.backgroundColor = Colors.textPrimary();
     }
     createButton.focus();
+    createButton.value = "";
 }
 
 /**
@@ -426,6 +431,8 @@ function convertTask(obj) {
  * Parses the new Task created by the user and adds it to the cache if it is valid.
  */
 function parseNewTask() {
+    if(createButton.value == "selected") { return; }
+
     var serverIsSelected = false;
     var serverButtonSelects = document.getElementsByClassName("serverButtonSelect");
     for(var index = 0; index < serverButtonSelects.length; index++) {

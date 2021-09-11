@@ -159,6 +159,9 @@ copyButton.addEventListener('mouseleave', function() {
 });
 
 copyButton.addEventListener('click', function() {
+    if(copyButton.value == "selected") { return; }
+    copyButton.style.backgroundColor = "#555555";
+    copyButton.value = "selected";
     var toRegions = [];
     
     if(usEast1Button.value == "selected") {
@@ -175,6 +178,7 @@ copyButton.addEventListener('click', function() {
     }
     
     if(toRegions.length > 0) {
+        var counter = 0;
         for(var index = 0; index < toRegions.length; index++) {
             const reg = toRegions[index];
             copyImage(amiIdToCopy, amiNameToCopy, reg).then(function(result) {
@@ -189,11 +193,15 @@ copyButton.addEventListener('click', function() {
                 } else {
                     newPopup("Error", "Error copying image to " + regionDict[reg] + " region.", "Close");
                 }
-                if(index == toRegions.length - 1) {
+                counter++;
+                if(counter == toRegions.length) {
+                    copyButton.value = "";
                     window.close();
                 }
             });
         }
+    } else {        
+        copyButton.value = "";
     }
 });
 

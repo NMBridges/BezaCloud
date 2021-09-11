@@ -24,7 +24,6 @@ body {
   border-radius: 5px;
 }
 .button {
-  color: #6151f5;
   width: 98px;
   font-weight: bold;
   font-size: 15px;
@@ -42,7 +41,6 @@ body {
   line-height: 30px;
   width: 200px;
   text-align: center;
-  outline-color:#6151f5;
 }
 .textBox.shake {
   animation: shake 0.3s ease-in-out;

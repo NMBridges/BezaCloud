@@ -22,6 +22,9 @@ window.onload = function() {
     });
 
     continueButton.addEventListener('click', function() {
+        if(continueButton.value == "selected") { return; }
+        continueButton.value = "selected";
+        
         console.log(continueButton.textContent);
         if(continueButton.textContent == 'Copy and Continue') {
             clipboardy.writeSync(bodyLabel.textContent);

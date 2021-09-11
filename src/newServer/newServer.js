@@ -296,7 +296,11 @@ function getCpus() {
  * @param {string} ami The AMI ID to base the server on.
  * @param {string} cpu The CPU type.
  */
- async function newServer(name, ami, cpu) {
+async function newServer(name, ami, cpu) {
+    if(createServerButton.value == "selected") { return; }
+    createServerButton.value = "selected";
+    createServerButton.style.backgroundColor = "#555555";
+
     // Gets region's default VPC
     getDefaultVpcId().then(function(vpcId) {
         if(vpcId != "ERROR") {
@@ -311,12 +315,14 @@ function getCpus() {
                                 createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                     // done
                                     newPopup("", "Server successfully created.", "Close");
+                                    resetCreateServerButton();
                                     window.close();
                                     return true;
                                 });
                             } else {
                                 // Error
                                 newPopup("Error", "Error creating key pair.", "Close");
+                                resetCreateServerButton();
                                 window.close();
                                 return false;
                             }
@@ -333,10 +339,12 @@ function getCpus() {
                                             // done
                                             if(instanceId != "ERROR") {
                                                 newPopup("", "Successfully created server.", "Close");
+                                                resetCreateServerButton();
                                                 window.close();
                                                 return true;
                                             } else {
                                                 newPopup("Error", "Error creating server. Template is potentially invalid.", "Close");
+                                                resetCreateServerButton();
                                                 window.close();
                                                 return true;
                                             }
@@ -344,6 +352,7 @@ function getCpus() {
                                     } else {
                                         // Error
                                         newPopup("Error", "Error creating key pair.", "Close");
+                                        resetCreateServerButton();
                                         window.close();
                                         return false;
                                     }
@@ -351,23 +360,44 @@ function getCpus() {
                             } else {
                                 // Error
                                 newPopup("Error", "Error creating security group.", "Close");
+                                resetCreateServerButton();
                                 window.close();
                                 return false;
                             }
                         });
                     }
-                } 
+                } else {
+                    // Error
+                    newPopup("Error", "Error retrieving security groups.", "Close");
+                    resetCreateServerButton();
+                    window.close();
+                    return false;
+                }
             });
         } else {
             // Error
             newPopup("Error", "Error retrieving VPC ID.", "Close");
+            resetCreateServerButton();
             window.close();
             return false;
         }
     });
 }
 
+/**
+ * Resets the color and functionality of the createServerButton.
+ */
+function resetCreateServerButton() {
+    createServerButton.value = "";
+    if(getTheme() == "Dark") {
+        createServerButton.style.backgroundColor = Colors.backgroundSecondary();
+    } else {
+        createServerButton.style.backgroundColor = Colors.textPrimary();
+    }
+}
+
 createServerButton.addEventListener('mouseenter', function() {
+    if(createServerButton.value == "selected") { return; }
     if(getTheme() == "Dark") {
         createServerButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
@@ -376,6 +406,7 @@ createServerButton.addEventListener('mouseenter', function() {
 });
 
 createServerButton.addEventListener('mouseleave', function() {
+    if(createServerButton.value == "selected") { return; }
     if(getTheme() == "Dark") {
         createServerButton.style.backgroundColor = Colors.backgroundSecondary();
     } else {
@@ -384,6 +415,8 @@ createServerButton.addEventListener('mouseleave', function() {
 });
 
 createServerButton.addEventListener('click', function() {
+    if(createServerButton.value == "selected") { return; }
+
     // Create server
     var amiId = "";
     var cpuType = "";

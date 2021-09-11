@@ -212,6 +212,25 @@ templatesButton.addEventListener('click', function() {
 
 // ---------------------------------------------------------------------------------- //
 
+// ---------------------------- signOutButton functions ----------------------------- //
+
+signOutButton.addEventListener('mouseenter', function() {
+    signOutButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+});
+
+signOutButton.addEventListener('mouseleave', function() {
+    signOutButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+});
+
+/** Goes to the Options page */
+signOutButton.addEventListener('click', function() {
+    const remote = require('electron').remote;
+    let w = remote.getCurrentWindow();
+    w.emit('logOut');
+});
+
+// ---------------------------------------------------------------------------------- //
+
 if (window.addEventListener) {
     window.addEventListener("message", onMessage, false);        
 } 

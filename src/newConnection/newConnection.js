@@ -118,6 +118,7 @@ function updateElements() {
 // -------------------------------  connectButton functions  -------------------------------- //
 
 connectButton.addEventListener('mouseenter', function() {
+    if(connectButton.value == "selected") { return; }
     if(getTheme() == "Dark") {
         connectButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
@@ -126,6 +127,7 @@ connectButton.addEventListener('mouseenter', function() {
 });
 
 connectButton.addEventListener('mouseleave', function() {
+    if(connectButton.value == "selected") { return; }
     if(getTheme() == "Dark") {
         connectButton.style.backgroundColor = Colors.backgroundSecondary();
     } else {
@@ -134,6 +136,7 @@ connectButton.addEventListener('mouseleave', function() {
 });
 
 connectButton.addEventListener('click', function() {
+    if(connectButton.value == "selected") { return; }
     connect();
 });
 
@@ -226,6 +229,7 @@ fileUploadButton.addEventListener('change', (event) => {
  */
  function buttonDown() {
     connectButton.style.backgroundColor = "#333333";
+    connectButton.value = "selected";
     connectButton.focus();
 }
 
@@ -238,6 +242,7 @@ function buttonUp() {
     } else {
         connectButton.style.backgroundColor = Colors.textPrimary();
     }
+    connectButton.value = "";
     connectButton.focus();
 }
 
@@ -245,6 +250,7 @@ function buttonUp() {
  * Connects to a server.
  */
  function connect() {
+    if(connectButton.value == "selected") { return; }
     const ipv4 = server.ipv4;
 
     if(passBox.value == "selected") {
@@ -266,7 +272,8 @@ function buttonUp() {
                     const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
                     mercorExec(cmd2);
                     // Should be running Remote Desktop
-                    window.close();
+                    buttonUp();
+                    setTimeout(window.close, 200);
                 } else {
                     // Mac
                     newPopup("The password to your server is", newPassword, "Copy and Continue");
@@ -274,6 +281,7 @@ function buttonUp() {
                     const e1 = execSync(cmd1);
                     const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/connections/server.rdp";
                     const e2 = execSync(cmd2);
+                    buttonUp();
                     window.close();
                 }
             });
@@ -316,7 +324,8 @@ function buttonUp() {
                                         const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
                                         mercorExec(cmd2);
                                         // Should be running Remote Desktop
-                                        window.close();
+                                        buttonUp();
+                                        setTimeout(window.close, 200);
                                     } else {
                                         // Mac
                                         newPopup("The password to your server is", newPassword, "Copy and Continue");
@@ -325,6 +334,7 @@ function buttonUp() {
                                         const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " 
                                             + awsDir() + "/connections/server.rdp";
                                         const e2 = execSync(cmd2);
+                                        buttonUp();
                                         window.close();
                                     }
                                 });
