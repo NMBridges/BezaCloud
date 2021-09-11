@@ -1,7 +1,7 @@
 // Supplemental functions
 const {
     Colors, getTheme, setPopupValues, getRegion,
-    getCacheValue, awsDir, mercorExec
+    getCacheValue, awsDir, mercorExec, updateCache
 } = require('../mercor.js');
 const {
     Server, Task, getInstances
@@ -170,7 +170,8 @@ function loadServers() {
                         getStatus(srv),
                         (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
                         (newSpecs.length > 2) ? newSpecs[1] : "",
-                        (newSpecs.length > 2) ? newSpecs[2] : ""
+                        (newSpecs.length > 2) ? newSpecs[2] : "",
+                        getLaunchTime(srv)
                     ));
                 }
             }
@@ -276,6 +277,14 @@ function getCpuType(json) {
 }
 
 /**
+ * Returns the CPU type of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getLaunchTime(json) {
+    return json["Instances"][0]["LaunchTime"];
+}
+
+/**
  * Returns the specs of the server instance, given the instance JSON.
  * @param {JSON} json The instance JSON object.
  */
@@ -319,7 +328,7 @@ createButton.addEventListener('mouseleave', function() {
 });
 
 createButton.addEventListener('click', function() {
-    connect();
+    parseNewTask();
 });
 
 // ------------------------------------------------------------------------------------------ //
@@ -406,118 +415,110 @@ function buttonUp() {
 }
 
 /**
- * Connects to a server.
+ * Given a JSON object, it will return a Task object with the same values.
+ * @param {any} obj The JSON object to parse.
  */
- function connect() {
-    const ipv4 = server.ipv4;
+function convertTask(obj) {
+    return new Task(obj.name, obj.id, obj.type, obj.time, obj.region);
+}
 
-    if(stopBox.value == "selected") {
-        buttonDown();
-        const newPassword = stopTextBox.value.trim();
-        if(newPassword != "") {
-            // Add new encoded password tag.
-            addTags(server.id, "Cert", btoa(newPassword)).then(function(success) {
-                if(success) {
-                    // Successfully added tags.
-                } else {
-                    // Oh well, try again next time.
-                }
-
-                // Run Microsoft Remote Desktop
-                if(parent.process.platform == 'win32') {
-                    const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
-                    const e = execSync(cmd1);
-                    const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-                    mercorExec(cmd2);
-                    // Should be running Remote Desktop
-                    //window.close();
-                } else {
-                    // Mac
-                    newPopup("The password to your server is", newPassword, "Copy and Continue");
-                    const cmd1 = "touch " + awsDir() + "/connections/server.rdp";
-                    const e1 = execSync(cmd1);
-                    const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " + awsDir() + "/connections/server.rdp";
-                    const e2 = execSync(cmd2);
-                    window.close();
-                }
-            });
-        } else {
-            console.log("Manual password field cannot be empty.");
-            newPopup("Error", "The manual password field cannot be empty while connecting to a server using a manual password.", "Close");
-            buttonUp();
+/**
+ * Parses the new Task created by the user and adds it to the cache if it is valid.
+ */
+function parseNewTask() {
+    var serverIsSelected = false;
+    var serverButtonSelects = document.getElementsByClassName("serverButtonSelect");
+    for(var index = 0; index < serverButtonSelects.length; index++) {
+        if(serverButtonSelects[index].value == "selected") {
+            serverIsSelected = true;
         }
-    } else if(startBox.value == "selected") {
-        buttonDown();
-        if(pemFileLabel.textContent != "") {
-            // Checks if it is a valid file.
-            if(fs.existsSync(pemFileLabel.textContent)) {
-                getInstancePasswordData(server.id).then(function(result) {
-                    if(result == "ERROR" || result.PasswordData == "") {
-                        // Server is not available yet
-                        console.log("Server is not available yet.");
-                        newPopup("Error", "Server is not available yet. Servers may take up to 10 minutes to become available.", "Close");
-                        buttonUp();
-                    } else {
-                        // Decode password data
-                        try {
-                            var pemFile = fs.readFileSync(pemFileLabel.textContent, "utf-8");
-                            var buffer = Buffer.from(result.PasswordData, "base64");
-                            var newPassword = crypto.privateDecrypt({key: pemFile, padding: crypto.constants.RSA_PKCS1_PADDING}, buffer).toString('utf-8');
+    }
+    if(serverIsSelected) {
+        if(stopBox.value == "selected" || startBox.value == "selected") {
+            buttonDown();
+            const value = "" + (stopBox.value == "selected" ? stopTextBox.value.trim() : startTextBox.value.trim());
+            console.log(value);
+            if(value.length == 19 && value.split(" ").length == 2
+                && value.split(" ")[0].length == 10
+                && value.split(" ")[1].length == 8
+                && value.split(" ")[0].split("/").length == 3
+                && value.split(" ")[0].split("/")[0].length == 2
+                && value.split(" ")[0].split("/")[1].length == 2
+                && value.split(" ")[0].split("/")[2].length == 4
+                && value.split(" ")[1].split(":").length == 3
+                && value.split(" ")[1].split(":")[0].length == 2
+                && value.split(" ")[1].split(":")[1].length == 2
+                && value.split(" ")[1].split(":")[2].length == 2) {
+    
+                const dd = value.split(" ")[0].split("/")[1];
+                const MM = value.split(" ")[0].split("/")[0];
+                const yy = value.split(" ")[0].split("/")[2];
+                const hh = value.split(" ")[1].split(":")[0];
+                const mm = value.split(" ")[1].split(":")[1];
+                const ss = value.split(" ")[1].split(":")[2];
 
-                            if(newPassword != "") {
-                                // Add new encoded password tag
-                                addTags(server.id, "Cert", btoa(newPassword)).then(function(success) {
-                                    if(success) {
-                                        // Successfully added tags.
-                                    } else {
-                                        // Oh well, try again next time.
-                                    }
+                console.log("" + parseInt(dd) + parseInt(MM) + parseInt(yy) + parseInt(hh) + parseInt(mm) + parseInt(ss));
+                
+                const months = [
+                    "Jan", "Feb", "Mar", "Apr",
+                    "May", "Jun", "Jul", "Aug",
+                    "Sep", "Oct", "Nov", "Dec"
+                ]
+                
+                const inputtedDate = new Date(months[parseInt(MM) - 1] + " " + parseInt(dd) +" "+ parseInt(yy) +" "+ parseInt(hh) +":"+  parseInt(mm) +":"+ parseInt(ss) +" "+ new Date().toLocaleTimeString('en-us',{timeZoneName:'short'}).split(' ')[2]);
+                
+                if(inputtedDate.toString() != "Invalid Date" && inputtedDate.getTime() > Date.now()) {
+                    var serverButtonSelects = document.getElementsByClassName("serverButtonSelect");
+                    for(var index = 0; index < serverButtonSelects.length; index++) {
+                        if(serverButtonSelects[index].value == "selected") {
+                            console.log(servers);
+                            for(var serverIndex = 0; serverIndex < servers.length; serverIndex++) {
+                                if(serverButtonSelects[index].id = servers[serverIndex].id) {
+                                    // Load 'tasks' from cache, add new Task, and recache it.
+                                    var tasks = [];
                                     
-                                    // Run Microsoft Remote Desktop
-                                    if(parent.process.platform == 'win32') {
-                                        const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
-                                        const e = execSync(cmd1);
-                                        const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-                                        mercorExec(cmd2);
-                                        // Should be running Remote Desktop
-                                        //window.close();
-                                    } else {
-                                        // Mac
-                                        newPopup("The password to your server is", newPassword, "Copy and Continue");
-                                        const cmd1 = "touch " + awsDir() + "/connections/server.rdp";
-                                        const e1 = execSync(cmd1);
-                                        const cmd2 = "echo \"full address:s:" + ipv4 + "\nusername:s:Administrator\" > " 
-                                            + awsDir() + "/connections/server.rdp";
-                                        const e2 = execSync(cmd2);
-                                        window.close();
+                                    const cacheTasks = getCacheValue('tasks-' + getRegion());
+                                    if(cacheTasks != "ERROR") {
+                                        for(var index = 0; index < cacheTasks.length; index++) {
+                                            tasks.push(convertTask(cacheTasks[index]));
+                                        }
                                     }
-                                });
-                            } else {
-                                console.log("There was an error retrieving the password. No password found.");
-                                newPopup("Error", "There was an error retrieving the server password." + 
-                                    " Servers may take 10 or more minutes after creation to become available.", "Close");
-                                buttonUp();
+
+                                    if(stopBox.value == "selected") {
+                                        const newTaskForCache = new Task(servers[serverIndex].name, servers[serverIndex].id, "stop", inputtedDate.getTime() / 1000, getRegion());
+                                        tasks.push(newTaskForCache);
+                                        updateCache("tasks-" + getRegion(), tasks);
+                                    } else {
+                                        const newTaskForCache = new Task(servers[serverIndex].name, servers[serverIndex].id, "start", inputtedDate.getTime() / 1000, getRegion());
+                                        tasks.push(newTaskForCache);
+                                        updateCache("tasks-" + getRegion(), tasks);
+                                    }
+                                    // Success.
+                                    newPopup("Success", "Successfully created Task.", "Close");
+                                    buttonUp();
+                                    window.close();
+                                }
                             }
-                        } catch(err) {
-                            console.log("There was an error retrieving the password.", err);
-                            newPopup("Error", "There was an error retrieving the server password.", "Close");
-                            buttonUp();
                         }
                     }
-                });
+                } else {
+                    // Invalid Datetime. Please follow the format.
+                    newPopup("Invalid datetime", "Please ensure your date and time exist and have not passed.", "Close");
+                    buttonUp();
+                }
             } else {
-                // Please attach a valid .pem or .cem file.
-                console.log("Please attach a valid .pem or .cem file.");
-                newPopup("Error", "Please attach a valid .pem or .cem file.", "Close");
+                // Invalid Datetime. Please follow the format.
+                newPopup("Invalid datetime", "Please follow the datetime format given: DD/MM/YYYY HH/mm/ss", "Close");
                 buttonUp();
             }
         } else {
-            // Please attach a valid .pem or .cem file.
-            console.log("Please attach a valid .pem or .cem file.");
-            newPopup("Error", "Please attach a valid .pem or .cem file.", "Close");
+            // No Server.
+            newPopup("Error", "Please select a type for the task, either Start or Stop.", "Close");
             buttonUp();
         }
     } else {
-        // Please select an option.
+        // No Server.
+        newPopup("Error", "Please select a server to create a Task for.", "Close");
+        buttonUp();
     }
 }

@@ -36,8 +36,7 @@ var servers = [];
 window.onload = function() {
     loadServers();
 
-
-
+    setInterval(checkServerTimes, 5000);
 };
 
 // ---------------------------- Server Connecting Functions ------------------------- //
@@ -157,7 +156,8 @@ function loadServers() {
                             getStatus(srv),
                             (newSpecs.length > 2) ? (newSpecs[0] + " (" + getCpuType(srv) + ")") : getCpuType(srv),
                             (newSpecs.length > 2) ? newSpecs[1] : "",
-                            (newSpecs.length > 2) ? newSpecs[2] : ""
+                            (newSpecs.length > 2) ? newSpecs[2] : "",
+                            getLaunchTime(srv)
                         ));
                     }
                 }
@@ -464,7 +464,7 @@ function addTile(index) {
             terminateInstance(servers[parseInt(newRebootButton.id)].id).then(function(terminated) {
                 if(terminated) {
                     // Good to go
-                    loadServers();
+                    setTimeout(loadServers, 500);
                 } else {
                     // Error rebooting server
                 }
@@ -581,6 +581,14 @@ function getCpuType(json) {
 }
 
 /**
+ * Returns the CPU type of the server instance, given the instance JSON.
+ * @param {JSON} json The instance JSON object.
+ */
+function getLaunchTime(json) {
+    return json["Instances"][0]["LaunchTime"];
+}
+
+/**
  * Returns the specs of the server instance, given the instance JSON.
  * @param {JSON} json The instance JSON object.
  */
@@ -674,6 +682,33 @@ function newPopup(header, body, button) {
     const remote = parent.require('electron').remote;
     let w = remote.getCurrentWindow();
     w.emit('showPopup');
+}
+
+/**
+ * 
+ */
+function checkServerTimes() {
+    for(var index = 0; index < servers.length; index++) {
+        const msSinceLaunch = Date.now() - new Date(servers[index].launchTime).getTime();
+        if(servers[index].status == "running") {
+            if(Math.abs( msSinceLaunch - 10800000 ) <= 2500) {
+                // Send notification that the server has been running for 3 hours.
+                new Notification("Server Notice", { body: server[index].name
+                    + " (" + server[index].id + ") has been running for 3 hours." }).onclick
+                         = () => console.log("");
+            } else if(Math.abs( msSinceLaunch - 21600000 ) <= 2500) {
+                // Send notification that the server has been running for 6 hours.
+                new Notification("Server Notice", { body: server[index].name
+                    + " (" + server[index].id + ") has been running for 6 hours." }).onclick
+                         = () => console.log("");
+            } else if(Math.abs( msSinceLaunch - 86400000 ) <= 2500) {
+                // Send notification that the server has been running for 24 hours.
+                new Notification("Server Notice", { body: server[index].name
+                    + " (" + server[index].id + ") has been running for 24 hours." }).onclick
+                         = () => console.log("");
+            }           
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------- //

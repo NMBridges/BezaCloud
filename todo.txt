@@ -1,15 +1,11 @@
-- Pull AMI + CPU types [Servers]
-- Add cost pulling [Dashboard]
-- Add option to disable cost pulling [Options]
 - Offline support [all]
 - Revise "+" icon [Servers, Templates, Tasks]
 - Revise New Server window [Servers]
-- Add Tasks page [Tasks]
-- Add notifications [Tasks]
-- Replace default colors [all]
+- Style login and licenseKey pages [Login, LicenseKey]
 - New version updates [all]
 - Don't load costs, servers, etc. before sign in. [all]
 - Implement auto sign in [all]
+- Button disabling while loading [all]
 
 
 Instead of prebuilt AMIs, give the option for basic windows platform, then you can
@@ -42,43 +38,3 @@ CPU
 [ +   [    other AWS CPU textbox    ]  ] |
 
 Create Server   Cancel
-
-{
-    "And": [
-        {
-            "Or": [
-                {
-                    "Dimensions":
-                    {
-                        "Key": "REGION",
-                        "Values": [
-                            "us-east-1",
-                            "us-west-1"
-                        ]
-                    }
-                },
-                {
-                    "Tags":
-                    {
-                        "Key": "TagName",
-                        "Values": [
-                            "Value1"
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "Not":
-                {
-                    "Dimensions":
-                        {
-                            "Key": "USAGE_TYPE",
-                            "Values": [
-                                "DataTransfer"
-                            ]
-                        }
-                }
-        }
-    ]
-}

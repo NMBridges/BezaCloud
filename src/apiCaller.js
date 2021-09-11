@@ -583,8 +583,9 @@ class Server {
      * @param {string} cpu The CPU details for the server.
      * @param {string} memory The RAM details for the server.
      * @param {string} storage The storage details for the server.
+     * @param {string} launchTime
      */
-    constructor(name, id, ipv4, password, key, status, cpu, memory, storage) {
+    constructor(name, id, ipv4, password, key, status, cpu, memory, storage, launchTime) {
         this.name = name;
         this.id = id;
         this.ipv4 = ipv4;
@@ -594,6 +595,7 @@ class Server {
         this.cpu = cpu;
         this.memory = memory;
         this.storage = storage;
+        this.launchTime = launchTime;
     }
 }
 

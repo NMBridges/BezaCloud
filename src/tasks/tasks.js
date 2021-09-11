@@ -4,7 +4,7 @@ const {
     getRegion, updateCache, getCacheValue
 } = parent.require("../mercor.js");
 const {
-    Task
+    Task, Server, startInstance, stopInstance
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
 const homeDir = parent.require('os').homedir();
@@ -20,10 +20,16 @@ var loader = document.getElementById("loader");
 
 /** @type {Task[]} The list of Tasks set by the user. */
 var tasks = [];
+/** @type {Server[]} The list of Servers set by the user. */
+var servers = [];
 
 /** Called when the window is first loaded. */
 window.onload = function() {
     updateColors();
+
+    loadTasks();
+
+    setInterval(checkAndRunTasks, 5000);
 }
 
 // ---------------------------  Task loading functions  ---------------------------- //
@@ -33,7 +39,7 @@ window.onload = function() {
  * @param {any} obj The JSON object to parse.
  */
 function convertTask(obj) {
-    return new Task(obj.name, obj.id, obj.type, obj.time, obj.reg);
+    return new Task(obj.name, obj.id, obj.type, obj.time, obj.region);
 }
 
 /**
@@ -142,25 +148,7 @@ function convertTask(obj) {
 
 /** Reloads the Task tiles on the page. */
 function loadTasks() {
-    updateCache("tasks-us-east-1", [new Task("BIG BOY SERVER", "serverIDDD", "start", 1628633092, "us-east-1")]);
-
-    tasks = [];
-
-    const regions = [
-        'us-east-1', 'us-east-2',
-        'us-west-1', 'us-west-2'
-    ]
-
-    for(var regIndex = 0; regIndex < regions.length; regIndex++) {
-        const cacheTasks = getCacheValue('tasks-' + regions[regIndex]);
-        if(cacheTasks != "ERROR") {
-            for(var index = 0; index < cacheTasks.length; index++) {
-                tasks.push(convertTask(cacheTasks[index]));
-            }
-        }
-    }
-
-    console.log(tasks);
+    loadTasksFromCache();
 
     // Clears and adds Tasks in current region to GUI.
     primaryBody.innerHTML = '';
@@ -170,6 +158,27 @@ function loadTasks() {
 
     displayOverlay(false);
     updateColors();
+}
+
+/**
+ * Loads the 'tasks' variable for the region from cache.
+ */
+function loadTasksFromCache() {
+    tasks = [];
+
+    const regions = [
+        'us-east-1', 'us-east-2',
+        'us-west-1', 'us-west-2'
+    ];
+
+    const cacheTasks = getCacheValue('tasks-' + getRegion());
+    if(cacheTasks != "ERROR") {
+        for(var index = 0; index < cacheTasks.length; index++) {
+            tasks.push(convertTask(cacheTasks[index]));
+        }
+    }
+
+    console.log(tasks);
 }
 
 // --------------------------------------------------------------------------------- //
@@ -223,6 +232,76 @@ function unixToDate(unix){
  */
 function twoDig(num) {
     return ((("" + num).length > 1) ? "" : "0") + num;
+}
+
+/**
+ * Checks if any Tasks need to be executed and executes them if so.
+ */
+function checkAndRunTasks() {
+    // Refreshes the tasks variable.
+    loadTasksFromCache();
+
+    // Activated when a Task is executed and deleted.
+    var needsRefresh = false;
+
+    /** 
+     *  The new array of Tasks that will, by the end of the
+     *  loop, contain only unused Tasks.
+     */
+    var newTasks = [];
+
+    // Loops through 'tasks' and checks if any need to be executed.
+    for(var index = 0; index < tasks.length; index++) {
+        var tempTask = tasks[index];
+        var taskRan = false;
+        // Verifies that it is the correct region.
+        if(getRegion() == tempTask.region) {
+            // Verifies that the Task is due to run.
+            if(Date.now() / 1000 > parseInt(tempTask.time)) {
+                console.log("Task should run ", tempTask)
+                taskRan = true;
+                if(tempTask.type == "start") {
+                    startInstance(tempTask.id).then(function(success) {
+                        if(success) {
+                            // Send notification that server started.
+                            new Notification("Server Started", { body: tempTask.name
+                                + " (" + tempTask.id + ") successfully started." }).onclick
+                                     = () => console.log("");
+                            needsRefresh = true;
+                        } else {
+                            // Try again next cycle...
+                        }
+                    });
+                    // Do something about it so in case it takes > 5 seconds
+                } else if(tempTask.type == "stop") {
+                    stopInstance(tempTask.id).then(function(success) {
+                        if(success) {
+                            // Send notification that server stopped.
+                            new Notification("Server Stopped", { body: tempTask.name
+                                + " (" + tempTask.id + ") successfully stopped." }).onclick
+                                     = () => console.log("");
+                            needsRefresh = true;
+                        } else {
+                            // Try again next cycle...
+                        }
+                    });
+                    // Do something about it so in case it takes > 5 seconds
+                }
+            }
+        }
+        
+        if(!taskRan) {
+            newTasks.push(tasks[index]);
+        } else {
+            needsRefresh = true;
+        }
+    }
+
+    updateCache("tasks-" + getRegion(), newTasks);
+
+    if(needsRefresh) {
+        loadTasks();
+    }
 }
 
 /**

@@ -11,9 +11,11 @@ var primaryBody = document.getElementById('optionsPrimaryBody');
 var regionButton = document.getElementById('regionButton');
 var themeButton = document.getElementById('themeButton');
 var costButton = document.getElementById('costButton');
+var notiButton = document.getElementById('notiButton');
 var regionSelect = document.getElementById('regionSelect');
 var themeSelect = document.getElementById('themeSelect');
 var costSelect = document.getElementById('costSelect');
+var notiSelect = document.getElementById('notiSelect');
 
 window.onload = function() {
     initElements();
@@ -81,6 +83,25 @@ function initElements() {
 
     // --------------------------------------------------------------------------- //
 
+    // -------------------------  notiButton functions  -------------------------- //
+
+    notiButton.addEventListener('mouseenter', function() {
+        notiButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    notiButton.addEventListener('mouseleave', function() {
+        notiButton.style.backgroundColor = Colors.backgroundPrimary();
+    });
+    notiButton.addEventListener('click', function() {
+        notiSelect.style.visibility = "hidden";
+        if(notiSelect.style.visibility != "visible") {
+            notiSelect.style.visibility = "visible";
+        } else {
+            notiSelect.style.visibility = "hidden";
+        }
+    });
+
+    // --------------------------------------------------------------------------- //
+
     // ----------------------  themeSelectButton functions  ---------------------- //
 
     themeSelectButtons = document.getElementsByClassName('themeSelectButton');
@@ -137,6 +158,25 @@ function initElements() {
     }
 
     // --------------------------------------------------------------------------- //
+    
+    // ----------------------  notiSelectButton functions  ----------------------- //
+
+    notiSelectButtons = document.getElementsByClassName('notiSelectButton');
+    for(var index = 0; index < notiSelectButtons.length; index++) {
+        const nsbi = notiSelectButtons[index];
+        nsbi.addEventListener('mouseenter', function() {
+            nsbi.style.backgroundColor = Colors.backgroundPrimaryAccent();
+        });
+        nsbi.addEventListener('mouseleave', function() {
+            nsbi.style.backgroundColor = Colors.backgroundPrimary();
+        });
+        nsbi.addEventListener('click', function() {
+            // Changes the cache for whether it pulls cost usage or not.
+            updateNotiSending(nsbi.id == "notiYes");
+        });
+    }
+
+    // --------------------------------------------------------------------------- //
 
 }
 
@@ -178,6 +218,16 @@ function updateCostPulling(newSetting) {
 }
 
 /**
+ * Updates whether the program should send notifications for Server usage.
+ * @param {string} newSetting The new boolean value to switch to.
+ */
+function updateNotiSending(newSetting) {
+    updateCache("sendNotifications", newSetting ? "On" : "Off");
+    notiButton.textContent = newSetting ? "On" : "Off";
+    notiSelect.style.visibility = "hidden";
+}
+
+/**
  * Resets the buttons' values to be in accordance with the cache.
  */
 function resetElements() {
@@ -199,9 +249,18 @@ function resetElements() {
         costButton.textContent = costVal;
     }
 
+    const notiVal = getCacheValue("sendNotifications");
+    if(notiVal == "ERROR") {
+        notiButton.textContent = "On";
+        updateCache("sendNotifications", "On");
+    } else {
+        notiButton.textContent = notiVal;
+    }
+
     regionSelect.style.visibility = "hidden";
     themeSelect.style.visibility = "hidden";
     costSelect.style.visibility = "hidden";
+    notiSelect.style.visibility = "hidden";
 }
 
 /**
@@ -219,10 +278,13 @@ function updateColors() {
         themeButton.style.color = Colors.textPrimary();
         costButton.style.backgroundColor = Colors.backgroundPrimary();
         costButton.style.color = Colors.textPrimary();
+        notiButton.style.backgroundColor = Colors.backgroundPrimary();
+        notiButton.style.color = Colors.textPrimary();
 
         regionSelect.style.borderColor = Colors.textTertiary();
         themeSelect.style.borderColor = Colors.textTertiary();
         costSelect.style.borderColor = Colors.textTertiary();
+        notiSelect.style.borderColor = Colors.textTertiary();
 
         regionSelectButtons = document.getElementsByClassName('regionSelectButton');
         for(var index = 0; index < regionSelectButtons.length; index++) {
@@ -240,6 +302,12 @@ function updateColors() {
         for(var index = 0; index < costSelectButtons.length; index++) {
             costSelectButtons[index].style.color = Colors.textSecondary();
             costSelectButtons[index].style.backgroundColor = Colors.backgroundPrimary();
+        }
+
+        notiSelectButtons = document.getElementsByClassName('notiSelectButton');
+        for(var index = 0; index < notiSelectButtons.length; index++) {
+            notiSelectButtons[index].style.color = Colors.textSecondary();
+            notiSelectButtons[index].style.backgroundColor = Colors.backgroundPrimary();
         }
 
         resetElements();

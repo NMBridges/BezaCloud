@@ -89,6 +89,7 @@ body {
                         width: calc(100% - 5px);
                         height: 24px;
                         text-align: left;
+                        text-overflow: ellipsis;
                     }
         .box {
             display: grid;
