@@ -148,7 +148,7 @@ function convertTask(obj) {
 
 /** Reloads the Task tiles on the page. */
 function loadTasks() {
-    loadTasksFromCache();
+    loadTasksFromCache(getRegion());
 
     // Clears and adds Tasks in current region to GUI.
     primaryBody.innerHTML = '';
@@ -162,8 +162,9 @@ function loadTasks() {
 
 /**
  * Loads the 'tasks' variable for the region from cache.
+ * @param {string} reg The region to pull Tasks from cache for.
  */
-function loadTasksFromCache() {
+function loadTasksFromCache(reg) {
     tasks = [];
 
     const regions = [
@@ -171,7 +172,7 @@ function loadTasksFromCache() {
         'us-west-1', 'us-west-2'
     ];
 
-    const cacheTasks = getCacheValue('tasks-' + getRegion());
+    const cacheTasks = getCacheValue('tasks-' + reg);
     if(cacheTasks != "ERROR") {
         for(var index = 0; index < cacheTasks.length; index++) {
             tasks.push(convertTask(cacheTasks[index]));
@@ -238,69 +239,77 @@ function twoDig(num) {
  * Checks if any Tasks need to be executed and executes them if so.
  */
 function checkAndRunTasks() {
-    // Refreshes the tasks variable.
-    loadTasksFromCache();
+    const regions = [
+        'us-east-1', 'us-east-2',
+        'us-west-1', 'us-west-2'
+    ];
 
-    // Activated when a Task is executed and deleted.
-    var needsRefresh = false;
+    for(var regionIndex = 0; regionIndex < regions.length; regionIndex++) {
+        const reg = regions[regionIndex];
+        // Refreshes the tasks variable.
+        loadTasksFromCache(reg);
 
-    /** 
-     *  The new array of Tasks that will, by the end of the
-     *  loop, contain only unused Tasks.
-     */
-    var newTasks = [];
+        // Activated when a Task is executed and deleted.
+        var needsRefresh = false;
 
-    // Loops through 'tasks' and checks if any need to be executed.
-    for(var index = 0; index < tasks.length; index++) {
-        var tempTask = tasks[index];
-        var taskRan = false;
-        // Verifies that it is the correct region.
-        if(getRegion() == tempTask.region) {
-            // Verifies that the Task is due to run.
-            if(Date.now() / 1000 > parseInt(tempTask.time)) {
-                console.log("Task should run ", tempTask)
-                taskRan = true;
-                if(tempTask.type == "start") {
-                    startInstance(tempTask.id).then(function(success) {
-                        if(success) {
-                            // Send notification that server started.
-                            new Notification("Server Started", { body: tempTask.name
-                                + " (" + tempTask.id + ") successfully started." }).onclick
-                                     = () => console.log("");
-                            needsRefresh = true;
-                        } else {
-                            // Try again next cycle...
-                        }
-                    });
-                    // Do something about it so in case it takes > 5 seconds
-                } else if(tempTask.type == "stop") {
-                    stopInstance(tempTask.id).then(function(success) {
-                        if(success) {
-                            // Send notification that server stopped.
-                            new Notification("Server Stopped", { body: tempTask.name
-                                + " (" + tempTask.id + ") successfully stopped." }).onclick
-                                     = () => console.log("");
-                            needsRefresh = true;
-                        } else {
-                            // Try again next cycle...
-                        }
-                    });
-                    // Do something about it so in case it takes > 5 seconds
+        /** 
+         *  The new array of Tasks that will, by the end of the
+         *  loop, contain only unused Tasks.
+         */
+        var newTasks = [];
+
+        // Loops through 'tasks' and checks if any need to be executed.
+        for(var index = 0; index < tasks.length; index++) {
+            var tempTask = tasks[index];
+            var taskRan = false;
+            // Verifies that it is the correct region.
+            if(reg == tempTask.region) {
+                // Verifies that the Task is due to run.
+                if(Date.now() / 1000 > parseInt(tempTask.time)) {
+                    console.log("Task should run ", tempTask)
+                    taskRan = true;
+                    if(tempTask.type == "start") {
+                        startInstance(tempTask.id, reg).then(function(success) {
+                            if(success) {
+                                // Send notification that server started.
+                                new Notification("Server Started", { body: tempTask.name
+                                    + " (" + tempTask.id + ") successfully started." }).onclick
+                                        = () => console.log("");
+                                needsRefresh = true;
+                            } else {
+                                // Try again next cycle...
+                            }
+                        });
+                        // Do something about it so in case it takes > 5 seconds
+                    } else if(tempTask.type == "stop") {
+                        stopInstance(tempTask.id, reg).then(function(success) {
+                            if(success) {
+                                // Send notification that server stopped.
+                                new Notification("Server Stopped", { body: tempTask.name
+                                    + " (" + tempTask.id + ") successfully stopped." }).onclick
+                                        = () => console.log("");
+                                needsRefresh = true;
+                            } else {
+                                // Try again next cycle...
+                            }
+                        });
+                        // Do something about it so in case it takes > 5 seconds
+                    }
                 }
             }
+            
+            if(!taskRan) {
+                newTasks.push(tasks[index]);
+            } else {
+                needsRefresh = true;
+            }
         }
-        
-        if(!taskRan) {
-            newTasks.push(tasks[index]);
-        } else {
-            needsRefresh = true;
+
+        updateCache("tasks-" + reg, newTasks);
+
+        if(reg == getRegion() && needsRefresh) {
+            loadTasks();
         }
-    }
-
-    updateCache("tasks-" + getRegion(), newTasks);
-
-    if(needsRefresh) {
-        loadTasks();
     }
 }
 

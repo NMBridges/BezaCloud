@@ -1,7 +1,6 @@
 - Offline support [all]
 - Revise "+" icon [Servers, Templates, Tasks]
 - Revise New Server window [Servers]
-- Style licenseKey page [LicenseKey]
 - New version updates [all]
 - Don't load costs, servers, etc. before sign in. [all]
 - Renaming server functionality [Servers]

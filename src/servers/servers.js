@@ -384,7 +384,7 @@ function addTile(index) {
             if(server.status == "stopped") {
                 // Turn server on.
                 displayOverlay(true);
-                startInstance(servers[parseInt(newPowerButton.id)].id).then(function(started) {
+                startInstance(servers[parseInt(newPowerButton.id)].id, getRegion()).then(function(started) {
                     if(started) { 
                         // Good to go
                         loadServers();
@@ -395,7 +395,7 @@ function addTile(index) {
             } else if(server.status == "running") {
                 // Turn server off.
                 displayOverlay(true);
-                stopInstance(servers[parseInt(newPowerButton.id)].id).then(function(stopped) {
+                stopInstance(servers[parseInt(newPowerButton.id)].id, getRegion()).then(function(stopped) {
                     if(stopped) { 
                         // Good to go
                         loadServers();

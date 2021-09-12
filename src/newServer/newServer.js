@@ -323,7 +323,7 @@ async function newServer(name, ami, cpu) {
                                 // Error
                                 newPopup("Error", "Error creating key pair.", "Close");
                                 resetCreateServerButton();
-                                window.close();
+                                //window.close();
                                 return false;
                             }
                         });
@@ -345,7 +345,7 @@ async function newServer(name, ami, cpu) {
                                             } else {
                                                 newPopup("Error", "Error creating server. Template is potentially invalid.", "Close");
                                                 resetCreateServerButton();
-                                                window.close();
+                                                //window.close();
                                                 return true;
                                             }
                                         });
@@ -353,7 +353,7 @@ async function newServer(name, ami, cpu) {
                                         // Error
                                         newPopup("Error", "Error creating key pair.", "Close");
                                         resetCreateServerButton();
-                                        window.close();
+                                        //window.close();
                                         return false;
                                     }
                                 });
@@ -361,7 +361,7 @@ async function newServer(name, ami, cpu) {
                                 // Error
                                 newPopup("Error", "Error creating security group.", "Close");
                                 resetCreateServerButton();
-                                window.close();
+                                //window.close();
                                 return false;
                             }
                         });
@@ -370,7 +370,7 @@ async function newServer(name, ami, cpu) {
                     // Error
                     newPopup("Error", "Error retrieving security groups.", "Close");
                     resetCreateServerButton();
-                    window.close();
+                    //window.close();
                     return false;
                 }
             });
@@ -378,7 +378,7 @@ async function newServer(name, ami, cpu) {
             // Error
             newPopup("Error", "Error retrieving VPC ID.", "Close");
             resetCreateServerButton();
-            window.close();
+            //window.close();
             return false;
         }
     });

@@ -50,6 +50,15 @@ function resetEC2Client() {
 }
 
 /**
+ * Resets the ec2Client variable to have the correct region.
+ * @param {string} reg The region to base the EC2 client.
+ * @returns a version of the client with the correct region.
+ */
+function customEC2Client(reg) {
+    return new EC2Client({ region: reg});
+}
+
+/**
  * Resets the ceClient variable to have the correct region.
  * @returns a version of the client with the correct region.
  */
@@ -75,11 +84,12 @@ const connectionTest = async () => {
 /**
  * Starts a server with a specified instance ID.
  * @param {string} instanceId The instance ID of the server to start.
+ * @param {string} region The region that the server is based in.
  * @returns Whether or not the starting of the server was successful.
  */
-const startInstance = async (instanceId) => {
+const startInstance = async (instanceId, region) => {
     try {
-        ec2Client = resetEC2Client();
+        ec2Client = customEC2Client(region);
         const data = await ec2Client.send(new StartInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Starting server successful");
         return true;
@@ -92,11 +102,12 @@ const startInstance = async (instanceId) => {
 /**
  * Stop a server with a specified instance ID.
  * @param {string} instanceId The instance ID of the server to stop.
+ * @param {string} region The region in which this server exists.
  * @returns Whether or not the stopping of the server was successful.
  */
-const stopInstance = async (instanceId) => {
+const stopInstance = async (instanceId, region) => {
     try {
-        ec2Client = resetEC2Client();
+        ec2Client = customEC2Client(region);
         const data = await ec2Client.send(new StopInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Stopping server successful");
         return true;
