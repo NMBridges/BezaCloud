@@ -119,13 +119,23 @@ function loadTemplates() {
                     }
                 }
 
+                const mercorStarterAmis = {
+                    "us-east-1":"ami-054dc1c0a4617b048",
+                    "us-east-2":"ami-099169caa4ac62e3f",
+                    "us-west-1":"ami-0d17b334f19846f71",
+                    "us-west-2":"ami-01c0f1391ef4b74f9"
+                };
+
+                const mercorStarterAmi = mercorStarterAmis[getRegion()];
+
                 // Adds the default mercor-starter Template if it doesn't already exist.
                 for(var templateIndex = -1; templateIndex < templates.length; templateIndex++) {
+
                     if(templateIndex == templates.length - 1) {
-                        if(templateIndex != -1 && templates[templateIndex].id == "ami-054dc1c0a4617b048") {
+                        if(templateIndex != -1 && templates[templateIndex].id == mercorStarterAmi) {
                             break;
-                        } else if(!newTemplatesToPull.includes("ami-054dc1c0a4617b048")) {
-                            newTemplatesToPull.push("ami-054dc1c0a4617b048");
+                        } else if(!newTemplatesToPull.includes(mercorStarterAmi)) {
+                            newTemplatesToPull.push(mercorStarterAmi);
                         }
                     }
                 }

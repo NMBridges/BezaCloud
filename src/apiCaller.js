@@ -27,7 +27,7 @@ const {
 const {
     getRegion, unixToDate
 } = require("./mercor.js");
-var ec2Client = new EC2Client({ region: "us-east-1"});
+//var ec2Client = new EC2Client({ region: "us-east-1"});
 var ceClient = new CostExplorerClient({ region: "us-east-1"});
 const fs = require('fs');
 const homeDir = require('os').homedir();
@@ -71,7 +71,7 @@ function resetCEClient() {
  */
 const connectionTest = async () => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeInstancesCommand({}));
         console.log("Login successful");
         return true;
@@ -89,7 +89,7 @@ const connectionTest = async () => {
  */
 const startInstance = async (instanceId, region) => {
     try {
-        ec2Client = customEC2Client(region);
+        var ec2Client = customEC2Client(region);
         const data = await ec2Client.send(new StartInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Starting server successful");
         return true;
@@ -107,7 +107,7 @@ const startInstance = async (instanceId, region) => {
  */
 const stopInstance = async (instanceId, region) => {
     try {
-        ec2Client = customEC2Client(region);
+        var ec2Client = customEC2Client(region);
         const data = await ec2Client.send(new StopInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Stopping server successful");
         return true;
@@ -124,7 +124,7 @@ const stopInstance = async (instanceId, region) => {
  */
 const rebootInstance = async (instanceId) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new RebootInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Rebooting server successful");
         return true;
@@ -141,7 +141,7 @@ const rebootInstance = async (instanceId) => {
  */
 const terminateInstance = async (instanceId) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new TerminateInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
         console.log("Terminating server successful");
         return true;
@@ -156,7 +156,7 @@ const terminateInstance = async (instanceId) => {
  */
 const getInstances = async () => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeInstancesCommand({}));
         return data;
     } catch {
@@ -184,7 +184,7 @@ function genRandom(len) {
  */
 const getDefaultVpcId = async () => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeVpcsCommand({}));
         for(var index = 0; index < data.Vpcs.length; index++) {
             if(data.Vpcs[index].IsDefault) {     
@@ -205,7 +205,7 @@ const getDefaultVpcId = async () => {
  */
 const getSecurityGroups = async () => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeSecurityGroupsCommand({}));
         console.log("Successfully retrieved security groups", data.SecurityGroups)
         return data.SecurityGroups;
@@ -235,7 +235,7 @@ function getMercorSecurityGroupId(secGroups) {
  */
 const createMercorSecurityGroup = async (vpcId) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "mercorSecGroup", Description: "absolutely free", VpcId: vpcId}));
 
         try {
@@ -266,7 +266,7 @@ const createMercorSecurityGroup = async (vpcId) => {
  */
 const createKeyPair = async (key) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const keyName = genRandom(16);
         const data = await ec2Client.send(new CreateKeyPairCommand({KeyName: keyName}));
         console.log(data.KeyMaterial);
@@ -308,7 +308,7 @@ function pemFileExists(key) {
  */
 const getInstancePasswordData = async (instanceId) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new GetPasswordDataCommand({InstanceId: instanceId}));
         console.log("Successfully retrieved password data", data);
         return data;
@@ -320,7 +320,7 @@ const getInstancePasswordData = async (instanceId) => {
 
 const addTags = async (instanceId, tag, value) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const tagParams = {
             Resources: [instanceId],
             Tags: [
@@ -344,7 +344,7 @@ const addTags = async (instanceId, tag, value) => {
  */
 async function getUserAMIs() {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeImagesCommand({Owners: ["self"]}));
         console.log("Successfully described user's images", data);
         return data;
@@ -361,7 +361,7 @@ async function getUserAMIs() {
  */
 const getAmiData = async (amiIds) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DescribeImagesCommand({ImageIds: amiIds}));
         console.log("Successfully describe images", data);
         return data;
@@ -378,7 +378,7 @@ const getAmiData = async (amiIds) => {
  */
 const changeAmiVisibility = async (id, public) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         var parameters;
         if(public) {
             parameters = {
@@ -424,7 +424,7 @@ const changeAmiVisibility = async (id, public) => {
  */
 const createImage = async (id, name) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new CreateImageCommand({InstanceId: id, Name: name}));
         console.log("Successfully created image", data);
         return data;
@@ -442,7 +442,7 @@ const createImage = async (id, name) => {
  */
  const copyImage = async (id, name, newRegion) => {
     try {
-        ec2Client = new EC2Client({ region: newRegion});
+        var ec2Client = new EC2Client({ region: newRegion});
         const data = await ec2Client.send(new CopyImageCommand({SourceImageId: id, SourceRegion: getRegion(), Name: name}));
         console.log("Successfully moved image", data);
         return data;
@@ -458,7 +458,7 @@ const createImage = async (id, name) => {
  */
 const deleteImage = async (id) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
         const data = await ec2Client.send(new DeregisterImageCommand({ImageId: id}));
         console.log("Successfully deleted image", data);
         return data;
@@ -534,7 +534,7 @@ const getSpending = async (gran) => {
  */
 const createInstance = async (ami, cpu, name, key, secGroupId) => {
     try {
-        ec2Client = resetEC2Client();
+        var ec2Client = resetEC2Client();
 
         // Set the parameters
         const instanceParams = {

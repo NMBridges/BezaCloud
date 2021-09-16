@@ -1,10 +1,9 @@
 - Offline support [all]
-- Revise "+" icon [Servers, Templates, Tasks]
-- Revise New Server window [Servers]
+- Revise New Server window [newServer]
 - New version updates [all]
 - Don't load costs, servers, etc. before sign in. [all]
 - Renaming server functionality [Servers]
-- Make sure everyone has mercor-starter by default [Templates]
+- Fix bug on monthly spending chart on hover [Dashboard]
 
 
 Instead of prebuilt AMIs, give the option for basic windows platform, then you can
