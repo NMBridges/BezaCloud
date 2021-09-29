@@ -1,16 +1,67 @@
 @import url(../assets/fonts/fonts.css);
 
 body {
-    font-family: "Segoe UI", sans-serif;
-    font-style: normal;
-    font-weight: normal;
-    margin: auto;
-    max-width: 38rem;
-    padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  margin: 0;
+  padding: 2rem;
+  background: #6151f5;
+  text-align: center;
+  height: 400px;
+}
+  .wrapper {
+    color: #6151f5;
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    padding: 20px;
+    background-color: white;
+    margin: 0;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    border-radius: 5px;
   }
-
+    .button {
+      width: 247px;
+      font-weight: bold;
+      font-size: 15px;
+      margin-top: 30px;
+    }
+    .fieldLabel {
+      color: #6151f5;
+      font-size: 14px;
+      font-style: italic;
+      line-height: 25px;
+      height: 25px;
+      margin-top: 10px;
+    }
+    .serosImg {
+      height: 50px;
+      margin-top: 10px;
+    }
+    .textBox {
+      line-height: 30px;
+      width: 500px;
+      text-align: center;
+      margin-top: 10px;
+      border: 1px solid black;
+    }
+    .textBox.shake {
+      animation: shake 0.3s ease-in-out;
+    }
+    @keyframes shake {
+      0%, 100% {
+        margin-left: 0;
+      }
+      20%, 80% {
+        margin-left: -12px;
+      }
+      40%, 60% {
+        margin-left: 12px;
+      }
+    }
 ::-webkit-scrollbar {
     width: 0px;
     display: none;
 }
-  

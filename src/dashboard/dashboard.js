@@ -1,7 +1,7 @@
 // Supplemental functions
 const {
     Colors, getCacheValue
- } = parent.require("../mercor.js");
+ } = parent.require("../seros.js");
 const {
     Expenditure, getSpending
 } = parent.require("../apiCaller.js");
@@ -387,6 +387,11 @@ function updateColors() {
     for(var count = 0; count < barChart.children.length; count++) {
         if(barChart.children[count].className == "bar") {
             barChart.children[count].style.backgroundColor = Colors.chartColor();
+            barChart.children[count].children[0].style.color = Colors.textSecondary();
         }
     }
+
+    document.getElementsByClassName('topRightGridContainer')[0].style.borderColor = Colors.textSecondary();
+    document.getElementsByClassName('topLeftGridContainer')[0].style.borderColor = Colors.textSecondary();
+    document.getElementsByClassName('bottomGridContainer')[0].style.borderColor = Colors.textSecondary();
 }

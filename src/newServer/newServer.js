@@ -2,11 +2,11 @@
 const {
     Colors, getTheme, setPopupValues, getRegion,
     getCacheValue
-} = require('../mercor.js');
+} = require('../seros.js');
 const {
     Template, getAmiData, getDefaultVpcId, getSecurityGroups,
-    getMercorSecurityGroupId, createKeyPair, createInstance,
-    createMercorSecurityGroup
+    getSerosSecurityGroupId, createKeyPair, createInstance,
+    createSerosSecurityGroup
 } = require('../apiCaller.js');
 
 // Page element references
@@ -91,8 +91,8 @@ function updateColors() {
 
     var templateButtonSelects = document.getElementsByClassName("templateButtonSelect");
     for(var index = 0; index < templateButtonSelects.length; index++) {
-        templateButtonSelects[index].style.backgroundColor = Colors.textTertiary();
-        templateButtonSelects[index].style.borderColor = Colors.textTertiary();
+        templateButtonSelects[index].style.backgroundColor = "#989898";
+        templateButtonSelects[index].style.borderColor = "#989898";
     }
 
     var cpuNameLabels = document.getElementsByClassName("cpuNameLabel");
@@ -102,8 +102,8 @@ function updateColors() {
 
     var cpuButtonSelects = document.getElementsByClassName("cpuButtonSelect");
     for(var index = 0; index < cpuButtonSelects.length; index++) {
-        cpuButtonSelects[index].style.backgroundColor = Colors.textTertiary();
-        cpuButtonSelects[index].style.borderColor = Colors.textTertiary();
+        cpuButtonSelects[index].style.backgroundColor = "#989898";
+        cpuButtonSelects[index].style.borderColor = "#989898";
     }
 
 }
@@ -184,7 +184,7 @@ function addTemplateToList(name, amiId, index) {
         // Resets colors of all other options
         var templateButtonSelects = document.getElementsByClassName("templateButtonSelect");
         for(var index = 0; index < templateButtonSelects.length; index++) {
-            templateButtonSelects[index].style.backgroundColor = Colors.textTertiary();
+            templateButtonSelects[index].style.backgroundColor = "#989898";
             templateButtonSelects[index].value = "unselected";
         }
         // Highlights selected option
@@ -209,6 +209,7 @@ function addCpuToList(name, index) {
     var newCpuButtonSelect = document.createElement('div');
     newCpuButtonSelect.className = "cpuButtonSelect";
     newCpuButtonSelect.id = name;
+    newCpuButtonSelect.style.backgroundColor = "#989898";
     newCpuOption.appendChild(newCpuButtonSelect);
 
     var newCpuNameLabel = document.createElement('div');
@@ -220,7 +221,7 @@ function addCpuToList(name, index) {
         // Resets colors of all other options
         var cpuButtonSelects = document.getElementsByClassName("cpuButtonSelect");
         for(var index = 0; index < cpuButtonSelects.length; index++) {
-            cpuButtonSelects[index].style.backgroundColor = Colors.textTertiary();
+            cpuButtonSelects[index].style.backgroundColor = "#989898";
             cpuButtonSelects[index].value = "unselected";
         }
         // Highlights selected option
@@ -306,8 +307,8 @@ async function newServer(name, ami, cpu) {
         if(vpcId != "ERROR") {
             getSecurityGroups().then(function(secGroups) {
                 if(secGroups[0] != "ERROR") {
-                    // Checks if Mercor security group exists in the region
-                    var secGroupId = getMercorSecurityGroupId(secGroups);
+                    // Checks if Seros security group exists in the region
+                    var secGroupId = getSerosSecurityGroupId(secGroups);
                     if(secGroupId != "NONE") {
                         // Continue as is
                         createKeyPair().then(function(key) {
@@ -323,13 +324,13 @@ async function newServer(name, ami, cpu) {
                                 // Error
                                 newPopup("Error", "Error creating key pair.", "Close");
                                 resetCreateServerButton();
-                                window.close();
+                                //window.close();
                                 return false;
                             }
                         });
                     } else {
                         // If not, creates one
-                        createMercorSecurityGroup(vpcId).then(function(newId) {
+                        createSerosSecurityGroup(vpcId).then(function(newId) {
                             secGroupId = newId;
                             if(secGroupId != "ERROR") {
                                 // Continue
@@ -345,7 +346,7 @@ async function newServer(name, ami, cpu) {
                                             } else {
                                                 newPopup("Error", "Error creating server. Template is potentially invalid.", "Close");
                                                 resetCreateServerButton();
-                                                window.close();
+                                                //window.close();
                                                 return true;
                                             }
                                         });
@@ -353,7 +354,7 @@ async function newServer(name, ami, cpu) {
                                         // Error
                                         newPopup("Error", "Error creating key pair.", "Close");
                                         resetCreateServerButton();
-                                        window.close();
+                                        //window.close();
                                         return false;
                                     }
                                 });
@@ -361,7 +362,7 @@ async function newServer(name, ami, cpu) {
                                 // Error
                                 newPopup("Error", "Error creating security group.", "Close");
                                 resetCreateServerButton();
-                                window.close();
+                                //window.close();
                                 return false;
                             }
                         });
@@ -370,7 +371,7 @@ async function newServer(name, ami, cpu) {
                     // Error
                     newPopup("Error", "Error retrieving security groups.", "Close");
                     resetCreateServerButton();
-                    window.close();
+                    //window.close();
                     return false;
                 }
             });
@@ -378,7 +379,7 @@ async function newServer(name, ami, cpu) {
             // Error
             newPopup("Error", "Error retrieving VPC ID.", "Close");
             resetCreateServerButton();
-            window.close();
+            //window.close();
             return false;
         }
     });

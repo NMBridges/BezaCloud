@@ -1,8 +1,8 @@
 // Supplemental functions
 const {
     Colors, getTheme, setPopupValues, getRegion,
-    getCacheValue, awsDir, mercorExec
-} = require('../mercor.js');
+    getCacheValue, awsDir, serosExec
+} = require('../seros.js');
 const {
     Template, Server, getInstancePasswordData, addTags,
     pemFileExists
@@ -270,7 +270,7 @@ function buttonUp() {
                     const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
                     const e = execSync(cmd1);
                     const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-                    mercorExec(cmd2);
+                    serosExec(cmd2);
                     // Should be running Remote Desktop
                     buttonUp();
                     setTimeout(window.close, 200);
@@ -322,7 +322,7 @@ function buttonUp() {
                                         const cmd1 = "cmd.exe /k cmdkey /generic:" + ipv4 + " /user:Administrator /pass:\"" + newPassword + "\"";
                                         const e = execSync(cmd1);
                                         const cmd2 = "cmd.exe /k mstsc /v:" + ipv4;
-                                        mercorExec(cmd2);
+                                        serosExec(cmd2);
                                         // Should be running Remote Desktop
                                         buttonUp();
                                         setTimeout(window.close, 200);

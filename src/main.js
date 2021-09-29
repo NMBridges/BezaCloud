@@ -5,7 +5,7 @@ const {
   tryLicenseKey, cachedLicenseKey, createAwsDir,
   installAwsCli, hasAwsCliInstalled, awsDir,
   cachedAwsCredentials
-} = require("./mercor.js");
+} = require("./seros.js");
 
 let licenseKeyWindow;
 let loginWindow;
@@ -266,7 +266,7 @@ function createWindows() {
   
    licenseKeyWindow = new BrowserWindow({
     width: 600,
-    height: 400,
+    height: 300,
     frame: false,
     resizable: false,
     webPreferences: {
@@ -290,6 +290,8 @@ function createWindows() {
       if(exists) {
         licenseKeyWindow.hide();
         loginWindow.show();
+      } else {
+        licenseKeyWindow.webContents.executeJavaScript("resetSubmitButton();");
       }
     });
   });
@@ -298,7 +300,7 @@ function createWindows() {
 
   // --------------------------------      loginWindow      --------------------------------------------//
 
-   loginWindow = new BrowserWindow({
+  loginWindow = new BrowserWindow({
     width: 600,
     height: 400,
     autoHideMenuBar: true,
@@ -342,7 +344,7 @@ function createWindows() {
     show: false
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
-  //primaryWindow.webContents.openDevTools();
+  primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {
@@ -410,12 +412,14 @@ function createWindows() {
   const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
     console.log("License key result for " + cachedLicenseKey() + ":", exists);
     if(exists) {
-      // If logic for AWS credentials.
+      // Autologin with AWS credentials.
       loginWindow.webContents.executeJavaScript("accessKeyIdField.focus();").then(function() {
         loginWindow.webContents.executeJavaScript("loginClicked();").then(function(success) {
           if(!success) {
             licenseKeyWindow.hide();
             loginWindow.show();
+          } else {
+            primaryWindow.show();
           }
         });
       });

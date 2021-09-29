@@ -1,15 +1,15 @@
 // Supplemental functions
 const { 
     Colors, createRdpFile, openRdpFile, setPopupValues,
-    getPopupValues, awsDir, getRegion, updateCache
-} = parent.require("../mercor.js");
+    getPopupValues, awsDir, getRegion, updateCache, getTheme
+} = parent.require("../seros.js");
 const { 
     getInstances, startInstance, stopInstance, 
     terminateInstance, rebootInstance, Server,
     createKeyPair, getInstancePasswordData,
     createInstance, getSecurityGroups, 
-    getDefaultVpcId, createMercorSecurityGroup,
-    getMercorSecurityGroupId, pemFileExists,
+    getDefaultVpcId, createSerosSecurityGroup,
+    getSerosSecurityGroupId, pemFileExists,
     addTags, createImage, genRandom
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
@@ -53,14 +53,6 @@ function connect(index) {
     w.emit('newConnection');
 }
 
-/**
- * Returns where or not the server has been prepared by Mercor.
- * @param {number} index The index of the server in the 'servers' array.
- */
-function isMercor(index) {
-
-}
-
 // ---------------------------------------------------------------------------------- //
 
 // ----------------------------- Server Creating Functions -------------------------- //
@@ -77,8 +69,8 @@ function newServer(name, ami, cpu) {
         if(vpcId != "ERROR") {
             getSecurityGroups().then(function(secGroups) {
                 if(secGroups[0] != "ERROR") {
-                    // Checks if Mercor security group exists in the region
-                    var secGroupId = getMercorSecurityGroupId(secGroups);
+                    // Checks if Seros security group exists in the region
+                    var secGroupId = getSerosSecurityGroupId(secGroups);
                     if(secGroupId != "NONE") {
                         // Continue as is
                         createKeyPair().then(function(key) {
@@ -96,7 +88,7 @@ function newServer(name, ami, cpu) {
                         });
                     } else {
                         // If not, creates one
-                        createMercorSecurityGroup(vpcId).then(function(newId) {
+                        createSerosSecurityGroup(vpcId).then(function(newId) {
                             secGroupId = newId;
                             if(secGroupId != "ERROR") {
                                 // Continue
@@ -140,6 +132,7 @@ function newServer(name, ami, cpu) {
 function loadServers() {
     if(!loadingServers) {
         loadingServers = true;
+        updateColors();
         const servJson = getInstances().then(function(data) {
             servers = [];
             if(data["Reservations"] != undefined) {
@@ -346,7 +339,7 @@ function addTile(index) {
                 createImage(servId, templateName).then(function(data) {
                     if(data != "ERROR") {
                         // Good to go
-                        newPopup("Template successfully created", "Template created with name " + templateName + ". Note: Templates based on Servers not made in Mercor Connect may, when used to create Servers, have connection issues.", "Close");
+                        newPopup("Template successfully created", "Template created with name " + templateName + ". Note: Templates based on Servers not made in Seros may, when used to create Servers, have connection issues.", "Close");
                         loadServers();
                     } else {
                         // Error rebooting server
@@ -384,10 +377,10 @@ function addTile(index) {
             if(server.status == "stopped") {
                 // Turn server on.
                 displayOverlay(true);
-                startInstance(servers[parseInt(newPowerButton.id)].id).then(function(started) {
+                startInstance(servers[parseInt(newPowerButton.id)].id, getRegion()).then(function(started) {
                     if(started) { 
                         // Good to go
-                        loadServers();
+                        setTimeout(loadServers, 500);
                     } else {
                         // Error starting server
                     }
@@ -395,10 +388,10 @@ function addTile(index) {
             } else if(server.status == "running") {
                 // Turn server off.
                 displayOverlay(true);
-                stopInstance(servers[parseInt(newPowerButton.id)].id).then(function(stopped) {
+                stopInstance(servers[parseInt(newPowerButton.id)].id, getRegion()).then(function(stopped) {
                     if(stopped) { 
                         // Good to go
-                        loadServers();
+                        setTimeout(loadServers, 500);
                     } else {
                         // Error stopping server
                     }
@@ -432,7 +425,7 @@ function addTile(index) {
                 rebootInstance(servers[parseInt(newRebootButton.id)].id).then( function(rebooted) {
                     if(rebooted) {
                         // Good to go
-                        loadServers();
+                        setTimeout(loadServers, 500);
                     } else {
                         // Error rebooting server
                     }
@@ -778,6 +771,7 @@ function updateColors() {
             } else {
                 statusIcons[count].style.backgroundColor = "#cc3333";
             }
+            statusIcons[count].children[0].style.color = Colors.textSecondary();
         }
         
         var serverIds = document.getElementsByClassName("serverId");
@@ -862,6 +856,14 @@ function updateColors() {
             } else {
                 terminateButtons[count].style.color = "#882222";
             }
+        }
+
+        if(getTheme() == "Seros") {
+            newServerButton.children[0].src = "../assets/Plus-Seros.png";
+            refreshButton.children[0].src = "../assets/Refresh-Seros.png";
+        } else {
+            newServerButton.children[0].src = "../assets/Plus-White.png";
+            refreshButton.children[0].src = "../assets/Refresh-White.png";
         }
     }
 }

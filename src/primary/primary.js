@@ -2,7 +2,7 @@
 const { 
     hex, Colors, getTheme, setTheme, getPage,
     setPage, getPopupValues, setPopupValues
- } = require("../mercor.js");
+ } = require("../seros.js");
 
 // Document items
 var dashboardButton = document.getElementById("dashboardButton");

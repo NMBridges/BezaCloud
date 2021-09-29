@@ -2,8 +2,8 @@
 const { 
     Colors, createRdpFile, openRdpFile, setPopupValues,
     getPopupValues, awsDir, getRegion, updateCache,
-    getCacheValue
-} = parent.require("../mercor.js");
+    getCacheValue, getTheme
+} = parent.require("../seros.js");
 const {
     getUserAMIs, Template, changeAmiVisibility, deleteImage,
     copyImage, getAmiData
@@ -119,13 +119,23 @@ function loadTemplates() {
                     }
                 }
 
-                // Adds the default mercor-starter Template if it doesn't already exist.
+                const serosStarterAmis = {
+                    "us-east-1":"ami-054dc1c0a4617b048",
+                    "us-east-2":"ami-099169caa4ac62e3f",
+                    "us-west-1":"ami-0d17b334f19846f71",
+                    "us-west-2":"ami-01c0f1391ef4b74f9"
+                };
+
+                const serosStarterAmi = serosStarterAmis[getRegion()];
+
+                // Adds the default seros-starter Template if it doesn't already exist.
                 for(var templateIndex = -1; templateIndex < templates.length; templateIndex++) {
+
                     if(templateIndex == templates.length - 1) {
-                        if(templateIndex != -1 && templates[templateIndex].id == "ami-054dc1c0a4617b048") {
+                        if(templateIndex != -1 && templates[templateIndex].id == serosStarterAmi) {
                             break;
-                        } else if(!newTemplatesToPull.includes("ami-054dc1c0a4617b048")) {
-                            newTemplatesToPull.push("ami-054dc1c0a4617b048");
+                        } else if(!newTemplatesToPull.includes(serosStarterAmi)) {
+                            newTemplatesToPull.push(serosStarterAmi);
                         }
                     }
                 }
@@ -570,6 +580,7 @@ function updateColors() {
             } else {
                 statusIcons[count].style.backgroundColor = "#cc3333";
             }
+            statusIcons[count].children[0].style.color = Colors.textSecondary();
         }
         
         var templateIds = document.getElementsByClassName("templateId");
@@ -632,6 +643,14 @@ function updateColors() {
             } else {
                 terminateButtons[count].style.color = "#882222";
             }
+        }
+
+        if(getTheme() == "Seros") {
+            newTemplateButton.children[0].src = "../assets/Plus-Seros.png";
+            refreshButton.children[0].src = "../assets/Refresh-Seros.png";
+        } else {
+            newTemplateButton.children[0].src = "../assets/Plus-White.png";
+            refreshButton.children[0].src = "../assets/Refresh-White.png";
         }
     }
 }
