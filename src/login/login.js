@@ -2,7 +2,7 @@
 const {
     cachedAwsCredentials, updateAwsCredentialsCache, Colors,
     getTheme
-} = require("../mercor.js");
+} = require("../seros.js");
 const {
     connectionTest
 } = require("../apiCaller.js");
@@ -14,7 +14,7 @@ var secretAccessKeyField = document.getElementById('secretAccessKeyField');
 var loginBtn = document.getElementById('loginBtn');
 var exitBtn = document.getElementById('exitBtn');
 var fieldLabels = document.getElementsByClassName('fieldLabel');
-var mercorImg = document.getElementById("mercorImg");
+var serosImg = document.getElementById("serosImg");
 
 
 loginBtn.onclick = loginClicked;
@@ -97,24 +97,30 @@ function exitClicked() {
  * Updates the colors of the elements in accordance with the color theme.
  */
 function updateColors() {
-    bod.style.backgroundColor = Colors.backgroundPrimary();
-
-    wrapper.style.backgroundColor = Colors.textPrimary();
-    wrapper.style.color = Colors.backgroundPrimary();
-
-    for(var index = 0; index < fieldLabels.length; index++) {
-        fieldLabels[index].style.color = Colors.backgroundSecondary();
-    }
-
     accessKeyIdField.style.outlineColor = Colors.backgroundSecondary();
     secretAccessKeyField.style.outlineColor = Colors.backgroundSecondary();
 
-    loginBtn.style.color = Colors.backgroundSecondary();
-    exitBtn.style.color = Colors.backgroundSecondary();
-
     if(getTheme() == "Dark") {
-        mercorImg.src = "../assets/MercorBannerx100-Dark.png";
+        serosImg.src = "../assets/MercorBannerx100-Dark.png";
+        bod.style.backgroundColor = Colors.backgroundPrimary();
+        wrapper.style.backgroundColor = Colors.textPrimary();
+        wrapper.style.color = Colors.backgroundPrimary();
+        for(var index = 0; index < fieldLabels.length; index++) {
+            fieldLabels[index].style.color = Colors.backgroundSecondary();
+        }
+        loginBtn.style.backgroundColor = Colors.textPrimary();
+        loginBtn.style.color = Colors.backgroundSecondary();
+        exitBtn.style.color = Colors.backgroundSecondary();
     } else {
-        mercorImg.src = "../assets/MercorBannerx100.png";
+        serosImg.src = "../assets/MercorBannerx100.png";
+        bod.style.backgroundColor = Colors.backgroundSecondary();
+        wrapper.style.backgroundColor = Colors.backgroundPrimary();
+        wrapper.style.color = Colors.textPrimary();
+        for(var index = 0; index < fieldLabels.length; index++) {
+            fieldLabels[index].style.color = Colors.textPrimary();
+        }
+        loginBtn.style.backgroundColor = Colors.backgroundPrimary();
+        loginBtn.style.color = Colors.backgroundSecondary();
+        exitBtn.style.color = Colors.backgroundSecondary();
     }
 }

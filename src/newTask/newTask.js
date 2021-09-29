@@ -1,8 +1,8 @@
 // Supplemental functions
 const {
     Colors, getTheme, setPopupValues, getRegion,
-    getCacheValue, awsDir, mercorExec, updateCache
-} = require('../mercor.js');
+    getCacheValue, awsDir, serosExec, updateCache
+} = require('../seros.js');
 const {
     Server, Task, getInstances
 } = require('../apiCaller.js');
@@ -70,6 +70,9 @@ function updateColors() {
         cancelButton.style.borderColor = Colors.textPrimary();
     }
 
+    startLabel.style.color = Colors.textPrimary();
+    stopLabel.style.color = Colors.textPrimary();
+
     var elements = document.getElementsByClassName("box");
     for(var index = 0; index < elements.length; index++) {
         elements[index].style.backgroundColor = Colors.backgroundPrimaryAccent();
@@ -77,8 +80,8 @@ function updateColors() {
 
     elements = document.getElementsByClassName("selectButton");
     for(var index = 0; index < elements.length; index++) {
-        elements[index].style.backgroundColor = Colors.textTertiary();
-        elements[index].style.borderColor = Colors.textTertiary();
+        elements[index].style.backgroundColor = "#989898";
+        elements[index].style.borderColor = "#989898";
     }
 
     document.getElementById("serverLabel").style.color = Colors.textSecondary();
@@ -100,8 +103,8 @@ function updateColors() {
 
     elements = document.getElementsByClassName("serverButtonSelect");
     for(var index = 0; index < elements.length; index++) {
-        elements[index].style.backgroundColor = Colors.textTertiary();
-        elements[index].style.borderColor = Colors.textTertiary();
+        elements[index].style.backgroundColor = "#989898";
+        elements[index].style.borderColor = "#989898";
     }
 
 }
@@ -139,7 +142,7 @@ function updateElements() {
         // Resets colors of all other options
         var serverButtonSelects = document.getElementsByClassName("serverButtonSelect");
         for(var index = 0; index < serverButtonSelects.length; index++) {
-            serverButtonSelects[index].style.backgroundColor = Colors.textTertiary();
+            serverButtonSelects[index].style.backgroundColor = "#989898";
             serverButtonSelects[index].value = "unselected";
         }
         // Highlights selected option
@@ -360,7 +363,7 @@ startBox.addEventListener('click', function() {
     startBox.value = "selected";
     
     stopBox.style.backgroundColor = Colors.backgroundPrimaryAccent();
-    stopButton.style.backgroundColor = Colors.textTertiary();
+    stopButton.style.backgroundColor = "#989898";
     stopBox.value = "deselected";
 });
 
@@ -374,7 +377,7 @@ stopBox.addEventListener('click', function() {
     stopBox.value = "selected";
     
     startBox.style.backgroundColor = Colors.backgroundPrimaryAccent();
-    startButton.style.backgroundColor = Colors.textTertiary();
+    startButton.style.backgroundColor = "#989898";
     startBox.value = "deselected";
 });
 

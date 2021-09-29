@@ -1,7 +1,7 @@
 // Supplemental functions
 const {
     Colors, getTheme, updateKeyCache
-} = require("../mercor.js");
+} = require("../seros.js");
 const {
     connectionTest
 } = require("../apiCaller.js");
@@ -12,7 +12,7 @@ var licenseKeyField = document.getElementById('licenseKeyField');
 var submitBtn = document.getElementById('submitBtn');
 var exitBtn = document.getElementById('exitBtn');
 var fieldLabels = document.getElementsByClassName('fieldLabel');
-var mercorImg = document.getElementById("mercorImg");
+var serosImg = document.getElementById("serosImg");
 
 window.onload = function() {
     updateColors();
@@ -117,8 +117,8 @@ function updateColors() {
     exitBtn.style.color = Colors.backgroundSecondary();
 
     if(getTheme() == "Dark") {
-        mercorImg.src = "../assets/MercorBannerx100-Dark.png";
+        serosImg.src = "../assets/MercorBannerx100-Dark.png";
     } else {
-        mercorImg.src = "../assets/MercorBannerx100.png";
+        serosImg.src = "../assets/MercorBannerx100.png";
     }
 }

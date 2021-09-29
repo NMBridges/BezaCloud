@@ -2,7 +2,7 @@
 const { 
     Colors, getTheme, setTheme, setRegion,
     getRegion, updateCache, getCacheValue
-} = parent.require("../mercor.js");
+} = parent.require("../seros.js");
 
 // Page elements
 var headerBar = document.getElementById('optionsHeaderBar');
@@ -36,6 +36,8 @@ function initElements() {
     });
     themeButton.addEventListener('click', function() {
         regionSelect.style.visibility = "hidden";
+        costSelect.style.visibility = "hidden";
+        notiSelect.style.visibility = "hidden";
         if(themeSelect.style.visibility != "visible") {
             themeSelect.style.visibility = "visible";
         } else {
@@ -55,6 +57,8 @@ function initElements() {
     });
     regionButton.addEventListener('click', function() {
         themeSelect.style.visibility = "hidden";
+        costSelect.style.visibility = "hidden";
+        notiSelect.style.visibility = "hidden";
         if(regionSelect.style.visibility != "visible") {
             regionSelect.style.visibility = "visible";
         } else {
@@ -73,7 +77,9 @@ function initElements() {
         costButton.style.backgroundColor = Colors.backgroundPrimary();
     });
     costButton.addEventListener('click', function() {
-        costSelect.style.visibility = "hidden";
+        themeSelect.style.visibility = "hidden";
+        regionSelect.style.visibility = "hidden";
+        notiSelect.style.visibility = "hidden";
         if(costSelect.style.visibility != "visible") {
             costSelect.style.visibility = "visible";
         } else {
@@ -92,7 +98,9 @@ function initElements() {
         notiButton.style.backgroundColor = Colors.backgroundPrimary();
     });
     notiButton.addEventListener('click', function() {
-        notiSelect.style.visibility = "hidden";
+        themeSelect.style.visibility = "hidden";
+        regionSelect.style.visibility = "hidden";
+        costSelect.style.visibility = "hidden";
         if(notiSelect.style.visibility != "visible") {
             notiSelect.style.visibility = "visible";
         } else {
@@ -274,12 +282,16 @@ function updateColors() {
 
         regionButton.style.backgroundColor = Colors.backgroundPrimary();
         regionButton.style.color = Colors.textPrimary();
+        regionButton.style.borderColor = Colors.textPrimary();
         themeButton.style.backgroundColor = Colors.backgroundPrimary();
         themeButton.style.color = Colors.textPrimary();
+        themeButton.style.borderColor = Colors.textPrimary();
         costButton.style.backgroundColor = Colors.backgroundPrimary();
         costButton.style.color = Colors.textPrimary();
+        costButton.style.borderColor = Colors.textPrimary();
         notiButton.style.backgroundColor = Colors.backgroundPrimary();
         notiButton.style.color = Colors.textPrimary();
+        notiButton.style.borderColor = Colors.textPrimary();
 
         regionSelect.style.borderColor = Colors.textTertiary();
         themeSelect.style.borderColor = Colors.textTertiary();
@@ -308,6 +320,11 @@ function updateColors() {
         for(var index = 0; index < notiSelectButtons.length; index++) {
             notiSelectButtons[index].style.color = Colors.textSecondary();
             notiSelectButtons[index].style.backgroundColor = Colors.backgroundPrimary();
+        }
+
+        settingLabels = document.getElementsByClassName('settingLabel');
+        for(var index = 0; index < settingLabels.length; index++) {
+            settingLabels[index].style.color = Colors.textPrimary();
         }
 
         resetElements();

@@ -15,11 +15,11 @@ var popupBody = "";
 /** Global variable that holds information for the popup window button. */
 var popupButton = "";
 
-/** @type {string} The color theme of Mercor Connect. */
+/** @type {string} The color theme of Seros. */
 var theme = getTheme();
-/** @type {string} The AWS region of Mercor Connect. */
+/** @type {string} The AWS region of Seros. */
 var region = getRegion();
-/** @type {string} The current page that Mercor Connect is on. */
+/** @type {string} The current page that Seros is on. */
 var page = "Dashboard";
 
 /**
@@ -85,7 +85,7 @@ const installAwsCli = async () => {
  * Runs an inputted command. Used asynchronously by windows that are about to close.
  * @param {string} inpCmd The inputted command to be executed.
  */
-const mercorExec = (inpCmd) => {
+const serosExec = (inpCmd) => {
     exec(inpCmd);
 }
 
@@ -408,8 +408,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Mercor") {
-            return hex(255,255,255);
+        } else if (theme == "Seros") {
+            //return hex(255,255,255);
+            return hex(23,4,74);
         }
         return "D90166";
     }
@@ -417,7 +418,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(255,255,255);
         }
         return "D90166";
@@ -426,8 +427,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(192,192,192);
-        } else if (theme == "Mercor") {
-            return hex(225,225,225);
+        } else if (theme == "Seros") {
+            //return hex(225,225,225);
+            return hex(73,24,124);
         }
         return "D90166";
     }
@@ -435,8 +437,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(152,152,152);
-        } else if (theme == "Mercor") {
-            return hex(170,170,170);
+        } else if (theme == "Seros") {
+            //return hex(170,170,170);
+            return hex(93,29,144);
         }
         return "D90166";
     }
@@ -444,8 +447,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
-        } else if (theme == "Mercor") {
-            return hex(97,81,245);
+        } else if (theme == "Seros") {
+            //return hex(97,81,245); // (0, 207, 255)
+            return hex(255,255,255); // (0, 207, 255)
         }
         return "D90166";
     }
@@ -453,8 +457,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(32,43,58);
-        } else if (theme == "Mercor") {
-            return hex(101,85,250);
+        } else if (theme == "Seros") {
+            //return hex(101,85,250);
+            return hex(0,207,255);
         }
         return "D90166";
     }
@@ -462,8 +467,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(247, 150, 37);
-        } else if (theme == "Mercor") {
-            return hex(128, 132, 246);
+        } else if (theme == "Seros") {
+            //return hex(128, 132, 246);
+            return hex(0, 207, 255);
         }
         return "D90166";
     }
@@ -471,7 +477,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(255,255,255);
         }
         return "D90166";
@@ -480,8 +486,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
-        } else if (theme == "Mercor") {
-            return hex(255,255,255);
+        } else if (theme == "Seros") {
+            //return hex(255,255,255);
+            return hex(33,14,84);
         }
         return "D90166";
     }
@@ -489,7 +496,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(225,225,225);
         }
         return "D90166";
@@ -498,8 +505,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(45,57,74);
-        } else if (theme == "Mercor") {
-            return hex(102,86,255);
+        } else if (theme == "Seros") {
+            //return hex(102,86,255);
+            return hex(245,245,245);
         }
         return "D90166";
     }
@@ -507,8 +515,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(55,67,84);
-        } else if (theme == "Mercor") {
-            return hex(112,96,255);
+        } else if (theme == "Seros") {
+            //return hex(112,96,255);
+            return hex(235,235,235);
         }
         return "D90166";
     }
@@ -516,8 +525,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(222,121,35);
-        } else if (theme == "Mercor") {
-            return hex(138,142,255);
+        } else if (theme == "Seros") {
+            //return hex(138,142,255);
+            return hex(5, 217, 255);
         }
         return "D90166";
     }
@@ -525,8 +535,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(202,111,33);
-        } else if (theme == "Mercor") {
-            return hex(148,152,255);
+        } else if (theme == "Seros") {
+            //return hex(148,152,255);
+            return hex(10, 227, 255);
         }
         return "D90166";
     }
@@ -534,8 +545,9 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,165,40);
-        } else if (theme == "Mercor") {
-            return hex(45,45,45);
+        } else if (theme == "Seros") {
+            //return hex(45,45,45);
+            return hex(15,237,255);
         }
         return "D90166";
     }
@@ -543,7 +555,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(158,163,247);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(247,150,37);
         }
         return "D90166";
@@ -552,8 +564,10 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
-        } else if (theme == "Mercor") {
-            return hex(97,81,245);
+        } else if (theme == "Seros") {
+            //return hex(97,81,245);
+            return hex(0,207,255);
+
         }
         return "D90166";
     }
@@ -561,7 +575,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(158,163,247);
         }
         return "D90166";
@@ -570,7 +584,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(255,255,255);
         }
         return "D90166";
@@ -579,7 +593,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(35,225,35);
         }
         return "D90166";
@@ -588,7 +602,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(97,81,245);
         }
         return "D90166";
@@ -597,7 +611,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(37,49,65);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(101,85,249);
         }
         return "D90166";
@@ -606,7 +620,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(36,48,64);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(99,83,247);
         }
         return "D90166";
@@ -615,7 +629,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(38,50,66);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(103,87,251);
         }
         return "D90166";
@@ -624,7 +638,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(50,60,70);
-        } else if (theme == "Mercor") {
+        } else if (theme == "Seros") {
             return hex(109,93,255);
         }
         return "D90166";
@@ -636,6 +650,6 @@ module.exports = {
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
     installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled,
-    setRegion, getRegion, updateCache, getCacheValue, mercorExec,
+    setRegion, getRegion, updateCache, getCacheValue, serosExec,
     unixToDate
 };

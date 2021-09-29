@@ -1,12 +1,12 @@
 {
-  "name": "mercor-connect",
-  "productName": "Mercor Connect",
+  "name": "seros",
+  "productName": "Seros",
   "version": "1.0.0",
   "description": "Facilitating commmerce one server at a time.",
   "main": "src/main.js",
   "scripts": {
     "start": "electron-forge start",
-    "package": "asar pack out/'Mercor Connect-darwin-x64'/'Mercor Connect.app'/Contents/Resources/app out/'Mercor Connect-darwin-x64'/'Mercor Connect.app'/Contents/Resources/app.asar",
+    "package": "asar pack out/'Seros-darwin-x64'/'Seros.app'/Contents/Resources/app out/'Seros-darwin-x64'/'Seros.app'/Contents/Resources/app.asar",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
@@ -24,7 +24,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Mercor Connect"
+            "name": "Seros"
           }
         },
         {
@@ -68,8 +68,8 @@
     "electron-builder": "^22.11.7"
   },
   "build": {
-    "appId": "com.mercor.mercorconnect",
-    "productName": "Mercor Connect",
+    "appId": "com.serossoftware.seros",
+    "productName": "Seros",
     "target": "NSIS",
     "directories": {
       "buildResources": "resources",
@@ -77,7 +77,8 @@
     },
     "nsis": {
       "allowToChangeInstallationDirectory": true,
-      "oneClick": false
+      "oneClick": false,
+      "license": "eula.txt"
     }
   }
 }

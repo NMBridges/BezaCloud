@@ -2,7 +2,7 @@
 const {
     Colors, getTheme, setPopupValues, getCacheValue,
     updateCache, getRegion
-} = require('../mercor.js');
+} = require('../seros.js');
 const {
     Template, getAmiData, copyImage
 } = require('../apiCaller.js');
@@ -72,8 +72,8 @@ function updateColors() {
         const reg = getRegion();
         
         // Region Button
-        regionButtons[index].style.backgroundColor = Colors.textSecondary();
-        regionButtons[index].style.borderColor = Colors.textTertiary();
+        regionButtons[index].style.backgroundColor = "#C0C0C0";
+        regionButtons[index].style.borderColor = "#989898";
         if((index == 0 && reg == "us-east-1") || (index == 1 && reg == "us-east-2") ||
             (index == 2 && reg == "us-west-1") || (index == 3 && reg == "us-west-2") ) {
             regionButtons[index].style.borderColor = "#555555";
@@ -244,7 +244,7 @@ usEast1Box.addEventListener('mouseenter', function() {
 
 usEast1Box.addEventListener('mouseleave', function() {
     if(usEast1Button.value != "selected" && getRegion() != "us-east-1") {
-        usEast1Button.style.backgroundColor = Colors.textSecondary();
+        usEast1Button.style.backgroundColor = "#C0C0C0";
     }
 });
 
@@ -266,7 +266,7 @@ usEast2Box.addEventListener('mouseenter', function() {
 
 usEast2Box.addEventListener('mouseleave', function() {
     if(usEast2Button.value != "selected" && getRegion() != "us-east-2") {
-        usEast2Button.style.backgroundColor = Colors.textSecondary();
+        usEast2Button.style.backgroundColor = "#C0C0C0";
     }
 });
 
@@ -288,7 +288,7 @@ usWest1Box.addEventListener('mouseenter', function() {
 
 usWest1Box.addEventListener('mouseleave', function() {
     if(usWest1Button.value != "selected" && getRegion() != "us-west-1") {
-        usWest1Button.style.backgroundColor = Colors.textSecondary();
+        usWest1Button.style.backgroundColor = "#C0C0C0";
     }
 });
 
@@ -310,7 +310,7 @@ usWest2Box.addEventListener('mouseenter', function() {
 
 usWest2Box.addEventListener('mouseleave', function() {
     if(usWest2Button.value != "selected" && getRegion() != "us-west-2") {
-        usWest2Button.style.backgroundColor = Colors.textSecondary();
+        usWest2Button.style.backgroundColor = "#C0C0C0";
     }
 });
 

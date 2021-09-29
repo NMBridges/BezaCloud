@@ -1,8 +1,8 @@
 // Supplemental functions
 const { 
     Colors, setPopupValues, getPopupValues, awsDir,
-    getRegion, updateCache, getCacheValue
-} = parent.require("../mercor.js");
+    getRegion, updateCache, getCacheValue, getTheme
+} = parent.require("../seros.js");
 const {
     Task, Server, startInstance, stopInstance
 } = parent.require("../apiCaller.js");
@@ -392,6 +392,12 @@ function checkAndRunTasks() {
         for(var count = 0; count < items.length; count++) {
             items[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
             items[count].style.color = "#cc3333";
+        }
+        
+        if(getTheme() == "Seros") {
+            newTaskButton.children[0].src = "../assets/Plus-Seros.png";
+        } else {
+            newTaskButton.children[0].src = "../assets/Plus-White.png";
         }
     }
 }

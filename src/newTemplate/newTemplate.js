@@ -2,7 +2,7 @@
 const {
     Colors, getTheme, setPopupValues, getCacheValue,
     updateCache, getRegion
-} = require('../mercor.js');
+} = require('../seros.js');
 const {
     Template, getAmiData
 } = require('../apiCaller.js');

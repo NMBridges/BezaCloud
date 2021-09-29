@@ -26,7 +26,7 @@ const {
 } = require("@aws-sdk/client-cost-explorer");
 const {
     getRegion, unixToDate
-} = require("./mercor.js");
+} = require("./seros.js");
 //var ec2Client = new EC2Client({ region: "us-east-1"});
 var ceClient = new CostExplorerClient({ region: "us-east-1"});
 const fs = require('fs');
@@ -216,14 +216,14 @@ const getSecurityGroups = async () => {
 }
 
 /**
- * Returns whether or not the account has a security group named "mercorSecGroup."
+ * Returns whether or not the account has a security group named "serosSecGroup."
  * @param {SecGroups[]} secGroups The account's security groups.
  * @returns 
  */
-function getMercorSecurityGroupId(secGroups) {
+function getSerosSecurityGroupId(secGroups) {
     for(var index = 0; index < secGroups.length; index++) {
-        if(secGroups[index].GroupName == "mercorSecGroup") {
-            console.log("Mercor security group exists", secGroups[index]);
+        if(secGroups[index].GroupName == "serosSecGroup") {
+            console.log("Seros security group exists", secGroups[index]);
             return secGroups[index].GroupId;
         }
     }
@@ -231,16 +231,16 @@ function getMercorSecurityGroupId(secGroups) {
 }
 
 /**
- * Creates a new security group called "mercorSecGroup"
+ * Creates a new security group called "serosSecGroup"
  */
-const createMercorSecurityGroup = async (vpcId) => {
+const createSerosSecurityGroup = async (vpcId) => {
     try {
         var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "mercorSecGroup", Description: "absolutely free", VpcId: vpcId}));
+        const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "serosSecGroup", Description: "absolutely free", VpcId: vpcId}));
 
         try {
             const data2 = await ec2Client.send(new AuthorizeSecurityGroupIngressCommand({
-                GroupName: "mercorSecGroup",
+                GroupName: "serosSecGroup",
                 GroupId: data.GroupId,
                 IpPermissions: [{
                     IpProtocol: "-1",
@@ -680,8 +680,8 @@ module.exports =
     Server, Template, Task, Expenditure, connectionTest, getInstances,
     startInstance, stopInstance, rebootInstance, terminateInstance, 
     createKeyPair, getInstancePasswordData, createInstance,
-    getSecurityGroups, getMercorSecurityGroupId, getDefaultVpcId,
-    createMercorSecurityGroup, pemFileExists, addTags,
+    getSecurityGroups, getSerosSecurityGroupId, getDefaultVpcId,
+    createSerosSecurityGroup, pemFileExists, addTags,
     getUserAMIs, changeAmiVisibility, createImage, deleteImage,
     copyImage, getAmiData, genRandom, getSpending
 };

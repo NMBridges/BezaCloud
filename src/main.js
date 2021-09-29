@@ -5,7 +5,7 @@ const {
   tryLicenseKey, cachedLicenseKey, createAwsDir,
   installAwsCli, hasAwsCliInstalled, awsDir,
   cachedAwsCredentials
-} = require("./mercor.js");
+} = require("./seros.js");
 
 let licenseKeyWindow;
 let loginWindow;
@@ -344,7 +344,7 @@ function createWindows() {
     show: false
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
-  //primaryWindow.webContents.openDevTools();
+  primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {
