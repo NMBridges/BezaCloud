@@ -140,7 +140,7 @@ function cachedAwsCredentials() {
             }
         }
     }
-    
+
     if(tempStr != "") {
         lines.push(tempStr);
         tempStr = "";

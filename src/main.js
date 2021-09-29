@@ -311,7 +311,7 @@ function createWindows() {
     }
   });
   loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
-  //loginWindow.webContents.openDevTools();
+  loginWindow.webContents.openDevTools();
 
   loginWindow.setResizable(false);
 
@@ -413,7 +413,7 @@ function createWindows() {
     console.log("License key result for " + cachedLicenseKey() + ":", exists);
     if(exists) {
       // Autologin with AWS credentials.
-      loginWindow.webContents.executeJavaScript("accessKeyIdField.focus();").then(function() {
+      loginWindow.webContents.executeJavaScript("autofillTextboxes();").then(function() {
         loginWindow.webContents.executeJavaScript("loginClicked();").then(function(success) {
           if(!success) {
             licenseKeyWindow.hide();

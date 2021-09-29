@@ -25,10 +25,10 @@ const {
     GetCostAndUsageCommand, CostExplorerClient
 } = require("@aws-sdk/client-cost-explorer");
 const {
-    getRegion, unixToDate
+    getRegion, unixToDate, setRegion
 } = require("./seros.js");
 //var ec2Client = new EC2Client({ region: "us-east-1"});
-var ceClient = new CostExplorerClient({ region: "us-east-1"});
+var ceClient = new CostExplorerClient({ region: "us-east-1" });
 const fs = require('fs');
 const homeDir = require('os').homedir();
 const { exec, execSync } = require('child_process');
@@ -63,7 +63,7 @@ function customEC2Client(reg) {
  * @returns a version of the client with the correct region.
  */
 function resetCEClient() {
-    return new CostExplorerClient({ region: getRegion()});
+    return new CostExplorerClient({ region: getRegion() });
 }
 
 /**

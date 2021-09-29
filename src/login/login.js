@@ -20,11 +20,6 @@ var serosImg = document.getElementById("serosImg");
 loginBtn.onclick = loginClicked;
 exitBtn.onclick = exitClicked;
 
-// Autofills the textboxes.
-document.onfocus = autofillTextboxes;
-accessKeyIdField.onfocus = autofillTextboxes;
-accessKeyIdField.focus();
-
 window.onload = function() {
     updateColors();
 };
@@ -39,6 +34,7 @@ function loginClicked() {
     
     const out = "[default]\naws_access_key_id=" + accessKeyIdField.value + "\naws_secret_access_key=" + secretAccessKeyField.value;
     updateAwsCredentialsCache(out);
+    console.log(out);
     connectionTest().then( function(valid) {
         if(valid) {
             console.log("Logged in");
@@ -77,7 +73,7 @@ function loginClicked() {
  * Fills the textboxes with past login info.
  */
 function autofillTextboxes() {
-    if(accessKeyIdField.value == "") {
+    if(accessKeyIdField.value == "" && secretAccessKeyField.value == "") {
         const credObj = cachedAwsCredentials();
         accessKeyIdField.value = credObj['akId'];
         secretAccessKeyField.value = credObj['sak'];
