@@ -4,6 +4,7 @@
 - Don't load costs, servers, etc. before sign in. [all]
 - Renaming server functionality [Servers]
 - Fix bug on monthly spending chart on hover [Dashboard]
+- Fix colors on Seros Color theme [connect to server]
 
 
 Instead of prebuilt AMIs, give the option for basic windows platform, then you can
