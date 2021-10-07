@@ -311,7 +311,7 @@ function createWindows() {
     }
   });
   loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
-  loginWindow.webContents.openDevTools();
+  //loginWindow.webContents.openDevTools();
 
   loginWindow.setResizable(false);
 
@@ -344,7 +344,7 @@ function createWindows() {
     show: false
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
-  primaryWindow.webContents.openDevTools();
+  //primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {
