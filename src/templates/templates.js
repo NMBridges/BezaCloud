@@ -5,8 +5,7 @@ const {
     getCacheValue, getTheme
 } = parent.require("../seros.js");
 const {
-    getUserAMIs, Template, changeAmiVisibility, deleteImage,
-    copyImage, getAmiData
+    Template, ApiCaller
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
 const homeDir = parent.require('os').homedir();
@@ -77,7 +76,7 @@ function createTemplateObject(ami, owner) {
 function loadTemplates() {
     if(!loadingTemplates) {
         loadingTemplates = true;
-        getUserAMIs().then(function(results) {
+        ApiCaller.getUserAMIs().then(function(results) {
             console.log(results);
             templates = [];
             // Gets the list of the user's AMIs
@@ -142,7 +141,7 @@ function loadTemplates() {
 
                 if(newTemplatesToPull.length > 0) {
                     // Get AMI data about the AMI IDs
-                    getAmiData(newTemplatesToPull).then(function(results) {
+                    ApiCaller.getAmiData(newTemplatesToPull).then(function(results) {
                         console.log(results);
                         if(results != "ERROR" && results != false) {
                             // create list of templates
@@ -342,7 +341,7 @@ function addTile(index) {
                 // Make the server private.
                 displayOverlay(true);
 
-                changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, false).then(function(result) {
+                ApiCaller.changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, false).then(function(result) {
                     if(result == "ERROR") {
                         console.log("ERROR");
                     }
@@ -352,7 +351,7 @@ function addTile(index) {
                 // Make the server public.
                 displayOverlay(true);
                 
-                changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, true).then(function(result) {
+                ApiCaller.changeAmiVisibility(templates[parseInt(newVisibilityButton.id)].id, true).then(function(result) {
                     if(result == "ERROR") {
                         console.log("ERROR");
                     }
@@ -385,7 +384,7 @@ function addTile(index) {
             const remote = parent.require('electron').remote;
             let w = remote.getCurrentWindow();
             w.emit('newCopyTemplate');
-            /*copyImage(templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName, "us-east-2").then(function() {
+            /*ApiCaller.copyImage(templates[parseInt(newCopyButton.id)].id, templates[parseInt(newCopyButton.id)].amiName, "us-east-2").then(function() {
                 loadTemplates();
             });*/
         }
@@ -416,7 +415,7 @@ function addTile(index) {
             if(templates[parseInt(newTerminateButton.id)].owner == "self") {
                 // Terminate Template.
                 displayOverlay(true);
-                deleteImage(templates[parseInt(newTerminateButton.id)].id).then(function() {
+                ApiCaller.deleteImage(templates[parseInt(newTerminateButton.id)].id).then(function() {
                     loadTemplates();
                 });
             } else {

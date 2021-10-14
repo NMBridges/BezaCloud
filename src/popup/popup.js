@@ -1,3 +1,5 @@
+const { app } = require("electron");
+
 // Supplemental functions
 const { Colors, awsDir } = parent.require("../seros.js");
 const clipboardy = parent.require('clipboardy');
@@ -32,6 +34,10 @@ window.onload = function() {
             const e1 = execSync(cmd1);
         } else if(continueButton.textContent == 'Copy and Close') {
             clipboardy.writeSync(bodyLabel.textContent);
+        } else if(continueButton.textContent == 'Exit') {
+            const remote = parent.require('electron').remote;
+            let w = remote.getCurrentWindow();
+            w.emit('exitApp');
         }
         window.top.close();
     });

@@ -4,8 +4,7 @@ const {
     getCacheValue, awsDir, serosExec
 } = require('../seros.js');
 const {
-    Template, Server, getInstancePasswordData, addTags,
-    pemFileExists
+    Template, Server, ApiCaller
 } = require('../apiCaller.js');
 const fs = require('fs');
 const { exec, execSync } = require('child_process');
@@ -78,6 +77,9 @@ function updateColors() {
         fileSelectButton.style.backgroundColor = Colors.textPrimary();
     }
 
+    pemLabel.style.color = Colors.textPrimary();
+    passLabel.style.color = Colors.textPrimary();
+
     var elements = document.getElementsByClassName("box");
     for(var index = 0; index < elements.length; index++) {
         elements[index].style.backgroundColor = Colors.backgroundPrimaryAccent();
@@ -85,8 +87,8 @@ function updateColors() {
 
     var elements = document.getElementsByClassName("selectButton");
     for(var index = 0; index < elements.length; index++) {
-        elements[index].style.backgroundColor = Colors.textTertiary();
-        elements[index].style.borderColor = Colors.textTertiary();
+        elements[index].style.backgroundColor = "#989898";
+        elements[index].style.borderColor = "#989898";
     }
 
     pemFileLabel.style.color = Colors.textSecondary();
@@ -110,7 +112,7 @@ function updateElements() {
         pemBox.click();
     }
 
-    if(pemFileExists(server.key)) {
+    if(ApiCaller.pemFileExists(server.key)) {
         pemFileLabel.textContent = awsDir() + "/connections/" + server.key + ".pem";
     }
 }
@@ -161,11 +163,19 @@ cancelButton.addEventListener('click', function() {
 // ------------------------------  fileSelectButton functions  ------------------------------ //
 
 fileSelectButton.addEventListener('mouseenter', function() {
-    fileSelectButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+    if (getTheme() == "Dark") {
+        fileSelectButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+    } else {
+        fileSelectButton.style.backgroundColor = Colors.textSecondary();
+    }
 });
 
 fileSelectButton.addEventListener('mouseleave', function() {
-    fileSelectButton.style.backgroundColor = Colors.backgroundSecondary();
+    if (getTheme() == "Dark") {
+        fileSelectButton.style.backgroundColor = Colors.backgroundSecondary();
+    } else {
+        fileSelectButton.style.backgroundColor = Colors.textPrimary();
+    }
 });
 
 fileSelectButton.addEventListener('click', function() {
@@ -182,7 +192,7 @@ pemBox.addEventListener('click', function() {
     pemBox.value = "selected";
     
     passBox.style.backgroundColor = Colors.backgroundPrimaryAccent();
-    passButton.style.backgroundColor = Colors.textTertiary();
+    passButton.style.backgroundColor = "#989898";
     passBox.value = "deselected";
 });
 
@@ -196,7 +206,7 @@ passBox.addEventListener('click', function() {
     passBox.value = "selected";
     
     pemBox.style.backgroundColor = Colors.backgroundPrimaryAccent();
-    pemButton.style.backgroundColor = Colors.textTertiary();
+    pemButton.style.backgroundColor = "#989898";
     pemBox.value = "deselected";
 });
 
@@ -258,7 +268,7 @@ function buttonUp() {
         const newPassword = manualPassTextBox.value.trim();
         if(newPassword != "") {
             // Add new encoded password tag.
-            addTags(server.id, "Cert", btoa(newPassword)).then(function(success) {
+            ApiCaller.addTags(server.id, "Cert", btoa(newPassword)).then(function(success) {
                 if(success) {
                     // Successfully added tags.
                 } else {
@@ -295,7 +305,7 @@ function buttonUp() {
         if(pemFileLabel.textContent != "") {
             // Checks if it is a valid file.
             if(fs.existsSync(pemFileLabel.textContent)) {
-                getInstancePasswordData(server.id).then(function(result) {
+                ApiCaller.getInstancePasswordData(server.id).then(function(result) {
                     if(result == "ERROR" || result.PasswordData == "") {
                         // Server is not available yet
                         console.log("Server is not available yet.");
@@ -310,7 +320,7 @@ function buttonUp() {
 
                             if(newPassword != "") {
                                 // Add new encoded password tag
-                                addTags(server.id, "Cert", btoa(newPassword)).then(function(success) {
+                                ApiCaller.addTags(server.id, "Cert", btoa(newPassword)).then(function(success) {
                                     if(success) {
                                         // Successfully added tags.
                                     } else {

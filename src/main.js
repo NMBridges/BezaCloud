@@ -4,7 +4,7 @@ const path = require('path');
 const {
   tryLicenseKey, cachedLicenseKey, createAwsDir,
   installAwsCli, hasAwsCliInstalled, awsDir,
-  cachedAwsCredentials
+  cachedAwsCredentials, checkVersion
 } = require("./seros.js");
 
 let licenseKeyWindow;
@@ -41,6 +41,10 @@ function newPopupWindow(header, body, button) {
         popupWindow.show();
       });
     });
+  });
+
+  popupWindow.on('exitApp', function() {
+    app.quit();
   });
 }
 
@@ -323,6 +327,13 @@ function createWindows() {
   loginWindow.on('loginSuccessful', () => {
     primaryWindow.show();
     loginWindow.hide();
+    primaryWindow.webContents.executeJavaScript('dash.contentWindow.loadChart();');
+    primaryWindow.webContents.executeJavaScript('serv.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('serv.contentWindow.loadServers();');
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.loadTemplates();');
+    primaryWindow.webContents.executeJavaScript('task.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('task.contentWindow.loadTasks();');
   });
 
   // ---------------------------------------------------------------------------------------------------//
@@ -406,25 +417,34 @@ function createWindows() {
   // Creates cache directory if it does not already exist
   createAwsDir();
 
-  // Automatically checks if there is a valid key on the hard drive. If so, it
-  // shows the login window. If not, it shows the license key window and waits
-  // for manual user input.
-  const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
-    console.log("License key result for " + cachedLicenseKey() + ":", exists);
-    if(exists) {
-      // Autologin with AWS credentials.
-      loginWindow.webContents.executeJavaScript("autofillTextboxes();").then(function() {
-        loginWindow.webContents.executeJavaScript("loginClicked();").then(function(success) {
-          if(!success) {
-            licenseKeyWindow.hide();
-            loginWindow.show();
-          } else {
-            primaryWindow.show();
-          }
-        });
+  checkVersion().then(function(versionInfo) {
+    if(versionInfo[0]) {
+      if(versionInfo[1]) {
+        newPopupWindow("Version Notice", versionInfo[2], "Close");
+      }
+      // Automatically checks if there is a valid key on the hard drive. If so, it
+      // shows the login window. If not, it shows the license key window and waits
+      // for manual user input.
+      tryLicenseKey(cachedLicenseKey()).then( function(exists) {
+        console.log("License key result for " + cachedLicenseKey() + ":", exists);
+        if(exists) {
+          // Autologin with AWS credentials.
+          loginWindow.webContents.executeJavaScript("autofillTextboxes();").then(function() {
+            loginWindow.webContents.executeJavaScript("loginClicked();").then(function(success) {
+              if(!success) {
+                licenseKeyWindow.hide();
+                loginWindow.show();
+              } else {
+                primaryWindow.show();
+              }
+            });
+          });
+        } else {
+          licenseKeyWindow.show();
+        }
       });
     } else {
-      licenseKeyWindow.show();
+      newPopupWindow("Invalid Version", versionInfo[2], "Exit");
     }
   });
 }

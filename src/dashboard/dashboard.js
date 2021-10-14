@@ -3,7 +3,7 @@ const {
     Colors, getCacheValue
  } = parent.require("../seros.js");
 const {
-    Expenditure, getSpending
+    Expenditure, ApiCaller
 } = parent.require("../apiCaller.js");
 
 // Document items
@@ -107,7 +107,7 @@ function loadSpending() {
     var completionCounter = 0;
 
     // Gets the spending for the previous 11, and current, month.
-    getSpending("MONTHLY").then(function(result) {
+    ApiCaller.getSpending("MONTHLY").then(function(result) {
         if(result != "ERROR") {
             if("ResultsByTime" in result) {
                 const spending = result["ResultsByTime"];
@@ -182,7 +182,7 @@ function loadSpending() {
     });
 
     // Gets the spending for the previous 30 days.
-    getSpending("DAILY").then(function(result) {
+    ApiCaller.getSpending("DAILY").then(function(result) {
         if(result != "ERROR") {
             if("ResultsByTime" in result) {
                 const spending = result["ResultsByTime"];

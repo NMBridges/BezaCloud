@@ -4,9 +4,7 @@ const {
     getCacheValue
 } = require('../seros.js');
 const {
-    Template, getAmiData, getDefaultVpcId, getSecurityGroups,
-    getSerosSecurityGroupId, createKeyPair, createInstance,
-    createSerosSecurityGroup
+    Template, ApiCaller
 } = require('../apiCaller.js');
 
 // Page element references
@@ -245,7 +243,7 @@ function loadTemplates() {
 
         if(cachedAmiIds.length > 0) {
             // Get AMI data about the AMI IDs
-            getAmiData(cachedAmiIds).then(function(results) {
+            ApiCaller.getAmiData(cachedAmiIds).then(function(results) {
                 console.log(results);
                 if(results != "ERROR" && results != false) {
                     // create list of templates
@@ -303,17 +301,17 @@ async function newServer(name, ami, cpu) {
     createServerButton.style.backgroundColor = "#555555";
 
     // Gets region's default VPC
-    getDefaultVpcId().then(function(vpcId) {
+    ApiCaller.getDefaultVpcId().then(function(vpcId) {
         if(vpcId != "ERROR") {
-            getSecurityGroups().then(function(secGroups) {
+            ApiCaller.getSecurityGroups().then(function(secGroups) {
                 if(secGroups[0] != "ERROR") {
                     // Checks if Seros security group exists in the region
-                    var secGroupId = getSerosSecurityGroupId(secGroups);
+                    var secGroupId = ApiCaller.getSerosSecurityGroupId(secGroups);
                     if(secGroupId != "NONE") {
                         // Continue as is
-                        createKeyPair().then(function(key) {
+                        ApiCaller.createKeyPair().then(function(key) {
                             if(key != "ERROR") {
-                                createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
+                                ApiCaller.createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                     // done
                                     newPopup("", "Server successfully created.", "Close");
                                     resetCreateServerButton();
@@ -330,13 +328,13 @@ async function newServer(name, ami, cpu) {
                         });
                     } else {
                         // If not, creates one
-                        createSerosSecurityGroup(vpcId).then(function(newId) {
+                        ApiCaller.createSerosSecurityGroup(vpcId).then(function(newId) {
                             secGroupId = newId;
                             if(secGroupId != "ERROR") {
                                 // Continue
-                                createKeyPair().then(function(key) {
+                                ApiCaller.createKeyPair().then(function(key) {
                                     if(key != "ERROR") {
-                                        createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
+                                        ApiCaller.createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                             // done
                                             if(instanceId != "ERROR") {
                                                 newPopup("", "Successfully created server.", "Close");

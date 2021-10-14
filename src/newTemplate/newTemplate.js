@@ -4,7 +4,7 @@ const {
     updateCache, getRegion
 } = require('../seros.js');
 const {
-    Template, getAmiData
+    Template, ApiCaller
 } = require('../apiCaller.js');
 
 // Page element references
@@ -150,7 +150,7 @@ addTemplateButton.addEventListener('click', function() {
         }
     }
     // If that passes Checks if the AMI ID is valid
-    getAmiData([newAmiId]).then(function(results) {
+    ApiCaller.getAmiData([newAmiId]).then(function(results) {
         console.log(results);
         if(results != "ERROR" && results != false) {
             if('Images' in results) {

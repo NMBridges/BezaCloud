@@ -4,7 +4,7 @@ const {
     getTheme
 } = require("../seros.js");
 const {
-    connectionTest
+    ApiCaller
 } = require("../apiCaller.js");
 
 var bod = document.body;
@@ -35,7 +35,7 @@ function loginClicked() {
     const out = "[default]\naws_access_key_id=" + accessKeyIdField.value + "\naws_secret_access_key=" + secretAccessKeyField.value;
     updateAwsCredentialsCache(out);
     console.log(out);
-    connectionTest().then( function(valid) {
+    ApiCaller.connectionTest().then( function(valid) {
         if(valid) {
             console.log("Logged in");
             // log in

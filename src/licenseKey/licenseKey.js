@@ -2,9 +2,6 @@
 const {
     Colors, getTheme, updateKeyCache
 } = require("../seros.js");
-const {
-    connectionTest
-} = require("../apiCaller.js");
 
 var bod = document.body;
 var wrapper = document.getElementById('wrapper');

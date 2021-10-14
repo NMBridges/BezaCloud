@@ -42,542 +42,547 @@ const promiseExec = require('util').promisify(exec);
 }
 
 /**
- * Resets the ec2Client variable to have the correct region.
- * @returns a version of the client with the correct region.
+ * Class that makes static calls using AWS's JavaScript SDK.
  */
-function resetEC2Client() {
-    return new EC2Client({ region: getRegion()});
-}
-
-/**
- * Resets the ec2Client variable to have the correct region.
- * @param {string} reg The region to base the EC2 client.
- * @returns a version of the client with the correct region.
- */
-function customEC2Client(reg) {
-    return new EC2Client({ region: reg});
-}
-
-/**
- * Resets the ceClient variable to have the correct region.
- * @returns a version of the client with the correct region.
- */
-function resetCEClient() {
-    return new CostExplorerClient({ region: getRegion() });
-}
-
-/**
- * Tests to see if the AWS credentials are valid
- */
-const connectionTest = async () => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DescribeInstancesCommand({}));
-        console.log("Login successful");
-        return true;
-    } catch(err) {
-        console.log("Error loggin in", err);
-        return false;
+class ApiCaller {
+    /**
+     * Resets the ec2Client variable to have the correct region.
+     * @returns a version of the client with the correct region.
+     */
+    static resetEC2Client() {
+        return new EC2Client({ region: getRegion() });
     }
-};
 
-/**
- * Starts a server with a specified instance ID.
- * @param {string} instanceId The instance ID of the server to start.
- * @param {string} region The region that the server is based in.
- * @returns Whether or not the starting of the server was successful.
- */
-const startInstance = async (instanceId, region) => {
-    try {
-        var ec2Client = customEC2Client(region);
-        const data = await ec2Client.send(new StartInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
-        console.log("Starting server successful");
-        return true;
-    } catch(err) {
-        console.log("Error starting server", err);
-        return false;
+    /**
+     * Resets the ec2Client variable to have the correct region.
+     * @param {string} reg The region to base the EC2 client.
+     * @returns a version of the client with the correct region.
+     */
+    static customEC2Client(reg) {
+        return new EC2Client({ region: reg });
     }
-}
 
-/**
- * Stop a server with a specified instance ID.
- * @param {string} instanceId The instance ID of the server to stop.
- * @param {string} region The region in which this server exists.
- * @returns Whether or not the stopping of the server was successful.
- */
-const stopInstance = async (instanceId, region) => {
-    try {
-        var ec2Client = customEC2Client(region);
-        const data = await ec2Client.send(new StopInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
-        console.log("Stopping server successful");
-        return true;
-    } catch(err) {
-        console.log("Error starting server", err);
-        return false;
+    /**
+     * Resets the ceClient variable to have the correct region.
+     * @returns a version of the client with the correct region.
+     */
+    static resetCEClient() {
+        return new CostExplorerClient({ region: getRegion() });
     }
-}
 
-/**
- * Reboot a server with a specified instance ID.
- * @param {string} instanceId The instance ID of the server to reboot.
- * @returns Whether or not the rebooting of the server was successful.
- */
-const rebootInstance = async (instanceId) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new RebootInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
-        console.log("Rebooting server successful");
-        return true;
-    } catch(err) {
-        console.log("Error rebooting server", err);
-        return false;
+    /**
+     * Tests to see if the AWS credentials are valid
+     */
+    static connectionTest = async () => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new DescribeInstancesCommand({}));
+            console.log("Login successful");
+            return true;
+        } catch(err) {
+            console.log("Error loggin in", err);
+            return false;
+        }
+    };
+
+    /**
+     * Starts a server with a specified instance ID.
+     * @param {string} instanceId The instance ID of the server to start.
+     * @param {string} region The region that the server is based in.
+     * @returns Whether or not the starting of the server was successful.
+     */
+    static startInstance = async (instanceId, region) => {
+        try {
+            var ec2Client = ApiCaller.customEC2Client(region);
+            const data = await ec2Client.send(new StartInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
+            console.log("Starting server successful");
+            return true;
+        } catch(err) {
+            console.log("Error starting server", err);
+            return false;
+        }
     }
-}
 
-/**
- * Terminate a server with a specified instance ID.
- * @param {string} instanceId The instance ID of the server to terminate.
- * @returns Whether or not the terminating of the server was successful.
- */
-const terminateInstance = async (instanceId) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new TerminateInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
-        console.log("Terminating server successful");
-        return true;
-    } catch(err) {
-        console.log("Error terminating server", err);
-        return false;
+    /**
+     * Stop a server with a specified instance ID.
+     * @param {string} instanceId The instance ID of the server to stop.
+     * @param {string} region The region in which this server exists.
+     * @returns Whether or not the stopping of the server was successful.
+     */
+    static stopInstance = async (instanceId, region) => {
+        try {
+            var ec2Client = ApiCaller.customEC2Client(region);
+            const data = await ec2Client.send(new StopInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
+            console.log("Stopping server successful");
+            return true;
+        } catch(err) {
+            console.log("Error starting server", err);
+            return false;
+        }
     }
-}
 
-/**
- * Retrieves instance data.
- */
-const getInstances = async () => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DescribeInstancesCommand({}));
-        return data;
-    } catch {
-        console.log("Error");
-        return "ERROR";
+    /**
+     * Reboot a server with a specified instance ID.
+     * @param {string} instanceId The instance ID of the server to reboot.
+     * @returns Whether or not the rebooting of the server was successful.
+     */
+    static rebootInstance = async (instanceId) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new RebootInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
+            console.log("Rebooting server successful");
+            return true;
+        } catch(err) {
+            console.log("Error rebooting server", err);
+            return false;
+        }
     }
-}
 
-/**
- * Returns a random alphanumeric string.
- * @param {number} len Length of string to return.
- */
-function genRandom(len) {
-    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    var output = "";
-    for(var index = 0; index < len; index++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        output += characters.substring(randomIndex, randomIndex + 1);
+    /**
+     * Terminate a server with a specified instance ID.
+     * @param {string} instanceId The instance ID of the server to terminate.
+     * @returns Whether or not the terminating of the server was successful.
+     */
+    static terminateInstance = async (instanceId) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new TerminateInstancesCommand({InstanceIds: [instanceId], DryRun: false}));
+            console.log("Terminating server successful");
+            return true;
+        } catch(err) {
+            console.log("Error terminating server", err);
+            return false;
+        }
     }
-    return output;
-}
 
-/**
- * @returns The default VPC of the user in that region.
- */
-const getDefaultVpcId = async () => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DescribeVpcsCommand({}));
-        for(var index = 0; index < data.Vpcs.length; index++) {
-            if(data.Vpcs[index].IsDefault) {     
-                console.log("Successfully retrieved default VPC ID", data.Vpcs[index].VpcId)
-                return data.Vpcs[index].VpcId;
+    /**
+     * Retrieves instance data.
+     */
+    static getInstances = async () => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new DescribeInstancesCommand({}));
+            return data;
+        } catch {
+            console.log("Error");
+            return "ERROR";
+        }
+    }
+
+    /**
+     * Returns a random alphanumeric string.
+     * @param {number} len Length of string to return.
+     */
+    static genRandom(len) {
+        const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var output = "";
+        for(var index = 0; index < len; index++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            output += characters.substring(randomIndex, randomIndex + 1);
+        }
+        return output;
+    }
+
+    /**
+     * @returns The default VPC of the user in that region.
+     */
+    static getDefaultVpcId = async () => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new DescribeVpcsCommand({}));
+            for(var index = 0; index < data.Vpcs.length; index++) {
+                if(data.Vpcs[index].IsDefault) {     
+                    console.log("Successfully retrieved default VPC ID", data.Vpcs[index].VpcId)
+                    return data.Vpcs[index].VpcId;
+                }
+            }
+            console.log("Error retrieving VPC IDs");
+            return "ERROR";
+        } catch(err) {
+            console.log("Error retrieving VPC IDs", err);
+            return "ERROR";
+        }
+    }
+
+    /**
+     * Returns the user's security groups.
+     */
+    static getSecurityGroups = async () => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new DescribeSecurityGroupsCommand({}));
+            console.log("Successfully retrieved security groups", data.SecurityGroups)
+            return data.SecurityGroups;
+        } catch(err) {
+            console.log("Error retrieving security groups", err);
+            return ["ERROR"];
+        }
+    }
+
+    /**
+     * Returns whether or not the account has a security group named "serosSecGroup."
+     * @param {SecGroups[]} secGroups The account's security groups.
+     * @returns 
+     */
+    static getSerosSecurityGroupId(secGroups) {
+        for(var index = 0; index < secGroups.length; index++) {
+            if(secGroups[index].GroupName == "serosSecGroup") {
+                console.log("Seros security group exists", secGroups[index]);
+                return secGroups[index].GroupId;
             }
         }
-        console.log("Error retrieving VPC IDs");
-        return "ERROR";
-    } catch(err) {
-        console.log("Error retrieving VPC IDs", err);
-        return "ERROR";
+        return "NONE";
     }
-}
 
-/**
- * Returns the user's security groups.
- */
-const getSecurityGroups = async () => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DescribeSecurityGroupsCommand({}));
-        console.log("Successfully retrieved security groups", data.SecurityGroups)
-        return data.SecurityGroups;
-    } catch(err) {
-        console.log("Error retrieving security groups", err);
-        return ["ERROR"];
-    }
-}
-
-/**
- * Returns whether or not the account has a security group named "serosSecGroup."
- * @param {SecGroups[]} secGroups The account's security groups.
- * @returns 
- */
-function getSerosSecurityGroupId(secGroups) {
-    for(var index = 0; index < secGroups.length; index++) {
-        if(secGroups[index].GroupName == "serosSecGroup") {
-            console.log("Seros security group exists", secGroups[index]);
-            return secGroups[index].GroupId;
-        }
-    }
-    return "NONE";
-}
-
-/**
- * Creates a new security group called "serosSecGroup"
- */
-const createSerosSecurityGroup = async (vpcId) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "serosSecGroup", Description: "absolutely free", VpcId: vpcId}));
-
+    /**
+     * Creates a new security group called "serosSecGroup"
+     */
+    static createSerosSecurityGroup = async (vpcId) => {
         try {
-            const data2 = await ec2Client.send(new AuthorizeSecurityGroupIngressCommand({
-                GroupName: "serosSecGroup",
-                GroupId: data.GroupId,
-                IpPermissions: [{
-                    IpProtocol: "-1",
-                    FromPort: -1,
-                    ToPort: -1,
-                    IpRanges: [{"CidrIp":"0.0.0.0/0"}]
-                }]
-            }));
-            console.log("Successfully created security group", data2);
-            return data.groupId;
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "serosSecGroup", Description: "absolutely free", VpcId: vpcId}));
+
+            try {
+                const data2 = await ec2Client.send(new AuthorizeSecurityGroupIngressCommand({
+                    GroupName: "serosSecGroup",
+                    GroupId: data.GroupId,
+                    IpPermissions: [{
+                        IpProtocol: "-1",
+                        FromPort: -1,
+                        ToPort: -1,
+                        IpRanges: [{"CidrIp":"0.0.0.0/0"}]
+                    }]
+                }));
+                console.log("Successfully created security group", data2);
+                return data.groupId;
+            } catch(err) {
+                console.log("Error creating security group", err);
+                return "ERROR";
+            }
         } catch(err) {
             console.log("Error creating security group", err);
             return "ERROR";
         }
-    } catch(err) {
-        console.log("Error creating security group", err);
-        return "ERROR";
     }
-}
 
-/**
- * Creates a key pair and returns the automatically generated key.
- */
-const createKeyPair = async (key) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const keyName = genRandom(16);
-        const data = await ec2Client.send(new CreateKeyPairCommand({KeyName: keyName}));
-        console.log(data.KeyMaterial);
-        createPemFile(keyName, "" + data.KeyMaterial);
-        console.log("Successfully generated key pair", data)
-        return keyName;
-    } catch {
-        console.log("Error creating key pair");
-        return "ERROR";
-    }
-};
+    /**
+     * Creates a key pair and returns the automatically generated key.
+     */
+    static createKeyPair = async (key) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const keyName = ApiCaller.genRandom(16);
+            const data = await ec2Client.send(new CreateKeyPairCommand({KeyName: keyName}));
+            console.log(data.KeyMaterial);
+            ApiCaller.createPemFile(keyName, "" + data.KeyMaterial);
+            console.log("Successfully generated key pair", data)
+            return keyName;
+        } catch {
+            console.log("Error creating key pair");
+            return "ERROR";
+        }
+    };
 
-/** 
- * Creates an .pem file.
- * @param {string} key
- * @param {string} text
- */ 
-function createPemFile(key, text) {
-    if(!fs.existsSync(awsDir() + "/connections/" + key + ".pem")) {
-        fs.appendFileSync(awsDir() + "/connections/" + key + ".pem", text);
-    } else {
-        fs.writeFileSync(awsDir() + "/connections/" + key + ".pem", text);
-    }
-}
-
-/** 
- * Returns where a .pem file with the specified key exists.
- * @param {string} key
- */ 
-function pemFileExists(key) {
-    return fs.existsSync(awsDir() + "/connections/" + key + ".pem");
-}
-
-/**
- * Gets the password of the recently-created server.
- * @param {string} instanceId The server ID.
- * @param {string} key The key to the key pair used for the instance.
- * @returns 
- */
-const getInstancePasswordData = async (instanceId) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new GetPasswordDataCommand({InstanceId: instanceId}));
-        console.log("Successfully retrieved password data", data);
-        return data;
-    } catch(err) {
-        console.log("Error retrieving password data", err);
-        return "ERROR";
-    }
-};
-
-const addTags = async (instanceId, tag, value) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const tagParams = {
-            Resources: [instanceId],
-            Tags: [
-                {
-                    Key: tag,
-                    Value: value,
-                },
-            ],
-        };
-        const data = await ec2Client.send(new CreateTagsCommand(tagParams));
-        console.log("Instance tagged");
-        return true;
-    } catch (err) {
-        console.log("Error tagging instance", err);
-        return false;
-    }
-};
-
-/**
- * Returns the AMIs that the user owns.
- */
-async function getUserAMIs() {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DescribeImagesCommand({Owners: ["self"]}));
-        console.log("Successfully described user's images", data);
-        return data;
-    } catch (err) {
-        console.log("Error describing user's images", err);
-        return false;
-    }
-};
-
-/**
- * Returns the image data regarding the given list of AMI IDs.
- * @param {string[]} amiIds The list of AMI IDs to get data about.
- * @returns The AMI data, given the AMI IDs.
- */
-const getAmiData = async (amiIds) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DescribeImagesCommand({ImageIds: amiIds}));
-        console.log("Successfully describe images", data);
-        return data;
-    } catch (err) {
-        console.log("Error describing images", err);
-        return false;
-    }
-}
-
-/**
- * Changes the visibility of an AMI.
- * @param {string} id The AMI ID to alter.
- * @param {string} public Whether the AMI should be made public.
- */
-const changeAmiVisibility = async (id, public) => {
-    try {
-        var ec2Client = resetEC2Client();
-        var parameters;
-        if(public) {
-            parameters = {
-                ImageId: id, 
-                LaunchPermission: {
-                    Add: [
-                        { 
-                            Group: "all"
-                        }
-                    ],
-                    Remove: [
-                        {
-    
-                        }
-                    ]
-                }
-            }
+    /** 
+     * Creates an .pem file.
+     * @param {string} key
+     * @param {string} text
+     */ 
+    static createPemFile(key, text) {
+        if(!fs.existsSync(awsDir() + "/connections/" + key + ".pem")) {
+            fs.appendFileSync(awsDir() + "/connections/" + key + ".pem", text);
         } else {
-            parameters = {
-                ImageId: id, 
-                LaunchPermission: {
-                    Remove: [
-                        {
-                            Group: "all"
-                        }
-                    ]
-                }
-            }
+            fs.writeFileSync(awsDir() + "/connections/" + key + ".pem", text);
         }
-        const data = await ec2Client.send(new ModifyImageAttributeCommand(parameters));
-        console.log("Successfully changed the AMI visibility", data);
-        return data;
-    } catch(err) {
-        console.log("Error changing the AMI visibility", err);
-        return "ERROR";
     }
-};
 
-/**
- * Creates a new AMI based on an instance.
- * @param {string} id The instance ID to base the AMI on.
- * @param {string} name The name of the new AMI.
- */
-const createImage = async (id, name) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new CreateImageCommand({InstanceId: id, Name: name}));
-        console.log("Successfully created image", data);
-        return data;
-    } catch(err) {
-        console.log("Error creating image", err);
-        return "ERROR";
+    /** 
+     * Returns where a .pem file with the specified key exists.
+     * @param {string} key
+     */ 
+    static pemFileExists(key) {
+        return fs.existsSync(awsDir() + "/connections/" + key + ".pem");
     }
-};
 
-/**
- * Creates a new AMI in another region based on another AMI.
- * @param {string} id The AMI ID to base the AMI on.
- * @param {string} name The name of the new AMI.
- * @param {string} newRegion The new region to copy to.
- */
- const copyImage = async (id, name, newRegion) => {
-    try {
-        var ec2Client = new EC2Client({ region: newRegion});
-        const data = await ec2Client.send(new CopyImageCommand({SourceImageId: id, SourceRegion: getRegion(), Name: name}));
-        console.log("Successfully moved image", data);
-        return data;
-    } catch(err) {
-        console.log("Error moving image", err);
-        return "ERROR";
-    }
-};
-
-/**
- * Deletes an AMI.
- * @param {string} id The ID of the AMI to delete.
- */
-const deleteImage = async (id) => {
-    try {
-        var ec2Client = resetEC2Client();
-        const data = await ec2Client.send(new DeregisterImageCommand({ImageId: id}));
-        console.log("Successfully deleted image", data);
-        return data;
-    } catch(err) {
-        console.log("Error deleting image", err);
-        return "ERROR";
-    }
-};
-
-/**
- * @param {string} gran The granularity of the spending. Either "DAILY" or "MONTHLY".
- * @returns The spending 
- */
-const getSpending = async (gran) => {
-    try {
-        ceClient = resetCEClient();
-
-        // Set the parameters
-        var startDate = "";
-        var endDate = "";
-        if(gran == "MONTHLY") {
-            endDate = unixToDate((Date.now()) / 1000);
-            startDate = unixToDate((Date.now() - 31536000000) / 1000);
-
-            if(endDate.substr(8) != "01") {
-                var month = "" + ((parseInt(endDate.substr(5, 7)) + 1) % 12);
-                if(month.length < 2) { month = "0" + month; }
-                
-                endDate = endDate.substr(0,4) + "-" + month + "-01";
-                startDate = startDate.substr(0,4) + "-" + month + "-01";
-            }
-        } else if(gran == "DAILY") {
-            endDate = unixToDate((Date.now()) / 1000);
-            startDate = unixToDate((Date.now() - 2592000000) / 1000);
+    /**
+     * Gets the password of the recently-created server.
+     * @param {string} instanceId The server ID.
+     * @param {string} key The key to the key pair used for the instance.
+     * @returns 
+     */
+    static getInstancePasswordData = async (instanceId) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new GetPasswordDataCommand({InstanceId: instanceId}));
+            console.log("Successfully retrieved password data", data);
+            return data;
+        } catch(err) {
+            console.log("Error retrieving password data", err);
+            return "ERROR";
         }
+    };
 
-        console.log(startDate);
-        console.log(endDate);
+    static addTags = async (instanceId, tag, value) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const tagParams = {
+                Resources: [instanceId],
+                Tags: [
+                    {
+                        Key: tag,
+                        Value: value,
+                    },
+                ],
+            };
+            const data = await ec2Client.send(new CreateTagsCommand(tagParams));
+            console.log("Instance tagged");
+            return true;
+        } catch (err) {
+            console.log("Error tagging instance", err);
+            return false;
+        }
+    };
 
-        const ceParams = {
-            Granularity: gran,
-            Metrics: ["BlendedCost"],
-            TimePeriod: {
-                End: endDate,
-                Start: startDate
-            },
-            Filter: {
-                Not: {
-                    Dimensions: {
-                        Key: "RECORD_TYPE",
-                        Values: [
-                            "Refund",
-                            "Credit"
+    /**
+     * Returns the AMIs that the user owns.
+     */
+    static getUserAMIs = async () => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new DescribeImagesCommand({Owners: ["self"]}));
+            console.log("Successfully described user's images", data);
+            return data;
+        } catch (err) {
+            console.log("Error describing user's images", err);
+            return false;
+        }
+    };
+
+    /**
+     * Returns the image data regarding the given list of AMI IDs.
+     * @param {string[]} amiIds The list of AMI IDs to get data about.
+     * @returns The AMI data, given the AMI IDs.
+     */
+    static getAmiData = async (amiIds) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new DescribeImagesCommand({ImageIds: amiIds}));
+            console.log("Successfully describe images", data);
+            return data;
+        } catch (err) {
+            console.log("Error describing images", err);
+            return false;
+        }
+    };
+
+    /**
+     * Changes the visibility of an AMI.
+     * @param {string} id The AMI ID to alter.
+     * @param {string} pub Whether the AMI should be made public.
+     */
+    static changeAmiVisibility = async (id, pub) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            var parameters;
+            if(pub) {
+                parameters = {
+                    ImageId: id, 
+                    LaunchPermission: {
+                        Add: [
+                            { 
+                                Group: "all"
+                            }
                         ],
-                        Include: true,
-                        Children: null
+                        Remove: [
+                            {
+        
+                            }
+                        ]
+                    }
+                }
+            } else {
+                parameters = {
+                    ImageId: id, 
+                    LaunchPermission: {
+                        Remove: [
+                            {
+                                Group: "all"
+                            }
+                        ]
                     }
                 }
             }
-        };
-        
-        const data = await ceClient.send(new GetCostAndUsageCommand(ceParams));
-        console.log("Successfully retrieved spending data", data);
-        return data;
-    } catch(err) {
-        console.log("Error", err);
-        return "ERROR";
-    }
-};
+            const data = await ec2Client.send(new ModifyImageAttributeCommand(parameters));
+            console.log("Successfully changed the AMI visibility", data);
+            return data;
+        } catch(err) {
+            console.log("Error changing the AMI visibility", err);
+            return "ERROR";
+        }
+    };
 
-/**
- * Creates an AWS instance.
- */
-const createInstance = async (ami, cpu, name, key, secGroupId) => {
-    try {
-        var ec2Client = resetEC2Client();
-
-        // Set the parameters
-        const instanceParams = {
-            ImageId: ami,
-            InstanceType: cpu,
-            KeyName: key,
-            MinCount: 1,
-            MaxCount: 1,
-            SecurityGroupIds: [secGroupId],
-        };
-
-        console.log(instanceParams);
-
-        const data = await ec2Client.send(new RunInstancesCommand(instanceParams));
-        const instanceId = data.Instances[0].InstanceId;
-        console.log("Created instance", instanceId);
-        // Add tags to the instance
-        const tagParams = {
-            Resources: [instanceId],
-            Tags: [
-                {
-                    Key: "Name",
-                    Value: name,
-                },
-                {
-                    Key: "Pair",
-                    Value: key,
-                },
-            ],
-        };
+    /**
+     * Creates a new AMI based on an instance.
+     * @param {string} id The instance ID to base the AMI on.
+     * @param {string} name The name of the new AMI.
+     */
+    static createImage = async (id, name) => {
         try {
-            const data = await ec2Client.send(new CreateTagsCommand(tagParams));
-            console.log("Instance tagged");
-            return instanceId;
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new CreateImageCommand({InstanceId: id, Name: name}));
+            console.log("Successfully created image", data);
+            return data;
+        } catch(err) {
+            console.log("Error creating image", err);
+            return "ERROR";
+        }
+    };
+
+    /**
+     * Creates a new AMI in another region based on another AMI.
+     * @param {string} id The AMI ID to base the AMI on.
+     * @param {string} name The name of the new AMI.
+     * @param {string} newRegion The new region to copy to.
+     */
+    static copyImage = async (id, name, newRegion) => {
+        try {
+            var ec2Client = new EC2Client({ region: newRegion});
+            const data = await ec2Client.send(new CopyImageCommand({SourceImageId: id, SourceRegion: getRegion(), Name: name}));
+            console.log("Successfully moved image", data);
+            return data;
+        } catch(err) {
+            console.log("Error moving image", err);
+            return "ERROR";
+        }
+    };
+
+    /**
+     * Deletes an AMI.
+     * @param {string} id The ID of the AMI to delete.
+     */
+    static deleteImage = async (id) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+            const data = await ec2Client.send(new DeregisterImageCommand({ImageId: id}));
+            console.log("Successfully deleted image", data);
+            return data;
+        } catch(err) {
+            console.log("Error deleting image", err);
+            return "ERROR";
+        }
+    };
+
+    /**
+     * @param {string} gran The granularity of the spending. Either "DAILY" or "MONTHLY".
+     * @returns The spending 
+     */
+    static getSpending = async (gran) => {
+        try {
+            ceClient = ApiCaller.resetCEClient();
+
+            // Set the parameters
+            var startDate = "";
+            var endDate = "";
+            if(gran == "MONTHLY") {
+                endDate = unixToDate((Date.now()) / 1000);
+                startDate = unixToDate((Date.now() - 31536000000) / 1000);
+
+                if(endDate.substr(8) != "01") {
+                    var month = "" + ((parseInt(endDate.substr(5, 7)) + 1) % 12);
+                    if(month.length < 2) { month = "0" + month; }
+                    
+                    endDate = endDate.substr(0,4) + "-" + month + "-01";
+                    startDate = startDate.substr(0,4) + "-" + month + "-01";
+                }
+            } else if(gran == "DAILY") {
+                endDate = unixToDate((Date.now()) / 1000);
+                startDate = unixToDate((Date.now() - 2592000000) / 1000);
+            }
+
+            console.log(startDate);
+            console.log(endDate);
+
+            const ceParams = {
+                Granularity: gran,
+                Metrics: ["BlendedCost"],
+                TimePeriod: {
+                    End: endDate,
+                    Start: startDate
+                },
+                Filter: {
+                    Not: {
+                        Dimensions: {
+                            Key: "RECORD_TYPE",
+                            Values: [
+                                "Refund",
+                                "Credit"
+                            ],
+                            Include: true,
+                            Children: null
+                        }
+                    }
+                }
+            };
+            
+            const data = await ceClient.send(new GetCostAndUsageCommand(ceParams));
+            console.log("Successfully retrieved spending data", data);
+            return data;
+        } catch(err) {
+            console.log("Error", err);
+            return "ERROR";
+        }
+    };
+
+    /**
+     * Creates an AWS instance.
+     */
+    static createInstance = async (ami, cpu, name, key, secGroupId) => {
+        try {
+            var ec2Client = ApiCaller.resetEC2Client();
+
+            // Set the parameters
+            const instanceParams = {
+                ImageId: ami,
+                InstanceType: cpu,
+                KeyName: key,
+                MinCount: 1,
+                MaxCount: 1,
+                SecurityGroupIds: [secGroupId],
+            };
+
+            console.log(instanceParams);
+
+            const data = await ec2Client.send(new RunInstancesCommand(instanceParams));
+            const instanceId = data.Instances[0].InstanceId;
+            console.log("Created instance", instanceId);
+            // Add tags to the instance
+            const tagParams = {
+                Resources: [instanceId],
+                Tags: [
+                    {
+                        Key: "Name",
+                        Value: name,
+                    },
+                    {
+                        Key: "Pair",
+                        Value: key,
+                    },
+                ],
+            };
+            try {
+                const data = await ec2Client.send(new CreateTagsCommand(tagParams));
+                console.log("Instance tagged");
+                return instanceId;
+            } catch (err) {
+                console.log("Error", err);
+                return "ERROR";
+            }
         } catch (err) {
             console.log("Error", err);
             return "ERROR";
         }
-    } catch (err) {
-        console.log("Error", err);
-        return "ERROR";
-    }
-};
+    };
+}
 
 /**
  * Class that stores the necessary information for each AWS server instance.
@@ -677,11 +682,5 @@ class Server {
 
 module.exports = 
 { 
-    Server, Template, Task, Expenditure, connectionTest, getInstances,
-    startInstance, stopInstance, rebootInstance, terminateInstance, 
-    createKeyPair, getInstancePasswordData, createInstance,
-    getSecurityGroups, getSerosSecurityGroupId, getDefaultVpcId,
-    createSerosSecurityGroup, pemFileExists, addTags,
-    getUserAMIs, changeAmiVisibility, createImage, deleteImage,
-    copyImage, getAmiData, genRandom, getSpending
+    Server, Template, Task, Expenditure, ApiCaller
 };

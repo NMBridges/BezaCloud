@@ -174,10 +174,67 @@ function updateAwsCredentialsCache(newCreds) {
 }
 
 /** 
- * @returns The IP, user, pass, and database of the SQL server from an s3 bucket
+ * @returns whether or not the version is sufficiently up to date.
  */
-function getSqlServer() {
+async function checkVersion() {
+    const con = mysql.createConnection({
+        host: "license-keys.cbwk6xh9szjx.us-east-1.rds.amazonaws.com",
+        user: "admin",
+        password: "H#XCiFUG%sTzNF",
+        database: "licensekeys"
+    });
 
+    /** Whether or not the current version is valid. */
+    var validVersion = false;
+    var postMessage = true;
+    var returnText = "";
+    
+    console.log("Connected to MySQL server");
+
+    // check if license key is valid
+    try {
+        const major = 0;
+        const minor = 1;
+        const patch = 2;
+
+        const result = await con.awaitQuery("SELECT * FROM versionControl WHERE id=?", 1);
+        
+        if(result.length == 0) {
+            // Version does not exist / could not find it.
+            // Will reject user.
+            console.log("Error checking Seros version.");
+            returnText = "Error checking Seros version.";
+            return [validVersion, postMessage, returnText];
+        } else if(result[0]['major'] == major && result[0]['minor'] == minor) {
+            // User may use software.
+            if(result[0]['patch'] == patch) {
+                // Version is completely up to date.
+                console.log("Seros is completely up to date.");
+                returnText = "Seros is completely up to date.";
+                postMessage = false;
+            } else {
+                // Version is not up to date but is recent enough.
+                console.log("There is a new version of Seros available. Please consider updating for the newest features.");
+                returnText = "There is a new version of Seros available. Please consider updating for the newest features.";
+            }
+            validVersion = true;
+        } else {
+            // Version is inadequate.
+            console.log("Version is inadequate. Please update to a newer version of Seros.");
+            returnText = "Version is inadequate. Please update to a newer version of Seros.";
+            validVersion = false;
+        }
+    
+        await con.awaitEnd();
+
+        return [validVersion, postMessage, returnText];
+    } catch {
+        console.log("Error checking Seros version.");
+        validVersion = false;
+        postMessage = true;
+        returnText = "Error checking Seros version.";
+        return [validVersion, postMessage, returnText];
+    }
 }
 
 /**
@@ -186,8 +243,6 @@ function getSqlServer() {
  * @returns A boolean hether the license key works.
  */
 async function tryLicenseKey(inputKey) {
-    // Connects to MySQL server - in future pull this data from
-    // s3 bucket using 'getSqlServer()'
     const con = mysql.createConnection({
         host: "license-keys.cbwk6xh9szjx.us-east-1.rds.amazonaws.com",
         user: "admin",
@@ -651,5 +706,5 @@ module.exports = {
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
     installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled,
     setRegion, getRegion, updateCache, getCacheValue, serosExec,
-    unixToDate
+    unixToDate, checkVersion
 };

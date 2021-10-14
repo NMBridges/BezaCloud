@@ -4,13 +4,7 @@ const {
     getPopupValues, awsDir, getRegion, updateCache, getTheme
 } = parent.require("../seros.js");
 const { 
-    getInstances, startInstance, stopInstance, 
-    terminateInstance, rebootInstance, Server,
-    createKeyPair, getInstancePasswordData,
-    createInstance, getSecurityGroups, 
-    getDefaultVpcId, createSerosSecurityGroup,
-    getSerosSecurityGroupId, pemFileExists,
-    addTags, createImage, genRandom
+    Server, ApiCaller
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
 const homeDir = parent.require('os').homedir();
@@ -65,17 +59,17 @@ function connect(index) {
  */
 function newServer(name, ami, cpu) {
     // Gets region's default VPC
-    getDefaultVpcId().then(function(vpcId) {
+    ApiCaller.getDefaultVpcId().then(function(vpcId) {
         if(vpcId != "ERROR") {
-            getSecurityGroups().then(function(secGroups) {
+            ApiCaller.getSecurityGroups().then(function(secGroups) {
                 if(secGroups[0] != "ERROR") {
                     // Checks if Seros security group exists in the region
-                    var secGroupId = getSerosSecurityGroupId(secGroups);
+                    var secGroupId = ApiCaller.getSerosSecurityGroupId(secGroups);
                     if(secGroupId != "NONE") {
                         // Continue as is
-                        createKeyPair().then(function(key) {
+                        ApiCaller.createKeyPair().then(function(key) {
                             if(key != "ERROR") {
-                                createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
+                                ApiCaller.createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                     // done
                                     newPopup("", "Server successfully created.", "Close");
                                     displayOverlay(false);
@@ -88,13 +82,13 @@ function newServer(name, ami, cpu) {
                         });
                     } else {
                         // If not, creates one
-                        createSerosSecurityGroup(vpcId).then(function(newId) {
+                        ApiCaller.createSerosSecurityGroup(vpcId).then(function(newId) {
                             secGroupId = newId;
                             if(secGroupId != "ERROR") {
                                 // Continue
-                                createKeyPair().then(function(key) {
+                                ApiCaller.createKeyPair().then(function(key) {
                                     if(key != "ERROR") {
-                                        createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
+                                        ApiCaller.createInstance(ami,cpu,name,key,secGroupId).then(function(instanceId) {
                                             // done
                                             newPopup("", "Successfully created server.", "Close");
                                             displayOverlay(false);
@@ -133,7 +127,7 @@ function loadServers() {
     if(!loadingServers) {
         loadingServers = true;
         updateColors();
-        const servJson = getInstances().then(function(data) {
+        const servJson = ApiCaller.getInstances().then(function(data) {
             servers = [];
             if(data["Reservations"] != undefined) {
                 for(var index = 0; index < data["Reservations"].length; index++) {
@@ -335,8 +329,8 @@ function addTile(index) {
                 // Create new template from instance.
                 displayOverlay(true);
                 const servId = servers[parseInt(newRebootButton.id)].id;
-                const templateName = servers[parseInt(newRebootButton.id)].name.trim() + genRandom(5);
-                createImage(servId, templateName).then(function(data) {
+                const templateName = servers[parseInt(newRebootButton.id)].name.trim() + ApiCaller.genRandom(5);
+                ApiCaller.createImage(servId, templateName).then(function(data) {
                     if(data != "ERROR") {
                         // Good to go
                         newPopup("Template successfully created", "Template created with name " + templateName + ". Note: Templates based on Servers not made in Seros may, when used to create Servers, have connection issues.", "Close");
@@ -377,7 +371,7 @@ function addTile(index) {
             if(server.status == "stopped") {
                 // Turn server on.
                 displayOverlay(true);
-                startInstance(servers[parseInt(newPowerButton.id)].id, getRegion()).then(function(started) {
+                ApiCaller.startInstance(servers[parseInt(newPowerButton.id)].id, getRegion()).then(function(started) {
                     if(started) { 
                         // Good to go
                         setTimeout(loadServers, 500);
@@ -388,7 +382,7 @@ function addTile(index) {
             } else if(server.status == "running") {
                 // Turn server off.
                 displayOverlay(true);
-                stopInstance(servers[parseInt(newPowerButton.id)].id, getRegion()).then(function(stopped) {
+                ApiCaller.stopInstance(servers[parseInt(newPowerButton.id)].id, getRegion()).then(function(stopped) {
                     if(stopped) { 
                         // Good to go
                         setTimeout(loadServers, 500);
@@ -422,7 +416,7 @@ function addTile(index) {
             // Reboot server.
             if(server.status == "running") {
                 displayOverlay(true);
-                rebootInstance(servers[parseInt(newRebootButton.id)].id).then( function(rebooted) {
+                ApiCaller.rebootInstance(servers[parseInt(newRebootButton.id)].id).then( function(rebooted) {
                     if(rebooted) {
                         // Good to go
                         setTimeout(loadServers, 500);
@@ -454,7 +448,7 @@ function addTile(index) {
         if(newTerminateButton.value == "active") {
             // Terminate server.
             displayOverlay(true);
-            terminateInstance(servers[parseInt(newRebootButton.id)].id).then(function(terminated) {
+            ApiCaller.terminateInstance(servers[parseInt(newRebootButton.id)].id).then(function(terminated) {
                 if(terminated) {
                     // Good to go
                     setTimeout(loadServers, 500);
@@ -632,7 +626,7 @@ newServerButton.addEventListener('click', function() {
     let w = remote.getCurrentWindow();
     w.emit('newServer');
     //newServer("HEEHE", "ami-00ca0e19d67106fc9", "t2.micro");
-    //createImage("i-0aff62c6e9addd8d7", "NEWEST-AMI3");
+    //ApiCaller.createImage("i-0aff62c6e9addd8d7", "NEWEST-AMI3");
 });
 
 newServerButton.addEventListener('mouseenter', function() {

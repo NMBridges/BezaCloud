@@ -4,7 +4,7 @@ const {
     getCacheValue, awsDir, serosExec, updateCache
 } = require('../seros.js');
 const {
-    Server, Task, getInstances
+    Server, Task, ApiCaller
 } = require('../apiCaller.js');
 const fs = require('fs');
 const { exec, execSync } = require('child_process');
@@ -157,7 +157,7 @@ function updateElements() {
  * Loads the list of servers that the user can select from.
  */
 function loadServers() {
-    const servJson = getInstances().then(function(data) {
+    const servJson = ApiCaller.getInstances().then(function(data) {
         servers = [];
         if(data != "ERROR" && data["Reservations"] != undefined) {
             for(var index = 0; index < data["Reservations"].length; index++) {

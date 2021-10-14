@@ -4,7 +4,7 @@ const {
     getRegion, updateCache, getCacheValue, getTheme
 } = parent.require("../seros.js");
 const {
-    Task, Server, startInstance, stopInstance
+    Task, Server, ApiCaller
 } = parent.require("../apiCaller.js");
 const { exec, execSync } = parent.require('child_process');
 const homeDir = parent.require('os').homedir();
@@ -269,7 +269,7 @@ function checkAndRunTasks() {
                     console.log("Task should run ", tempTask)
                     taskRan = true;
                     if(tempTask.type == "start") {
-                        startInstance(tempTask.id, reg).then(function(success) {
+                        ApiCaller.startInstance(tempTask.id, reg).then(function(success) {
                             if(success) {
                                 // Send notification that server started.
                                 new Notification("Server Started", { body: tempTask.name
@@ -282,7 +282,7 @@ function checkAndRunTasks() {
                         });
                         // Do something about it so in case it takes > 5 seconds
                     } else if(tempTask.type == "stop") {
-                        stopInstance(tempTask.id, reg).then(function(success) {
+                        ApiCaller.stopInstance(tempTask.id, reg).then(function(success) {
                             if(success) {
                                 // Send notification that server stopped.
                                 new Notification("Server Stopped", { body: tempTask.name

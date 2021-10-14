@@ -4,7 +4,7 @@ const {
     updateCache, getRegion
 } = require('../seros.js');
 const {
-    Template, getAmiData, copyImage
+    Template, ApiCaller
 } = require('../apiCaller.js');
 
 // Page element references
@@ -181,7 +181,7 @@ copyButton.addEventListener('click', function() {
         var counter = 0;
         for(var index = 0; index < toRegions.length; index++) {
             const reg = toRegions[index];
-            copyImage(amiIdToCopy, amiNameToCopy, reg).then(function(result) {
+            ApiCaller.copyImage(amiIdToCopy, amiNameToCopy, reg).then(function(result) {
                 const regionDict = {
                     "us-east-1": "N. Virginia",
                     "us-east-2": "Ohio",
