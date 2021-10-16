@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu, Tray } = require('electron');
 const EventEmitter = require('events');
 const path = require('path');
 const {
@@ -16,6 +16,16 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
   app.quit();
 }
 
+let tray = null
+app.whenReady().then(() => {
+  tray = new Tray(__dirname + '/assets/LowPolyEye-02.ico');
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Restore', type: 'radio' }
+  ]);
+  tray.setToolTip('Seros');
+  tray.setContextMenu(contextMenu);
+})
+
 function newPopupWindow(header, body, button) {
   let popupWindow;
   
@@ -28,7 +38,8 @@ function newPopupWindow(header, body, button) {
       contextIsolation: false,
       enableRemoteModule: true,
     },
-    focusable: true
+    focusable: true,
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));
   //popupWindow.webContents.openDevTools();
@@ -59,7 +70,8 @@ function newCreateServerWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
-    }
+    },
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   createServerWindow.loadFile(path.join(__dirname, 'newServer/newServer.html'));
   //createServerWindow.webContents.openDevTools();
@@ -98,7 +110,8 @@ function newAddTemplateWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
-    }
+    },
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   templateWindow.loadFile(path.join(__dirname, 'newTemplate/newTemplate.html'));
   //templateWindow.webContents.openDevTools();
@@ -139,7 +152,8 @@ function newCopyTemplateWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
-    }
+    },
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   copyTemplateWindow.loadFile(path.join(__dirname, 'copyTemplate/copyTemplate.html'));
   //copyTemplateWindow.webContents.openDevTools();
@@ -179,7 +193,8 @@ function newConnectionWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
-    }
+    },
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   connectionWindow.loadFile(path.join(__dirname, 'newConnection/newConnection.html'));
   //connectionWindow.webContents.openDevTools();
@@ -219,7 +234,8 @@ function newTaskWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
-    }
+    },
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   taskWindow.loadFile(path.join(__dirname, 'newTask/newTask.html'));
   //taskWindow.webContents.openDevTools();
@@ -277,7 +293,8 @@ function createWindows() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
-    }
+    },
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey/licenseKey.html'));
   //licenseKeyWindow.webContents.openDevTools();
@@ -312,7 +329,8 @@ function createWindows() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
-    }
+    },
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
   //loginWindow.webContents.openDevTools();
@@ -352,14 +370,15 @@ function createWindows() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    show: false
+    show: false,
+    icon: __dirname + '/assets/LowPolyEye-02.ico'
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
   //primaryWindow.webContents.openDevTools();
 
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {
-    app.quit();
+    //app.quit();
   });
 
   // On Mac, refreshes contents by resizing the window.
@@ -459,7 +478,7 @@ app.on('ready', createWindows);
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit();
+    //app.quit();
   }
 });
 

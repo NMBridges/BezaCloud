@@ -194,8 +194,8 @@ async function checkVersion() {
     // check if license key is valid
     try {
         const major = 0;
-        const minor = 1;
-        const patch = 2;
+        const minor = 0;
+        const patch = 1;
 
         const result = await con.awaitQuery("SELECT * FROM versionControl WHERE id=?", 1);
         

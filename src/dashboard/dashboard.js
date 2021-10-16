@@ -32,6 +32,7 @@ var loadingSpending = false;
 window.addEventListener('load', function() {
 
     if(getCacheValue("pullCost") == "On") {
+        console.log('FRICK');
         if(!loadingSpending) {
             loadSpending();
         }
@@ -85,6 +86,19 @@ function loadChart() {
     barChart.style = "--cols:" + newLength + ";";
     for(var counter = 0; counter < newLength; counter++) {
         addChildToChart(selectedExpenditures[counter], maxSpending, counter + 1);
+    }
+
+    if(newLength == 0) {
+        barChart.textContent = '';
+
+        var noPullLabel = document.createElement('div');
+        noPullLabel.textContent = "Spending chart disabled in Options.";
+        noPullLabel.style.color = Colors.textSecondary();
+        noPullLabel.style.width = "calc(100vw - 70px)";
+        noPullLabel.style.margin = "auto";
+        noPullLabel.style.marginTop = "calc(45vh - 140px)";
+        noPullLabel.style.textAlign = "center";
+        barChart.appendChild(noPullLabel);
     }
 
     updateColors();
@@ -394,4 +408,7 @@ function updateColors() {
     document.getElementsByClassName('topRightGridContainer')[0].style.borderColor = Colors.textSecondary();
     document.getElementsByClassName('topLeftGridContainer')[0].style.borderColor = Colors.textSecondary();
     document.getElementsByClassName('bottomGridContainer')[0].style.borderColor = Colors.textSecondary();
+    if (document.getElementsByClassName('outline').length > 0) {
+        document.getElementsByClassName('outline')[0].style.backgroundColor = Colors.textTertiary();
+    }
 }
