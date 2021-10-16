@@ -18,12 +18,22 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 
 let tray = null
 app.whenReady().then(() => {
-  tray = new Tray(__dirname + '/assets/LowPolyEye-02.ico');
+  tray = new Tray(__dirname + '/assets/SerosBlue.ico');
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Restore', type: 'radio' }
+    { label: 'Restore', click: function() {
+        //primaryWindow.show();
+      }
+    },
+    { label: 'Exit', click: function() {
+        app.quit();
+      }
+    }
   ]);
   tray.setToolTip('Seros');
   tray.setContextMenu(contextMenu);
+  tray.on('click', function() {
+    primaryWindow.show();
+  });
 })
 
 function newPopupWindow(header, body, button) {
@@ -39,7 +49,7 @@ function newPopupWindow(header, body, button) {
       enableRemoteModule: true,
     },
     focusable: true,
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));
   //popupWindow.webContents.openDevTools();
@@ -71,7 +81,7 @@ function newCreateServerWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   createServerWindow.loadFile(path.join(__dirname, 'newServer/newServer.html'));
   //createServerWindow.webContents.openDevTools();
@@ -111,7 +121,7 @@ function newAddTemplateWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   templateWindow.loadFile(path.join(__dirname, 'newTemplate/newTemplate.html'));
   //templateWindow.webContents.openDevTools();
@@ -153,7 +163,7 @@ function newCopyTemplateWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   copyTemplateWindow.loadFile(path.join(__dirname, 'copyTemplate/copyTemplate.html'));
   //copyTemplateWindow.webContents.openDevTools();
@@ -194,7 +204,7 @@ function newConnectionWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   connectionWindow.loadFile(path.join(__dirname, 'newConnection/newConnection.html'));
   //connectionWindow.webContents.openDevTools();
@@ -235,7 +245,7 @@ function newTaskWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   taskWindow.loadFile(path.join(__dirname, 'newTask/newTask.html'));
   //taskWindow.webContents.openDevTools();
@@ -294,7 +304,7 @@ function createWindows() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey/licenseKey.html'));
   //licenseKeyWindow.webContents.openDevTools();
@@ -330,7 +340,7 @@ function createWindows() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
   //loginWindow.webContents.openDevTools();
@@ -371,7 +381,7 @@ function createWindows() {
       enableRemoteModule: true
     },
     show: false,
-    icon: __dirname + '/assets/LowPolyEye-02.ico'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
   //primaryWindow.webContents.openDevTools();

@@ -97,7 +97,7 @@ function updateColors() {
     secretAccessKeyField.style.outlineColor = Colors.backgroundSecondary();
 
     if(getTheme() == "Dark") {
-        serosImg.src = "../assets/MercorBannerx100-Dark.png";
+        serosImg.src = "../assets/SerosBannerx100-Orange.png";
         bod.style.backgroundColor = Colors.backgroundPrimary();
         wrapper.style.backgroundColor = Colors.textPrimary();
         wrapper.style.color = Colors.backgroundPrimary();
@@ -108,7 +108,7 @@ function updateColors() {
         loginBtn.style.color = Colors.backgroundSecondary();
         exitBtn.style.color = Colors.backgroundSecondary();
     } else {
-        serosImg.src = "../assets/MercorBannerx100.png";
+        serosImg.src = "../assets/SerosBannerx100-White.png";
         bod.style.backgroundColor = Colors.backgroundSecondary();
         wrapper.style.backgroundColor = Colors.backgroundPrimary();
         wrapper.style.color = Colors.textPrimary();
@@ -116,7 +116,8 @@ function updateColors() {
             fieldLabels[index].style.color = Colors.textPrimary();
         }
         loginBtn.style.backgroundColor = Colors.backgroundPrimary();
-        loginBtn.style.color = Colors.backgroundSecondary();
+        loginBtn.style.color = Colors.textPrimary();
+        exitBtn.style.backgroundColor = Colors.textPrimary();
         exitBtn.style.color = Colors.backgroundSecondary();
     }
 }

@@ -74,7 +74,7 @@ function updateColors() {
         cancelButton.style.backgroundColor = Colors.backgroundPrimary();
         cancelButton.style.color = Colors.textPrimary();
         cancelButton.style.borderColor = Colors.textPrimary();
-        fileSelectButton.style.backgroundColor = Colors.textPrimary();
+        fileSelectButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     }
 
     pemLabel.style.color = Colors.textPrimary();
@@ -166,7 +166,7 @@ fileSelectButton.addEventListener('mouseenter', function() {
     if (getTheme() == "Dark") {
         fileSelectButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
-        fileSelectButton.style.backgroundColor = Colors.textSecondary();
+        fileSelectButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     }
 });
 
@@ -174,7 +174,7 @@ fileSelectButton.addEventListener('mouseleave', function() {
     if (getTheme() == "Dark") {
         fileSelectButton.style.backgroundColor = Colors.backgroundSecondary();
     } else {
-        fileSelectButton.style.backgroundColor = Colors.textPrimary();
+        fileSelectButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     }
 });
 

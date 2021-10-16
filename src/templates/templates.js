@@ -645,8 +645,8 @@ function updateColors() {
         }
 
         if(getTheme() == "Seros") {
-            newTemplateButton.children[0].src = "../assets/Plus-Seros.png";
-            refreshButton.children[0].src = "../assets/Refresh-Seros.png";
+            newTemplateButton.children[0].src = "../assets/Plus-White.png";
+            refreshButton.children[0].src = "../assets/Refresh-White.png";
         } else {
             newTemplateButton.children[0].src = "../assets/Plus-White.png";
             refreshButton.children[0].src = "../assets/Refresh-White.png";

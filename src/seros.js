@@ -464,8 +464,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(255,255,255);
         } else if (theme == "Seros") {
-            //return hex(255,255,255);
-            return hex(23,4,74);
+            return hex(255,255,255);
+            //return hex(23,4,74);
         }
         return "D90166";
     }
@@ -483,8 +483,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(192,192,192);
         } else if (theme == "Seros") {
-            //return hex(225,225,225);
-            return hex(73,24,124);
+            return hex(225,225,225);
+            //return hex(73,24,124);
         }
         return "D90166";
     }
@@ -493,8 +493,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(152,152,152);
         } else if (theme == "Seros") {
-            //return hex(170,170,170);
-            return hex(93,29,144);
+            return hex(170,170,170);
+            //return hex(93,29,144);
         }
         return "D90166";
     }
@@ -503,8 +503,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(35,47,63);
         } else if (theme == "Seros") {
-            //return hex(97,81,245); // (0, 207, 255)
-            return hex(255,255,255); // (0, 207, 255)
+            return hex(13,12,28); // (0, 207, 255)
+            //return hex(255,255,255); // (0, 207, 255)
         }
         return "D90166";
     }
@@ -523,8 +523,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(247, 150, 37);
         } else if (theme == "Seros") {
-            //return hex(128, 132, 246);
-            return hex(0, 207, 255);
+            return hex(21, 21, 47);
+            //return hex(0, 207, 255);
         }
         return "D90166";
     }
@@ -542,8 +542,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(247,150,37);
         } else if (theme == "Seros") {
-            //return hex(255,255,255);
-            return hex(33,14,84);
+            return hex(255,255,255);
+            //return hex(33,14,84);
         }
         return "D90166";
     }
@@ -561,8 +561,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(45,57,74);
         } else if (theme == "Seros") {
-            //return hex(102,86,255);
-            return hex(245,245,245);
+            return hex(18,17,35);
+            //return hex(245,245,245);
         }
         return "D90166";
     }
@@ -571,8 +571,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(55,67,84);
         } else if (theme == "Seros") {
-            //return hex(112,96,255);
-            return hex(235,235,235);
+            return hex(23,22,42);
+            //return hex(235,235,235);
         }
         return "D90166";
     }
@@ -581,8 +581,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(222,121,35);
         } else if (theme == "Seros") {
-            //return hex(138,142,255);
-            return hex(5, 217, 255);
+            return hex(15,32,59);
+            //return hex(5, 217, 255);
         }
         return "D90166";
     }
@@ -591,8 +591,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(202,111,33);
         } else if (theme == "Seros") {
-            //return hex(148,152,255);
-            return hex(10, 227, 255);
+            return hex(10,55,84);
+            //return hex(10, 227, 255);
         }
         return "D90166";
     }
@@ -601,8 +601,8 @@ class Colors {
         if (theme == "Dark") {
             return hex(255,165,40);
         } else if (theme == "Seros") {
-            //return hex(45,45,45);
-            return hex(15,237,255);
+            return hex(45,45,45);
+            //return hex(15,237,255);
         }
         return "D90166";
     }

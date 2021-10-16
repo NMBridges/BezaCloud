@@ -395,7 +395,7 @@ function checkAndRunTasks() {
         }
         
         if(getTheme() == "Seros") {
-            newTaskButton.children[0].src = "../assets/Plus-Seros.png";
+            newTaskButton.children[0].src = "../assets/Plus-White.png";
         } else {
             newTaskButton.children[0].src = "../assets/Plus-White.png";
         }
