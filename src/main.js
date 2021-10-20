@@ -49,6 +49,7 @@ function newPopupWindow(header, body, button) {
       enableRemoteModule: true,
     },
     focusable: true,
+    hide: true,
     icon: __dirname + '/assets/SerosBlue.ico'
   });
   popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));

@@ -4,6 +4,7 @@
 - Fix colors on Seros Color theme [all]
 - Don't shutdown fully on close for Task purposes
 - NEED TO FIX LOGIC FOR WINDOWS WITH TASK TRAY SHIT
+- Update .ico file
 
 
 Instead of prebuilt AMIs, give the option for basic windows platform, then you can
