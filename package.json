@@ -75,6 +75,9 @@
       "buildResources": "resources",
       "output": "build"
     },
+    "win": {
+      "icon": "./src/assets/SerosBlue.ico"
+    },
     "nsis": {
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,

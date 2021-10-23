@@ -13,6 +13,12 @@ let primaryWindow;
 
 var validLicenseKey = false;
 
+const originalInstance = app.requestSingleInstanceLock();
+    
+if (!originalInstance) {
+  app.quit();
+}
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
@@ -21,7 +27,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 if (process.platform == "win32") {
   let tray = null;
   app.whenReady().then(() => {
-    tray = new Tray(__dirname + '/assets/SerosBlue.icns');
+    tray = new Tray(__dirname + '/assets/SerosBlue.ico');
     const contextMenu = Menu.buildFromTemplate([
       { label: 'Restore', click: function() {
           if (validLicenseKey) {
@@ -76,7 +82,7 @@ function newPopupWindow(header, body, button) {
     },
     focusable: true,
     hide: true,
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));
   //popupWindow.webContents.openDevTools();
@@ -108,7 +114,7 @@ function newCreateServerWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   createServerWindow.loadFile(path.join(__dirname, 'newServer/newServer.html'));
   //createServerWindow.webContents.openDevTools();
@@ -148,7 +154,7 @@ function newAddTemplateWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   templateWindow.loadFile(path.join(__dirname, 'newTemplate/newTemplate.html'));
   //templateWindow.webContents.openDevTools();
@@ -190,7 +196,7 @@ function newCopyTemplateWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   copyTemplateWindow.loadFile(path.join(__dirname, 'copyTemplate/copyTemplate.html'));
   //copyTemplateWindow.webContents.openDevTools();
@@ -231,7 +237,7 @@ function newConnectionWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   connectionWindow.loadFile(path.join(__dirname, 'newConnection/newConnection.html'));
   //connectionWindow.webContents.openDevTools();
@@ -272,7 +278,7 @@ function newTaskWindow() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   taskWindow.loadFile(path.join(__dirname, 'newTask/newTask.html'));
   //taskWindow.webContents.openDevTools();
@@ -314,7 +320,7 @@ function resetPrimaryWindow() {
       enableRemoteModule: true
     },
     show: false,
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
   //primaryWindow.webContents.openDevTools();
@@ -400,7 +406,7 @@ function createWindows() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey/licenseKey.html'));
   //licenseKeyWindow.webContents.openDevTools();
@@ -437,7 +443,7 @@ function createWindows() {
       contextIsolation: false,
       enableRemoteModule: true
     },
-    icon: __dirname + '/assets/SerosBlue.icns'
+    icon: __dirname + '/assets/SerosBlue.ico'
   });
   loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
   //loginWindow.webContents.openDevTools();
