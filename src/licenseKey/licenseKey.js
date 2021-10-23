@@ -114,8 +114,8 @@ function updateColors() {
     exitBtn.style.color = Colors.backgroundSecondary();
 
     if(getTheme() == "Dark") {
-        serosImg.src = "../assets/MercorBannerx100-Dark.png";
+        serosImg.src = "../assets/SerosBannerx100-Orange.png";
     } else {
-        serosImg.src = "../assets/MercorBannerx100.png";
+        serosImg.src = "../assets/SerosBannerx100-White.png";
     }
 }
