@@ -672,7 +672,7 @@ function newPopup(header, body, button) {
 }
 
 /**
- * 
+ * Checks servers to see if notifications should be sent out for their run time.
  */
 function checkServerTimes() {
     for(var index = 0; index < servers.length; index++) {

@@ -11,6 +11,8 @@ let licenseKeyWindow;
 let loginWindow;
 let primaryWindow;
 
+var validLicenseKey = false;
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
@@ -21,7 +23,16 @@ app.whenReady().then(() => {
   tray = new Tray(__dirname + '/assets/SerosBlue.ico');
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Restore', click: function() {
-        //primaryWindow.show();
+				if (validLicenseKey) {
+					try {
+						primaryWindow.show();
+					} catch {
+						resetPrimaryWindow();
+						primaryWindow.show();
+					}
+				} else {
+					licenseKeyWindow.show();
+				}
       }
     },
     { label: 'Exit', click: function() {
@@ -32,7 +43,16 @@ app.whenReady().then(() => {
   tray.setToolTip('Seros');
   tray.setContextMenu(contextMenu);
   tray.on('click', function() {
-    primaryWindow.show();
+		if (validLicenseKey) {
+			try {
+				primaryWindow.show();
+			} catch {
+				resetPrimaryWindow();
+				primaryWindow.show();
+			}
+		} else {
+			licenseKeyWindow.show();
+		}
   });
 })
 
@@ -275,101 +295,7 @@ function newTaskWindow() {
   });
 }
 
-// The main logic function that controls interaction between windows
-function createWindows() {
-  /*
-    ---------   ---------   ---------   ---------   ---------   ---------   ---
-      No longer necessary due to AWS resolving issues with the JavaScript SDK.
-    ---   ---------   ---------   ---------   ---------   ---------   ---------
-
-  // Installs the AWS CLI if it is not already installed.
-  hasAwsCliInstalled().then(function(result) {
-    if(!result) {
-      installAwsCli().then(function() {
-        if(process.platform != 'win32') {
-          newPopupWindow("AWS CLI is not installed. Please run the following in Terminal:", "sudo installer -pkg " + awsDir() + "/AWSCLIV2.pkg -target /", "Copy and Close");
-        }
-      });
-    }
-  });*/
-
-  // ------------------------------      licenseKeyWindow     ----------------------------------------// 
-  
-   licenseKeyWindow = new BrowserWindow({
-    width: 600,
-    height: 300,
-    frame: false,
-    resizable: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true
-    },
-    icon: __dirname + '/assets/SerosBlue.ico'
-  });
-  licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey/licenseKey.html'));
-  //licenseKeyWindow.webContents.openDevTools();
-
-  // When license key window closes (not hides), it closes the application
-  licenseKeyWindow.on('close', () => {
-    app.quit();
-  });
-
-  // When the license key is input manually, it will validate the key (like above)
-  licenseKeyWindow.on('licenseKeySearched', () => {
-    const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
-      console.log("License key result for " + cachedLicenseKey() + ":", exists);
-      if(exists) {
-        licenseKeyWindow.hide();
-        loginWindow.show();
-      } else {
-        licenseKeyWindow.webContents.executeJavaScript("resetSubmitButton();");
-      }
-    });
-  });
-  // ---------------------------------------------------------------------------------------------------//
-
-
-  // --------------------------------      loginWindow      --------------------------------------------//
-
-  loginWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
-    autoHideMenuBar: true,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true
-    },
-    icon: __dirname + '/assets/SerosBlue.ico'
-  });
-  loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
-  //loginWindow.webContents.openDevTools();
-
-  loginWindow.setResizable(false);
-
-  // When login window closes (not hides), it closes the application
-  loginWindow.on('close', () => {
-    app.quit();
-  });
-
-  loginWindow.on('loginSuccessful', () => {
-    primaryWindow.show();
-    loginWindow.hide();
-    primaryWindow.webContents.executeJavaScript('dash.contentWindow.loadChart();');
-    primaryWindow.webContents.executeJavaScript('serv.contentWindow.displayOverlay(true);');
-    primaryWindow.webContents.executeJavaScript('serv.contentWindow.loadServers();');
-    primaryWindow.webContents.executeJavaScript('temp.contentWindow.displayOverlay(true);');
-    primaryWindow.webContents.executeJavaScript('temp.contentWindow.loadTemplates();');
-    primaryWindow.webContents.executeJavaScript('task.contentWindow.displayOverlay(true);');
-    primaryWindow.webContents.executeJavaScript('task.contentWindow.loadTasks();');
-  });
-
-  // ---------------------------------------------------------------------------------------------------//
-
-
-  // --------------------------------      primaryWindow      ------------------------------------------//
-
+function resetPrimaryWindow() {
   primaryWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -436,6 +362,105 @@ function createWindows() {
       loginWindow.show();
     });
   });
+}
+
+// The main logic function that controls interaction between windows
+function createWindows() {
+  /*
+    ---------   ---------   ---------   ---------   ---------   ---------   ---
+      No longer necessary due to AWS resolving issues with the JavaScript SDK.
+    ---   ---------   ---------   ---------   ---------   ---------   ---------
+
+  // Installs the AWS CLI if it is not already installed.
+  hasAwsCliInstalled().then(function(result) {
+    if(!result) {
+      installAwsCli().then(function() {
+        if(process.platform != 'win32') {
+          newPopupWindow("AWS CLI is not installed. Please run the following in Terminal:", "sudo installer -pkg " + awsDir() + "/AWSCLIV2.pkg -target /", "Copy and Close");
+        }
+      });
+    }
+  });*/
+
+  // ------------------------------      licenseKeyWindow     ----------------------------------------// 
+  
+   licenseKeyWindow = new BrowserWindow({
+    width: 600,
+    height: 300,
+    frame: false,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    },
+    icon: __dirname + '/assets/SerosBlue.ico'
+  });
+  licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey/licenseKey.html'));
+  //licenseKeyWindow.webContents.openDevTools();
+
+  // When license key window closes (not hides), it closes the application
+  licenseKeyWindow.on('close', () => {
+    app.quit();
+  });
+
+  // When the license key is input manually, it will validate the key (like above)
+  licenseKeyWindow.on('licenseKeySearched', () => {
+    const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
+      console.log("License key result for " + cachedLicenseKey() + ":", exists);
+      if(exists) {
+        licenseKeyWindow.hide();
+        loginWindow.show();
+				validLicenseKey = true;
+      } else {
+        licenseKeyWindow.webContents.executeJavaScript("resetSubmitButton();");
+      }
+    });
+  });
+  // ---------------------------------------------------------------------------------------------------//
+
+
+  // --------------------------------      loginWindow      --------------------------------------------//
+
+  loginWindow = new BrowserWindow({
+    width: 600,
+    height: 400,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    },
+    icon: __dirname + '/assets/SerosBlue.ico'
+  });
+  loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
+  //loginWindow.webContents.openDevTools();
+
+  loginWindow.setResizable(false);
+
+  // When login window closes (not hides), it closes the application
+  loginWindow.on('close', () => {
+    app.quit();
+  });
+
+  loginWindow.on('loginSuccessful', () => {
+    primaryWindow.show();
+    loginWindow.hide();
+    primaryWindow.webContents.executeJavaScript('dash.contentWindow.loadChart();');
+    primaryWindow.webContents.executeJavaScript('serv.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('serv.contentWindow.loadServers();');
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('temp.contentWindow.loadTemplates();');
+    primaryWindow.webContents.executeJavaScript('task.contentWindow.displayOverlay(true);');
+    primaryWindow.webContents.executeJavaScript('task.contentWindow.loadTasks();');
+  });
+
+  // ---------------------------------------------------------------------------------------------------//
+
+
+  // --------------------------------      primaryWindow      ------------------------------------------//
+
+  resetPrimaryWindow();
 
   // ---------------------------------------------------------------------------------------------------//
 
@@ -459,6 +484,7 @@ function createWindows() {
         console.log("License key result for " + cachedLicenseKey() + ":", exists);
         if(exists) {
           // Autologin with AWS credentials.
+					validLicenseKey = true;
           loginWindow.webContents.executeJavaScript("autofillTextboxes();").then(function() {
             loginWindow.webContents.executeJavaScript("loginClicked();").then(function(success) {
               if(!success) {
