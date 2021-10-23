@@ -12,3 +12,8 @@ npm run dist
 [Mac]
 npm run make
 npm run package
+
+OR 
+
+npx electron-packager . --icon=./src/assets/SerosBlue.icns --overwrite
+npm run package
