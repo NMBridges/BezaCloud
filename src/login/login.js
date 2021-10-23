@@ -42,6 +42,8 @@ function loginClicked() {
 
             loginBtn.value == "";
             loginBtn.style.backgroundColor = Colors.textPrimary();
+
+            updateColors();
             
             const remote = require('electron').remote;
             let w = remote.getCurrentWindow();

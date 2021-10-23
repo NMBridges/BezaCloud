@@ -26,10 +26,12 @@ if (process.platform == "win32") {
       { label: 'Restore', click: function() {
           if (validLicenseKey) {
             try {
-              primaryWindow.show();
+              primaryWindow.hide();
+              loginWindow.show();
             } catch {
               resetPrimaryWindow();
-              primaryWindow.show();
+              primaryWindow.hide();
+              loginWindow.show();
             }
           } else {
             licenseKeyWindow.show();
@@ -46,10 +48,12 @@ if (process.platform == "win32") {
     tray.on('click', function() {
       if (validLicenseKey) {
         try {
-          primaryWindow.show();
+          primaryWindow.hide();
+          loginWindow.show();
         } catch {
           resetPrimaryWindow();
-          primaryWindow.show();
+          primaryWindow.hide();
+          loginWindow.show();
         }
       } else {
         licenseKeyWindow.show();
@@ -526,5 +530,19 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createLoginWindow();
+  }
+  if (process.platform == "darwin") {
+    if (validLicenseKey) {
+      try {
+        primaryWindow.hide();
+        loginWindow.show();
+      } catch {
+        resetPrimaryWindow();
+        primaryWindow.hide();
+        loginWindow.show();
+      }
+    } else {
+      licenseKeyWindow.show();
+    }
   }
 });
