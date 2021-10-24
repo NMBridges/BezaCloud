@@ -510,17 +510,29 @@ class ApiCaller {
                     Start: startDate
                 },
                 Filter: {
-                    Not: {
-                        Dimensions: {
-                            Key: "RECORD_TYPE",
-                            Values: [
-                                "Refund",
-                                "Credit"
-                            ],
-                            Include: true,
-                            Children: null
+                    And: [
+                        {
+                            Dimensions: {
+                                Key: "SERVICE",
+                                Values: [
+                                    "Amazon Elastic Compute Cloud - Compute"
+                                ]
+                            }
+                        },
+                        {
+                            Not: {
+                                Dimensions: {
+                                    Key: "RECORD_TYPE",
+                                    Values: [
+                                        "Refund",
+                                        "Credit"
+                                    ],
+                                    Include: true,
+                                    Children: null
+                                }
+                            }
                         }
-                    }
+                    ]
                 }
             };
             
