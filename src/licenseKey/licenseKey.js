@@ -1,7 +1,7 @@
 // Supplemental functions
 const {
     Colors, getTheme, updateKeyCache
-} = require("../seros.js");
+} = require("../beza.js");
 
 var bod = document.body;
 var wrapper = document.getElementById('wrapper');
@@ -9,7 +9,7 @@ var licenseKeyField = document.getElementById('licenseKeyField');
 var submitBtn = document.getElementById('submitBtn');
 var exitBtn = document.getElementById('exitBtn');
 var fieldLabels = document.getElementsByClassName('fieldLabel');
-var serosImg = document.getElementById("serosImg");
+var mercorImg = document.getElementById("productImg");
 
 window.onload = function() {
     updateColors();
@@ -114,8 +114,8 @@ function updateColors() {
     exitBtn.style.color = Colors.backgroundSecondary();
 
     if(getTheme() == "Dark") {
-        serosImg.src = "../assets/SerosBannerx100-Orange.png";
+        mercorImg.src = "../assets/NiMBLeBannerx100-Orange.png";
     } else {
-        serosImg.src = "../assets/SerosBannerx100-White.png";
+        mercorImg.src = "../assets/NiMBLeBannerx100-White.png";
     }
 }

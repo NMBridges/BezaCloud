@@ -120,10 +120,18 @@ body {
                 border-radius: 10px;
                 border: 1px solid white;
                 margin:5px;
+                margin-top: 25px;
                 padding: 10px;
+                opacity: 0;
                 text-overflow: ellipsis;
                 position: relative;
+                transition: all 1s ease-in-out;
             }
+                .tile.show {
+                    opacity: 1;
+                    margin-top: 5px;
+                    transition: all 0.6s ease-out;
+                }
                 .serverName {
                     text-overflow: ellipsis;
                     white-space: nowrap;
@@ -232,6 +240,7 @@ body {
                     font-style: normal;
                     font-weight: 200;
                     cursor:pointer;
+                    transition: background-color 0.2s ease-in-out;
                 }
                 .modifyButton {
                     position:absolute;
@@ -249,16 +258,29 @@ body {
                     font-style: normal;
                     font-weight: 200;
                     cursor:pointer;
+                    z-index: 1;
+                    transition: background-color 0.2s ease-in-out;
                 }
                 .modifyArea {
                     position: absolute;
                     width: calc(50% - 14px);
                     height: 140px;
-                    bottom: 44px;
+                    bottom: 24px;
                     right: 10px;
+                    opacity: 0;
                     border-radius: 5px;
                     border: 1px solid white;
+                    transform: translateY(20px);
+                    pointer-events: none;
+                    transition: all 0.3s ease-out;
+                    z-index: 0;
                 }
+                    .modifyArea.show {
+                        opacity: 1;
+                        transform: translateY(-20px);
+                        pointer-events: all;
+                        transition: all 0.3s ease-out;
+                    }
                     .createTemplateButton {
                         overflow: hidden;
                         width: 100%;
@@ -273,6 +295,7 @@ body {
                         vertical-align: center;
                         border-radius: 5px;
                         cursor:pointer;
+                        transition: background-color 0.2s ease-in-out;
                     }
                     .powerButton {
                         overflow: hidden;
@@ -288,6 +311,7 @@ body {
                         vertical-align: center;
                         border-radius: 5px;
                         cursor:pointer;
+                        transition: background-color 0.2s ease-in-out;
                     }
                     .rebootButton {
                         overflow: hidden;
@@ -303,6 +327,7 @@ body {
                         vertical-align: center;
                         border-radius: 5px;
                         cursor:pointer;
+                        transition: background-color 0.2s ease-in-out;
                     }
                     .terminateButton {
                         overflow: hidden;
@@ -318,4 +343,5 @@ body {
                         vertical-align: center;
                         border-radius: 5px;
                         cursor:pointer;
+                        transition: background-color 0.2s ease-in-out;
                     }

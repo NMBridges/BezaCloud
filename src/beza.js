@@ -1,3 +1,4 @@
+const productName = 'Beza'
 const homeDir = require('os').homedir();
 const fs = require('fs');
 const { machineIdSync } = require("node-machine-id/index.js");
@@ -15,11 +16,11 @@ var popupBody = "";
 /** Global variable that holds information for the popup window button. */
 var popupButton = "";
 
-/** @type {string} The color theme of Seros. */
+/** @type {string} The color theme. */
 var theme = getTheme();
-/** @type {string} The AWS region of Seros. */
+/** @type {string} The AWS region. */
 var region = getRegion();
-/** @type {string} The current page that Seros is on. */
+/** @type {string} The current page. */
 var page = "Dashboard";
 
 /**
@@ -85,7 +86,7 @@ const installAwsCli = async () => {
  * Runs an inputted command. Used asynchronously by windows that are about to close.
  * @param {string} inpCmd The inputted command to be executed.
  */
-const serosExec = (inpCmd) => {
+const localExec = (inpCmd) => {
     exec(inpCmd);
 }
 
@@ -202,26 +203,26 @@ async function checkVersion() {
         if(result.length == 0) {
             // Version does not exist / could not find it.
             // Will reject user.
-            console.log("Error checking Seros version.");
-            returnText = "Error checking Seros version.";
+            console.log("Error checking " + productName + " version.");
+            returnText = "Error checking " + productName + " version.";
             return [validVersion, postMessage, returnText];
         } else if(result[0]['major'] == major && result[0]['minor'] == minor) {
             // User may use software.
             if(result[0]['patch'] == patch) {
                 // Version is completely up to date.
-                console.log("Seros is completely up to date.");
-                returnText = "Seros is completely up to date.";
+                console.log(productName + " is completely up to date.");
+                returnText = productName + " is completely up to date.";
                 postMessage = false;
             } else {
                 // Version is not up to date but is recent enough.
-                console.log("There is a new version of Seros available. Please consider updating for the newest features.");
-                returnText = "There is a new version of Seros available. Please consider updating for the newest features.";
+                console.log("There is a new version of " + productName + " available. Please consider updating for the newest features.");
+                returnText = "There is a new version of " + productName + " available. Please consider updating for the newest features.";
             }
             validVersion = true;
         } else {
             // Version is inadequate.
-            console.log("Version is inadequate. Please update to a newer version of Seros.");
-            returnText = "Version is inadequate. Please update to a newer version of Seros.";
+            console.log("Version is inadequate. Please update to a newer version of " + productName + ".");
+            returnText = "Version is inadequate. Please update to a newer version of " + productName + ".";
             validVersion = false;
         }
     
@@ -229,10 +230,10 @@ async function checkVersion() {
 
         return [validVersion, postMessage, returnText];
     } catch {
-        console.log("Error checking Seros version.");
+        console.log("Error checking " + productName + " version.");
         validVersion = false;
         postMessage = true;
-        returnText = "Error checking Seros version.";
+        returnText = "Error checking " + productName + " version.";
         return [validVersion, postMessage, returnText];
     }
 }
@@ -337,10 +338,14 @@ function getCacheValue(key) {
         return "ERROR";
     }
     const raw = fs.readFileSync(awsDir() + "/cache.json");
-    const jsonObj = JSON.parse(atob(atob(raw)));
-    if(key in jsonObj) {
-        return jsonObj[key];
-    } else {
+    try {
+        const jsonObj = JSON.parse(atob(atob(raw)));
+        if(key in jsonObj) {
+            return jsonObj[key];
+        } else {
+            return "ERROR";
+        }
+    } catch {
         return "ERROR";
     }
 }
@@ -463,7 +468,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(255,255,255);
             //return hex(23,4,74);
         }
@@ -473,7 +478,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(255,255,255);
         }
         return "D90166";
@@ -482,7 +487,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(192,192,192);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(225,225,225);
             //return hex(73,24,124);
         }
@@ -492,7 +497,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(152,152,152);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(170,170,170);
             //return hex(93,29,144);
         }
@@ -502,7 +507,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(13,12,28); // (0, 207, 255)
             //return hex(255,255,255); // (0, 207, 255)
         }
@@ -512,7 +517,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(32,43,58);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             //return hex(101,85,250);
             return hex(0,207,255);
         }
@@ -522,7 +527,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(247, 150, 37);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(21, 21, 47);
             //return hex(0, 207, 255);
         }
@@ -532,7 +537,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(255,255,255);
         }
         return "D90166";
@@ -541,7 +546,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(255,255,255);
             //return hex(33,14,84);
         }
@@ -551,7 +556,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(225,225,225);
         }
         return "D90166";
@@ -560,7 +565,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(45,57,74);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(18,17,35);
             //return hex(245,245,245);
         }
@@ -570,7 +575,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(55,67,84);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(23,22,42);
             //return hex(235,235,235);
         }
@@ -580,7 +585,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(222,121,35);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(15,32,59);
             //return hex(5, 217, 255);
         }
@@ -590,7 +595,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(202,111,33);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(10,55,84);
             //return hex(10, 227, 255);
         }
@@ -600,7 +605,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,165,40);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(45,45,45);
             //return hex(15,237,255);
         }
@@ -610,7 +615,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(158,163,247);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(247,150,37);
         }
         return "D90166";
@@ -619,7 +624,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(247,150,37);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             //return hex(97,81,245);
             return hex(0,207,255);
 
@@ -630,7 +635,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(158,163,247);
         }
         return "D90166";
@@ -639,7 +644,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(255,255,255);
         }
         return "D90166";
@@ -648,7 +653,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(255,255,255);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(35,225,35);
         }
         return "D90166";
@@ -657,7 +662,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(35,47,63);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(97,81,245);
         }
         return "D90166";
@@ -666,7 +671,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(37,49,65);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(101,85,249);
         }
         return "D90166";
@@ -675,7 +680,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(36,48,64);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(99,83,247);
         }
         return "D90166";
@@ -684,7 +689,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(38,50,66);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(103,87,251);
         }
         return "D90166";
@@ -693,7 +698,7 @@ class Colors {
         theme = getTheme();
         if (theme == "Dark") {
             return hex(50,60,70);
-        } else if (theme == "Seros") {
+        } else if (theme == productName) {
             return hex(109,93,255);
         }
         return "D90166";
@@ -705,6 +710,6 @@ module.exports = {
     cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
     installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled,
-    setRegion, getRegion, updateCache, getCacheValue, serosExec,
+    setRegion, getRegion, updateCache, getCacheValue, localExec,
     unixToDate, checkVersion
 };

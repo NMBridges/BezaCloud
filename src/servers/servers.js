@@ -1,8 +1,9 @@
 // Supplemental functions
 const { 
     Colors, createRdpFile, openRdpFile, setPopupValues,
-    getPopupValues, awsDir, getRegion, updateCache, getTheme
-} = parent.require("../seros.js");
+    getPopupValues, awsDir, getRegion, updateCache, getTheme,
+    productName
+} = parent.require("../beza.js");
 const { 
     Server, ApiCaller
 } = parent.require("../apiCaller.js");
@@ -63,8 +64,8 @@ function newServer(name, ami, cpu) {
         if(vpcId != "ERROR") {
             ApiCaller.getSecurityGroups().then(function(secGroups) {
                 if(secGroups[0] != "ERROR") {
-                    // Checks if Seros security group exists in the region
-                    var secGroupId = ApiCaller.getSerosSecurityGroupId(secGroups);
+                    // Checks if security group exists in the region
+                    var secGroupId = ApiCaller.getProductSecurityGroupId(secGroups);
                     if(secGroupId != "NONE") {
                         // Continue as is
                         ApiCaller.createKeyPair().then(function(key) {
@@ -82,7 +83,7 @@ function newServer(name, ami, cpu) {
                         });
                     } else {
                         // If not, creates one
-                        ApiCaller.createSerosSecurityGroup(vpcId).then(function(newId) {
+                        ApiCaller.createProductSecurityGroup(vpcId).then(function(newId) {
                             secGroupId = newId;
                             if(secGroupId != "ERROR") {
                                 // Continue
@@ -163,6 +164,7 @@ function loadServers() {
                 "stopped": 1,
                 "terminated": 0
             };
+
             servers.sort(function(a, b) {
                 return values[b.status] - values[a.status];
             })
@@ -183,8 +185,26 @@ function loadServers() {
             }
     
             // Updates the colors of the new tiles
-            updateColors();
             displayOverlay(false);
+            updateColors();
+            
+            var tiles = document.getElementsByClassName("tile");
+            for(var count = 0; count < tiles.length; count++) {
+                tiles[count].classList.add("show");
+            }
+
+            if (servers.length == 0) {
+                var noPullLabel = document.createElement('div');
+                noPullLabel.textContent = "You have no servers in this region.";
+                noPullLabel.style.color = Colors.textSecondary();
+                noPullLabel.style.width = "calc(100vw - 50px)";
+                noPullLabel.style.marginLeft = "auto";
+                noPullLabel.style.marginRight = "auto";
+                noPullLabel.style.marginTop = "calc(50vh - 50px)";
+                noPullLabel.style.textAlign = "center";
+                primaryBody.appendChild(noPullLabel);
+            }
+
             loadingServers = false;
         });
     }
@@ -282,6 +302,12 @@ function addTile(index) {
     });
     newTile.appendChild(newConnButton);
 
+    // The popup area that contains the modification buttons.
+    var newModifyArea = document.createElement('div');
+    newModifyArea.className = "modifyArea";
+    //newModifyArea.hidden = true;
+    newModifyArea.hidden = false;
+
     // The modify server button.
     var newModifyButton = document.createElement('button');
     newModifyButton.className = "modifyButton";
@@ -295,18 +321,20 @@ function addTile(index) {
     newModifyButton.addEventListener('mouseleave', function() {
         newModifyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
     });
-    newTile.appendChild(newModifyButton);
-
-    // The popup area that contains the modification buttons.
-    var newModifyArea = document.createElement('div');
-    newModifyArea.className = "modifyArea";
-    newModifyArea.hidden = true;
     newModifyButton.addEventListener('click', function() {
         newModifyArea.focus();
         if(newModifyButton.value == "active") {
-            newModifyArea.hidden = !newModifyArea.hidden;
+            //newModifyArea.hidden = !newModifyArea.hidden;
+            var modAreas = document.getElementsByClassName("modifyArea show");
+            for (var index = 0; index < modAreas.length; index += 1) {
+                if (modAreas[index] != newModifyArea) {
+                    modAreas[index].classList.remove("show");
+                }
+            }
+            newModifyArea.classList.toggle("show");
         }
     });
+    newTile.appendChild(newModifyButton);
 
     // The Create Template button.
     var newTemplateButton = document.createElement('div');
@@ -333,7 +361,7 @@ function addTile(index) {
                 ApiCaller.createImage(servId, templateName).then(function(data) {
                     if(data != "ERROR") {
                         // Good to go
-                        newPopup("Template successfully created", "Template created with name " + templateName + ". Note: Templates based on Servers not made in Seros may, when used to create Servers, have connection issues.", "Close");
+                        newPopup("Template successfully created", "Template created with name " + templateName + ". Note: Templates based on Servers not made in " + productName + " may, when used to create Servers, have connection issues.", "Close");
                         loadServers();
                     } else {
                         // Error rebooting server
@@ -721,6 +749,12 @@ function updateColors() {
             tiles[count].style.borderColor = Colors.textSecondary();
         }
 
+        tiles = document.getElementsByClassName("tile show");
+        for(var count = 0; count < tiles.length; count++) {
+            tiles[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            tiles[count].style.borderColor = Colors.textSecondary();
+        }
+
         var connectButtons = document.getElementsByClassName("connectButton");
         for(var count = 0; count < connectButtons.length; count++) {
             connectButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
@@ -852,7 +886,7 @@ function updateColors() {
             }
         }
 
-        if(getTheme() == "Seros") {
+        if(getTheme() == productName) {
             newServerButton.children[0].src = "../assets/Plus-White.png";
             refreshButton.children[0].src = "../assets/Refresh-White.png";
         } else {

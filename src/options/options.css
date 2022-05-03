@@ -55,20 +55,32 @@ body {
                 border-radius: 8px;
                 width: 125px;
                 height: 40px;
+                z-index: 1;
+                transition: background-color 0.2s ease-in-out;
             }
                 #regionSelect {
                     position: absolute;
                     top: 60px;
-                    left: 145px;
                     margin: 0px;
                     padding: 0px;
                     width: 500px;
                     height: 38px;
-                    display: grid;
-                    grid-template-columns: repeat(4, 125px);
                     border-radius: 8px;
                     border: 1px solid white;
+                    display: grid;
+                    opacity: 0;
+                    grid-template-columns: repeat(4, 125px);
+                    pointer-events: none;
+                    transition: all 0.3s ease-out;
+                    z-index: 0;
+                    left: 0px;
                 }
+                    #regionSelect.show {
+                        opacity: 1;
+                        left: 145px;
+                        pointer-events: all;
+                        transition: all 0.3s ease-out;
+                    }
                     .regionSelectButton {
                         grid-row: 1;
                         font-size: 15px;
@@ -80,6 +92,7 @@ body {
                         height: 100%;
                         border-radius: 8px;
                         border: 0px solid white;
+                        transition: background-color 0.2s ease-in-out;
                     }
             #themeLabel {
                 position: absolute;
@@ -101,11 +114,12 @@ body {
                 border-radius: 8px;
                 width: 125px;
                 height: 40px;
+                z-index: 1;
+                transition: background-color 0.2s ease-in-out;
             }
                 #themeSelect {
                     position: absolute;
                     top: 175px;
-                    left: 145px;
                     margin: 0px;
                     padding: 0px;
                     width: 250px;
@@ -114,7 +128,19 @@ body {
                     grid-template-columns: repeat(2, 125px);
                     border-radius: 8px;
                     border: 1px solid white;
+                    opacity: 0;
+                    grid-template-columns: repeat(4, 125px);
+                    pointer-events: none;
+                    transition: all 0.3s ease-out;
+                    z-index: 0;
+                    left: 0px;
                 }
+                    #themeSelect.show {
+                        opacity: 1;
+                        left: 145px;
+                        pointer-events: all;
+                        transition: all 0.3s ease-out;
+                    }
                     .themeSelectButton {
                         grid-row: 1;
                         font-size: 15px;
@@ -126,6 +152,7 @@ body {
                         height: 100%;
                         border-radius: 8px;
                         border: 0px solid white;
+                        transition: background-color 0.2s ease-in-out;
                     }
             #costLabel {
                 position: absolute;
@@ -147,11 +174,12 @@ body {
                 border-radius: 8px;
                 width: 125px;
                 height: 40px;
+                z-index: 1;
+                transition: background-color 0.2s ease-in-out;
             }
                 #costSelect {
                     position: absolute;
                     top: 312px;
-                    left: 145px;
                     margin: 0px;
                     padding: 0px;
                     width: 250px;
@@ -160,7 +188,19 @@ body {
                     grid-template-columns: repeat(2, 125px);
                     border-radius: 8px;
                     border: 1px solid white;
+                    opacity: 0;
+                    grid-template-columns: repeat(4, 125px);
+                    pointer-events: none;
+                    transition: all 0.3s ease-out;
+                    z-index: 0;
+                    left: 0px;
                 }
+                    #costSelect.show {
+                        opacity: 1;
+                        left: 145px;
+                        pointer-events: all;
+                        transition: all 0.3s ease-out;
+                    }
                     .costSelectButton {
                         grid-row: 1;
                         font-size: 15px;
@@ -172,13 +212,14 @@ body {
                         height: 100%;
                         border-radius: 8px;
                         border: 0px solid white;
+                        transition: background-color 0.2s ease-in-out;
                     }  
             #costNoticeLabel {
                 position: absolute;
                 word-wrap:normal;
                 line-break:normal;
                 top: 280px;
-                width: 285px;
+                width: 225px;
                 left: 20px;
                 font-size: 9px;
                 color: #777777;
@@ -203,11 +244,12 @@ body {
                 border-radius: 8px;
                 width: 125px;
                 height: 40px;
+                z-index: 1;
+                transition: background-color 0.2s ease-in-out;
             }
                 #notiSelect {
                     position: absolute;
                     top: 427px;
-                    left: 145px;
                     margin: 0px;
                     padding: 0px;
                     width: 250px;
@@ -216,7 +258,19 @@ body {
                     grid-template-columns: repeat(2, 125px);
                     border-radius: 8px;
                     border: 1px solid white;
+                    opacity: 0;
+                    grid-template-columns: repeat(4, 125px);
+                    pointer-events: none;
+                    transition: all 0.3s ease-out;
+                    z-index: 0;
+                    left: 0px;
                 }
+                    #notiSelect.show {
+                        opacity: 1;
+                        left: 145px;
+                        pointer-events: all;
+                        transition: all 0.3s ease-out;
+                    }
                     .notiSelectButton {
                         grid-row: 1;
                         font-size: 15px;
@@ -228,4 +282,5 @@ body {
                         height: 100%;
                         border-radius: 8px;
                         border: 0px solid white;
+                        transition: background-color 0.2s ease-in-out;
                     } 

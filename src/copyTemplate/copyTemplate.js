@@ -2,7 +2,7 @@
 const {
     Colors, getTheme, setPopupValues, getCacheValue,
     updateCache, getRegion
-} = require('../seros.js');
+} = require('../beza.js');
 const {
     Template, ApiCaller
 } = require('../apiCaller.js');

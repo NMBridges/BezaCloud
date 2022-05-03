@@ -2,14 +2,19 @@
 const { 
     hex, Colors, getTheme, setTheme, getPage,
     setPage, getPopupValues, setPopupValues
- } = require("../seros.js");
+ } = require("../beza.js");
 
 // Document items
 var dashboardButton = document.getElementById("dashboardButton");
+var dashLine = document.getElementById("dashLine");
 var serversButton = document.getElementById("serversButton");
+var serversLine = document.getElementById("serversLine");
 var tasksButton = document.getElementById("tasksButton");
+var tasksLine = document.getElementById("tasksLine");
 var optionsButton = document.getElementById("optionsButton");
+var optionsLine = document.getElementById("optionsLine");
 var templatesButton = document.getElementById("templatesButton");
+var templatesLine = document.getElementById("templatesLine");
 var signOutButton = document.getElementById("signOutButton");
 var menuBar = document.getElementById("menuBar");
 
@@ -37,27 +42,32 @@ function updateColors() {
     getTheme();
     const pg = getPage();
     if(pg == "Dashboard") {
-        dashboardButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        //dashboardButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        dashboardButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
         dashboardButton.style.backgroundColor = Colors.backgroundSecondary();
     }
     if(pg == "Servers") {
-        serversButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        //serversButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        serversButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
         serversButton.style.backgroundColor = Colors.backgroundSecondary();
     }
     if(pg == "Options") {
-        optionsButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        //optionsButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        optionsButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
         optionsButton.style.backgroundColor = Colors.backgroundSecondary();
     }
     if(pg == "Tasks") {
-        tasksButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        //tasksButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        tasksButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
         tasksButton.style.backgroundColor = Colors.backgroundSecondary();
     }
     if(pg == "Templates") {
-        templatesButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        //templatesButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+        templatesButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     } else {
         templatesButton.style.backgroundColor = Colors.backgroundSecondary();
     }
@@ -83,8 +93,10 @@ dashboardButton.addEventListener('mouseenter', function() {
     if(getPage() == "Dashboard") {
         dashboardButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
-        dashboardButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+        //dashboardButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     }
+    dashboardButton.classList.add("buttonBig");
+    dashLine.classList.add("hovered");
 });
 
 dashboardButton.addEventListener('mouseleave', function() {
@@ -92,7 +104,9 @@ dashboardButton.addEventListener('mouseleave', function() {
         dashboardButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
         dashboardButton.style.backgroundColor = Colors.backgroundSecondary();
+        dashLine.classList.remove("hovered");
     }
+    dashboardButton.classList.remove("buttonBig");
 });
 
 /** Goes to the Dashboard page */
@@ -110,8 +124,10 @@ serversButton.addEventListener('mouseenter', function() {
     if(getPage() == "Servers") {
         serversButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
-        serversButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+        //serversButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     }
+    serversButton.classList.add("buttonBig");
+    serversLine.classList.add("hovered");
 });
 
 serversButton.addEventListener('mouseleave', function() {
@@ -119,7 +135,9 @@ serversButton.addEventListener('mouseleave', function() {
         serversButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
         serversButton.style.backgroundColor = Colors.backgroundSecondary();
+        serversLine.classList.remove("hovered");
     }
+    serversButton.classList.remove("buttonBig");
 });
 
 /** Goes to the Servers page */
@@ -137,8 +155,10 @@ tasksButton.addEventListener('mouseenter', function() {
     if(getPage() == "Tasks") {
         tasksButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
-        tasksButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+        //tasksButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     }
+    tasksButton.classList.add("buttonBig");
+    tasksLine.classList.add("hovered");
 });
 
 tasksButton.addEventListener('mouseleave', function() {
@@ -146,7 +166,9 @@ tasksButton.addEventListener('mouseleave', function() {
         tasksButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
         tasksButton.style.backgroundColor = Colors.backgroundSecondary();
+        tasksLine.classList.remove("hovered");
     }
+    tasksButton.classList.remove("buttonBig");
 });
 
 /** Goes to the Tasks page */
@@ -164,8 +186,10 @@ optionsButton.addEventListener('mouseenter', function() {
     if(getPage() == "Options") {
         optionsButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
-        optionsButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+        //optionsButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     }
+    optionsButton.classList.add("buttonBig");
+    optionsLine.classList.add("hovered");
 });
 
 optionsButton.addEventListener('mouseleave', function() {
@@ -173,7 +197,9 @@ optionsButton.addEventListener('mouseleave', function() {
         optionsButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
         optionsButton.style.backgroundColor = Colors.backgroundSecondary();
+        optionsLine.classList.remove("hovered");
     }
+    optionsButton.classList.remove("buttonBig");
 });
 
 /** Goes to the Options page */
@@ -191,8 +217,10 @@ templatesButton.addEventListener('mouseenter', function() {
     if(getPage() == "Templates") {
         templatesButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
-        templatesButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+        //templatesButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
     }
+    templatesButton.classList.add("buttonBig");
+    templatesLine.classList.add("hovered");
 });
 
 templatesButton.addEventListener('mouseleave', function() {
@@ -200,7 +228,9 @@ templatesButton.addEventListener('mouseleave', function() {
         templatesButton.style.backgroundColor = Colors.backgroundSecondarySelected();
     } else {
         templatesButton.style.backgroundColor = Colors.backgroundSecondary();
+        templatesLine.classList.remove("hovered");
     }
+    templatesButton.classList.remove("buttonBig");
 });
 
 /** Goes to the Options page */
@@ -216,10 +246,12 @@ templatesButton.addEventListener('click', function() {
 
 signOutButton.addEventListener('mouseenter', function() {
     signOutButton.style.backgroundColor = Colors.backgroundSecondaryMouseHover();
+    signOutButton.classList.add("buttonBig");
 });
 
 signOutButton.addEventListener('mouseleave', function() {
     signOutButton.style.backgroundColor = Colors.backgroundSecondarySelected();
+    signOutButton.classList.remove("buttonBig");
 });
 
 /** Goes to the Options page */
@@ -259,6 +291,7 @@ function to(page) {
         dash.contentWindow.loadOnSwitch();
     } else {
         dash.hidden = true;
+        dashLine.classList.remove("hovered");
     }
     if(page == "Servers") {
         serv.hidden = false;
@@ -266,6 +299,7 @@ function to(page) {
         serv.contentWindow.loadServers();
     } else {
         serv.hidden = true;
+        serversLine.classList.remove("hovered");
     }
     if(page == "Tasks") {
         task.hidden = false;
@@ -273,11 +307,13 @@ function to(page) {
         task.contentWindow.loadTasks();
     } else {
         task.hidden = true;
+        tasksLine.classList.remove("hovered");
     }
     if(page == "Options") {
         opti.hidden = false;
     } else {
         opti.hidden = true;
+        optionsLine.classList.remove("hovered");
     }
     if(page == "Templates") {
         temp.hidden = false;
@@ -285,6 +321,7 @@ function to(page) {
         temp.contentWindow.loadTemplates();
     } else {
         temp.hidden = true;
+        templatesLine.classList.remove("hovered");
     }
 
     updateColors();

@@ -26,7 +26,7 @@ const {
 } = require("@aws-sdk/client-cost-explorer");
 const {
     getRegion, unixToDate, setRegion
-} = require("./seros.js");
+} = require("./beza.js");
 //var ec2Client = new EC2Client({ region: "us-east-1"});
 var ceClient = new CostExplorerClient({ region: "us-east-1" });
 const fs = require('fs');
@@ -220,14 +220,14 @@ class ApiCaller {
     }
 
     /**
-     * Returns whether or not the account has a security group named "serosSecGroup."
+     * Returns whether or not the account has a security group named "productSecGroup."
      * @param {SecGroups[]} secGroups The account's security groups.
      * @returns 
      */
-    static getSerosSecurityGroupId(secGroups) {
+    static getProductSecurityGroupId(secGroups) {
         for(var index = 0; index < secGroups.length; index++) {
-            if(secGroups[index].GroupName == "serosSecGroup") {
-                console.log("Seros security group exists", secGroups[index]);
+            if(secGroups[index].GroupName == "productSecGroup") {
+                console.log("Product security group exists", secGroups[index]);
                 return secGroups[index].GroupId;
             }
         }
@@ -235,16 +235,16 @@ class ApiCaller {
     }
 
     /**
-     * Creates a new security group called "serosSecGroup"
+     * Creates a new security group called "productSecGroup"
      */
-    static createSerosSecurityGroup = async (vpcId) => {
+    static createProductSecurityGroup = async (vpcId) => {
         try {
             var ec2Client = ApiCaller.resetEC2Client();
-            const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "serosSecGroup", Description: "absolutely free", VpcId: vpcId}));
+            const data = await ec2Client.send(new CreateSecurityGroupCommand({GroupName: "productSecGroup", Description: "absolutely free", VpcId: vpcId}));
 
             try {
                 const data2 = await ec2Client.send(new AuthorizeSecurityGroupIngressCommand({
-                    GroupName: "serosSecGroup",
+                    GroupName: "productSecGroup",
                     GroupId: data.GroupId,
                     IpPermissions: [{
                         IpProtocol: "-1",

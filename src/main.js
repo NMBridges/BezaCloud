@@ -4,8 +4,9 @@ const path = require('path');
 const {
   tryLicenseKey, cachedLicenseKey, createAwsDir,
   installAwsCli, hasAwsCliInstalled, awsDir,
-  cachedAwsCredentials, checkVersion
-} = require("./seros.js");
+  cachedAwsCredentials, checkVersion,
+  productName
+} = require("./beza.js");
 
 let licenseKeyWindow;
 let loginWindow;
@@ -27,7 +28,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 if (process.platform == "win32") {
   let tray = null;
   app.whenReady().then(() => {
-    tray = new Tray(__dirname + '/assets/SerosBlue.ico');
+    tray = new Tray(__dirname + '/assets/Beza.ico');
     const contextMenu = Menu.buildFromTemplate([
       { label: 'Restore', click: function() {
           if (validLicenseKey) {
@@ -49,7 +50,7 @@ if (process.platform == "win32") {
         }
       }
     ]);
-    tray.setToolTip('Seros');
+    tray.setToolTip('Beza Cloud');
     tray.setContextMenu(contextMenu);
     tray.on('click', function() {
       if (validLicenseKey) {
@@ -79,10 +80,11 @@ function newPopupWindow(header, body, button) {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
+      devTools: false
     },
     focusable: true,
     hide: true,
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   popupWindow.loadFile(path.join(__dirname, 'popup/popup.html'));
   //popupWindow.webContents.openDevTools();
@@ -112,9 +114,10 @@ function newCreateServerWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      devTools: false
     },
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   createServerWindow.loadFile(path.join(__dirname, 'newServer/newServer.html'));
   //createServerWindow.webContents.openDevTools();
@@ -152,9 +155,10 @@ function newAddTemplateWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      devTools: false
     },
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   templateWindow.loadFile(path.join(__dirname, 'newTemplate/newTemplate.html'));
   //templateWindow.webContents.openDevTools();
@@ -194,9 +198,10 @@ function newCopyTemplateWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      devTools: false
     },
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   copyTemplateWindow.loadFile(path.join(__dirname, 'copyTemplate/copyTemplate.html'));
   //copyTemplateWindow.webContents.openDevTools();
@@ -235,9 +240,10 @@ function newConnectionWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      devTools: false
     },
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   connectionWindow.loadFile(path.join(__dirname, 'newConnection/newConnection.html'));
   //connectionWindow.webContents.openDevTools();
@@ -276,9 +282,10 @@ function newTaskWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      devTools: false,
     },
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   taskWindow.loadFile(path.join(__dirname, 'newTask/newTask.html'));
   //taskWindow.webContents.openDevTools();
@@ -317,10 +324,11 @@ function resetPrimaryWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      //devTools: false
     },
     show: false,
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   primaryWindow.loadFile(path.join(__dirname, 'primary/primary.html'));
   //primaryWindow.webContents.openDevTools();
@@ -328,6 +336,11 @@ function resetPrimaryWindow() {
   // When login window closes (not hides), it closes the application
   primaryWindow.on('close', () => {
     //app.quit();
+  });
+
+  // Focuses the window when it shows.
+  primaryWindow.on('show', () => {
+    primaryWindow.focus();
   });
 
   // On Mac, refreshes contents by resizing the window.
@@ -404,9 +417,10 @@ function createWindows() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      devTools: false
     },
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey/licenseKey.html'));
   //licenseKeyWindow.webContents.openDevTools();
@@ -441,9 +455,10 @@ function createWindows() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      devTools: false
     },
-    icon: __dirname + '/assets/SerosBlue.ico'
+    icon: __dirname + '/assets/Beza.ico'
   });
   loginWindow.loadFile(path.join(__dirname, 'login/login.html'));
   //loginWindow.webContents.openDevTools();
@@ -453,6 +468,10 @@ function createWindows() {
   // When login window closes (not hides), it closes the application
   loginWindow.on('close', () => {
     app.quit();
+  });
+
+  loginWindow.on('show', () => {
+    loginWindow.focus();
   });
 
   loginWindow.on('loginSuccessful', () => {
