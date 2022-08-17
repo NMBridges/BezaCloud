@@ -114,6 +114,7 @@ body {
                     font-style: normal;
                     font-size: 20px;
                     font-weight: 200;
+                    transition: background-color 0.5s ease-in-out;
                 }
                 #monthlyButton {
                     width: 180px;
@@ -128,13 +129,14 @@ body {
                     font-style: normal;
                     font-size: 20px;
                     font-weight: 200;
+                    transition: background-color 0.5s ease-in-out;
                 }
             .chart {
                 width: calc(100% - 20px);
-                height: calc(100% - 25px);
+                height: 0%;
                 grid-area: chartArea;
                 margin-left:5px;
-                margin-top:10px;
+                margin-top:auto;
                 margin-bottom:5px;
                 display: grid;
                 grid-gap: 0px;
@@ -142,6 +144,10 @@ body {
                 padding-top: 10px;
                 grid-template-columns: repeat(var(--cols), calc((100% - 30px) / var(--cols)));
             }
+                .chart.chartBig {
+                    height: calc(100% - 25px);
+                    transition: height 1s ease-in-out;
+                }
                 .outline {
                     width: calc(100% - 70px);
                     height: 1px;
@@ -156,12 +162,14 @@ body {
                     width: 60%;
                     text-align: center;
                     height: calc(var(--hei) * (100% - 60px));
+                    max-height: calc(var(--hei) * (100% - 60px));
                     margin-bottom: 30px;
                     margin-left: 20%;
                     margin-right: 20%;
                     margin-top: auto;
                     background-color: white;
                     z-index: 0;
+                    transition: height 1s ease-in-out;
                 }
                     .bar .barPopup {
                         color: white;

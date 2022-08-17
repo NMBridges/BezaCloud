@@ -2,7 +2,7 @@
 const { 
     Colors, getTheme, setTheme, setRegion,
     getRegion, updateCache, getCacheValue
-} = parent.require("../seros.js");
+} = parent.require("../beza.js");
 
 // Page elements
 var headerBar = document.getElementById('optionsHeaderBar');
@@ -35,13 +35,13 @@ function initElements() {
         themeButton.style.backgroundColor = Colors.backgroundPrimary();
     });
     themeButton.addEventListener('click', function() {
-        regionSelect.style.visibility = "hidden";
-        costSelect.style.visibility = "hidden";
-        notiSelect.style.visibility = "hidden";
-        if(themeSelect.style.visibility != "visible") {
-            themeSelect.style.visibility = "visible";
+        regionSelect.classList.remove("show");
+        costSelect.classList.remove("show");
+        notiSelect.classList.remove("show");
+        if(themeSelect.className != "show") {
+            themeSelect.classList.add("show");
         } else {
-            themeSelect.style.visibility = "hidden";
+            themeSelect.classList.remove("show");
         }
     });
 
@@ -56,13 +56,13 @@ function initElements() {
         regionButton.style.backgroundColor = Colors.backgroundPrimary();
     });
     regionButton.addEventListener('click', function() {
-        themeSelect.style.visibility = "hidden";
-        costSelect.style.visibility = "hidden";
-        notiSelect.style.visibility = "hidden";
-        if(regionSelect.style.visibility != "visible") {
-            regionSelect.style.visibility = "visible";
+        themeSelect.classList.remove("show");
+        costSelect.classList.remove("show");
+        notiSelect.classList.remove("show");
+        if(regionSelect.className != "show") {
+            regionSelect.classList.add("show");
         } else {
-            regionSelect.style.visibility = "hidden";
+            regionSelect.classList.remove("show");
         }
     });
 
@@ -77,13 +77,13 @@ function initElements() {
         costButton.style.backgroundColor = Colors.backgroundPrimary();
     });
     costButton.addEventListener('click', function() {
-        themeSelect.style.visibility = "hidden";
-        regionSelect.style.visibility = "hidden";
-        notiSelect.style.visibility = "hidden";
-        if(costSelect.style.visibility != "visible") {
-            costSelect.style.visibility = "visible";
+        themeSelect.classList.remove("show");
+        regionSelect.classList.remove("show");
+        notiSelect.classList.remove("show");
+        if(costSelect.className != "show") {
+            costSelect.classList.add("show");
         } else {
-            costSelect.style.visibility = "hidden";
+            costSelect.classList.remove("show");
         }
     });
 
@@ -98,13 +98,13 @@ function initElements() {
         notiButton.style.backgroundColor = Colors.backgroundPrimary();
     });
     notiButton.addEventListener('click', function() {
-        themeSelect.style.visibility = "hidden";
-        regionSelect.style.visibility = "hidden";
-        costSelect.style.visibility = "hidden";
-        if(notiSelect.style.visibility != "visible") {
-            notiSelect.style.visibility = "visible";
+        themeSelect.classList.remove("show");
+        regionSelect.classList.remove("show");
+        costSelect.classList.remove("show");
+        if(notiSelect.className != "show") {
+            notiSelect.classList.add("show");
         } else {
-            notiSelect.style.visibility = "hidden";
+            notiSelect.classList.remove("show");
         }
     });
 
@@ -195,7 +195,7 @@ function initElements() {
 function updateTheme(newTheme) {
     setTheme(newTheme);
     themeButton.textContent = newTheme;
-    themeSelect.style.visibility = "hidden";
+    themeSelect.classList.remove("show");
     window.top.updateColors();
 }
 
@@ -212,7 +212,7 @@ function updateRegion(newRegion) {
         "us-west-2": "Oregon"
     };
     regionButton.textContent = regionDict[newRegion];
-    regionSelect.style.visibility = "hidden";
+    regionSelect.classList.remove("show");
 }
 
 /**
@@ -222,7 +222,7 @@ function updateRegion(newRegion) {
 function updateCostPulling(newSetting) {
     updateCache("pullCost", newSetting ? "On" : "Off");
     costButton.textContent = newSetting ? "On" : "Off";
-    costSelect.style.visibility = "hidden";
+    costSelect.classList.remove("show");
 }
 
 /**
@@ -232,7 +232,7 @@ function updateCostPulling(newSetting) {
 function updateNotiSending(newSetting) {
     updateCache("sendNotifications", newSetting ? "On" : "Off");
     notiButton.textContent = newSetting ? "On" : "Off";
-    notiSelect.style.visibility = "hidden";
+    notiSelect.classList.remove("show");
 }
 
 /**
@@ -265,10 +265,10 @@ function resetElements() {
         notiButton.textContent = notiVal;
     }
 
-    regionSelect.style.visibility = "hidden";
-    themeSelect.style.visibility = "hidden";
-    costSelect.style.visibility = "hidden";
-    notiSelect.style.visibility = "hidden";
+    regionSelect.classList.remove("show");
+    themeSelect.classList.remove("show");
+    costSelect.classList.remove("show");
+    notiSelect.classList.remove("show");
 }
 
 /**

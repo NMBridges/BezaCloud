@@ -1,7 +1,7 @@
 const { app } = require("electron");
 
 // Supplemental functions
-const { Colors, awsDir } = parent.require("../seros.js");
+const { Colors, awsDir } = parent.require("../beza.js");
 const clipboardy = parent.require('clipboardy');
 const { exec, execSync } = parent.require('child_process');
 

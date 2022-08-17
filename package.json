@@ -1,12 +1,12 @@
 {
-  "name": "seros",
-  "productName": "Seros",
+  "name": "beza",
+  "productName": "Beza Cloud",
   "version": "1.0.0",
   "description": "Facilitating commmerce one server at a time.",
   "main": "src/main.js",
   "scripts": {
     "start": "electron-forge start",
-    "package": "asar pack out/'Seros-darwin-x64'/'Seros.app'/Contents/Resources/app out/'Seros-darwin-x64'/'Seros.app'/Contents/Resources/app.asar",
+    "package": "asar pack out/'BezaCloud-darwin-x64'/'BezaCloud.app'/Contents/Resources/app out/'BezaCloud-darwin-x64'/'BezaCloud.app'/Contents/Resources/app.asar",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
@@ -76,7 +76,7 @@
       "output": "build"
     },
     "win": {
-      "icon": "./src/assets/SerosBlue.ico"
+      "icon": "./src/assets/Beza.ico"
     },
     "nsis": {
       "allowToChangeInstallationDirectory": true,

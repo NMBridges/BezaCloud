@@ -2,7 +2,7 @@
 const {
     cachedAwsCredentials, updateAwsCredentialsCache, Colors,
     getTheme
-} = require("../seros.js");
+} = require("../beza.js");
 const {
     ApiCaller
 } = require("../apiCaller.js");
@@ -14,7 +14,7 @@ var secretAccessKeyField = document.getElementById('secretAccessKeyField');
 var loginBtn = document.getElementById('loginBtn');
 var exitBtn = document.getElementById('exitBtn');
 var fieldLabels = document.getElementsByClassName('fieldLabel');
-var serosImg = document.getElementById("serosImg");
+var productImg = document.getElementById("productImg");
 
 
 loginBtn.onclick = loginClicked;
@@ -99,7 +99,7 @@ function updateColors() {
     secretAccessKeyField.style.outlineColor = Colors.backgroundSecondary();
 
     if(getTheme() == "Dark") {
-        serosImg.src = "../assets/SerosBannerx100-Orange.png";
+        productImg.src = "../assets/NiMBLeBannerx100-Orange.png";
         bod.style.backgroundColor = Colors.backgroundPrimary();
         wrapper.style.backgroundColor = Colors.textPrimary();
         wrapper.style.color = Colors.backgroundPrimary();
@@ -110,7 +110,7 @@ function updateColors() {
         loginBtn.style.color = Colors.backgroundSecondary();
         exitBtn.style.color = Colors.backgroundSecondary();
     } else {
-        serosImg.src = "../assets/SerosBannerx100-White.png";
+        productImg.src = "../assets/NiMBLeBannerx100-White.png";
         bod.style.backgroundColor = Colors.backgroundSecondary();
         wrapper.style.backgroundColor = Colors.backgroundPrimary();
         wrapper.style.color = Colors.textPrimary();

@@ -1,8 +1,9 @@
 // Supplemental functions
 const { 
     Colors, setPopupValues, getPopupValues, awsDir,
-    getRegion, updateCache, getCacheValue, getTheme
-} = parent.require("../seros.js");
+    getRegion, updateCache, getCacheValue, getTheme,
+    productName
+} = parent.require("../beza.js");
 const {
     Task, Server, ApiCaller
 } = parent.require("../apiCaller.js");
@@ -82,6 +83,11 @@ function convertTask(obj) {
     newTaskTime.textContent = "Time: " + unixToDate(task.time);
     newTile.appendChild(newTaskTime);
 
+    // The popup area that contains the modification buttons.
+    var newModifyArea = document.createElement('div');
+    newModifyArea.className = "modifyArea";
+    newModifyArea.hidden = false;
+
     // The modify Task button.
     var newModifyButton = document.createElement('button');
     newModifyButton.className = "modifyButton";
@@ -95,18 +101,19 @@ function convertTask(obj) {
     newModifyButton.addEventListener('mouseleave', function() {
         newModifyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
     });
-    newTile.appendChild(newModifyButton);
-
-    // The popup area that contains the modification buttons.
-    var newModifyArea = document.createElement('div');
-    newModifyArea.className = "modifyArea";
-    newModifyArea.hidden = true;
     newModifyButton.addEventListener('click', function() {
         newModifyArea.focus();
         if(newModifyButton.value == "active") {
-            newModifyArea.hidden = !newModifyArea.hidden;
+            var modAreas = document.getElementsByClassName("modifyArea show");
+            for (var index = 0; index < modAreas.length; index += 1) {
+                if (modAreas[index] != newModifyArea) {
+                    modAreas[index].classList.remove("show");
+                }
+            }
+            newModifyArea.classList.toggle("show");
         }
     });
+    newTile.appendChild(newModifyButton);
     
     // The permadelete Template button.
     var newTerminateButton = document.createElement('div');
@@ -149,6 +156,15 @@ function convertTask(obj) {
 /** Reloads the Task tiles on the page. */
 function loadTasks() {
     loadTasksFromCache(getRegion());
+    
+    // Clears old tiles, resets region label
+    const regionDict = {
+        "us-east-1": "N. Virginia",
+        "us-east-2": "Ohio",
+        "us-west-1": "N. California",
+        "us-west-2": "Oregon"
+    };
+    regionLabel.textContent = regionDict[getRegion()];
 
     // Clears and adds Tasks in current region to GUI.
     primaryBody.innerHTML = '';
@@ -158,6 +174,23 @@ function loadTasks() {
 
     displayOverlay(false);
     updateColors();
+            
+    var tiles = document.getElementsByClassName("tile");
+    for(var count = 0; count < tiles.length; count++) {
+        tiles[count].classList.add("show");
+    }
+                
+    if (tiles.length == 0) {
+        var noPullLabel = document.createElement('div');
+        noPullLabel.textContent = "You have no tasks in this region.";
+        noPullLabel.style.color = Colors.textSecondary();
+        noPullLabel.style.width = "calc(100vw - 50px)";
+        noPullLabel.style.marginLeft = "auto";
+        noPullLabel.style.marginRight = "auto";
+        noPullLabel.style.marginTop = "calc(50vh - 50px)";
+        noPullLabel.style.textAlign = "center";
+        primaryBody.appendChild(noPullLabel);
+    }
 }
 
 /**
@@ -350,6 +383,12 @@ function checkAndRunTasks() {
             items[count].style.borderColor = Colors.textSecondary();
         }
 
+        tiles = document.getElementsByClassName("tile show");
+        for(var count = 0; count < tiles.length; count++) {
+            tiles[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            tiles[count].style.borderColor = Colors.textSecondary();
+        }
+
         items = document.getElementsByClassName("modifyButton");
         for(var count = 0; count < items.length; count++) {
             items[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
@@ -394,7 +433,7 @@ function checkAndRunTasks() {
             items[count].style.color = "#cc3333";
         }
         
-        if(getTheme() == "Seros") {
+        if(getTheme() == productName) {
             newTaskButton.children[0].src = "../assets/Plus-White.png";
         } else {
             newTaskButton.children[0].src = "../assets/Plus-White.png";

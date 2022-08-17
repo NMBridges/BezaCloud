@@ -2,38 +2,7 @@
 - Renaming server functionality [Servers]
 - Fix bug on monthly spending chart on hover [Dashboard]
 - Fix colors on Seros Color theme [all]
-- Don't shutdown fully on close for Task purposes
-- NEED TO FIX LOGIC FOR WINDOWS WITH TASK TRAY SHIT
 - Update .ico file
 
 
-Instead of prebuilt AMIs, give the option for basic windows platform, then you can
-save your servers to AMIs
-- Note: need to solve random password problem. Perhaps basic windows platform is not
-    pure basic, it is an AMI that is already created
-- Logic:
-    Pulls Templates on startup, those will be used in New Server window until
-    the user loads up the My Templates window. Every time that window is opened,
-    the New Server window's Templates will be updated
-
 Close all the way if no tasks
-
-
-
-Create New Server
-
-Name
-[ Name text box ]
-
-Template
-[ 0   Default Mercor Windows Template  ] |
-[ O   Your custom template 1           ] i  // scrolls
-[ +   [      new AMI id textbox     ]  ] |
-
-CPU
-[ 0   t2.micro  <- on hover, SPECS     ] |
-[ O   t3.micro                         ] i  // scrolls
-[ O   t4.micro                         ] |
-[ +   [    other AWS CPU textbox    ]  ] |
-
-Create Server   Cancel

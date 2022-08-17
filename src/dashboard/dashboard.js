@@ -1,7 +1,7 @@
 // Supplemental functions
 const {
     Colors, getCacheValue
- } = parent.require("../seros.js");
+ } = parent.require("../beza.js");
 const {
     Expenditure, ApiCaller
 } = parent.require("../apiCaller.js");
@@ -32,7 +32,6 @@ var loadingSpending = false;
 window.addEventListener('load', function() {
 
     if(getCacheValue("pullCost") == "On") {
-        console.log('FRICK');
         if(!loadingSpending) {
             loadSpending();
         }
@@ -56,6 +55,7 @@ window.addEventListener('load', function() {
  */
 function loadChart() {
     // Clears the old chart of any children.
+    barChart.classList.remove("chartBig");
     barChart.textContent = '';
     var chartLine = document.createElement('div');
     chartLine.className = "outline";
@@ -99,6 +99,11 @@ function loadChart() {
         noPullLabel.style.marginTop = "calc(45vh - 140px)";
         noPullLabel.style.textAlign = "center";
         barChart.appendChild(noPullLabel);
+        barChart.classList.add("chartBig");
+    } else {
+        setTimeout(function() {
+            barChart.classList.add("chartBig");
+        }, 10);
     }
 
     updateColors();
@@ -288,7 +293,7 @@ function addChildToChart(expenditure, maxSpending, index) {
                                 + (expenditure.currency == "USD" ? "$" : "") + parseFloat(expenditure.spending).toFixed(2)
                                      + (expenditure.currency != "USD" ? " " + expenditure.currency : "");
     newChild.appendChild(newChildStatus);
-    
+
     barChart.appendChild(newChild);
 }
 
@@ -399,7 +404,7 @@ function updateColors() {
     headerBar.style.backgroundColor = Colors.backgroundPrimaryAccent();
 
     for(var count = 0; count < barChart.children.length; count++) {
-        if(barChart.children[count].className == "bar") {
+        if(barChart.children[count].className == "bar" || barChart.children[count].className == "bar barBig") {
             barChart.children[count].style.backgroundColor = Colors.chartColor();
             barChart.children[count].children[0].style.color = Colors.textSecondary();
         }

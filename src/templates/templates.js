@@ -2,8 +2,8 @@
 const { 
     Colors, createRdpFile, openRdpFile, setPopupValues,
     getPopupValues, awsDir, getRegion, updateCache,
-    getCacheValue, getTheme
-} = parent.require("../seros.js");
+    getCacheValue, getTheme, productName
+} = parent.require("../beza.js");
 const {
     Template, ApiCaller
 } = parent.require("../apiCaller.js");
@@ -118,23 +118,23 @@ function loadTemplates() {
                     }
                 }
 
-                const serosStarterAmis = {
+                const productStarterAmis = {
                     "us-east-1":"ami-054dc1c0a4617b048",
                     "us-east-2":"ami-099169caa4ac62e3f",
                     "us-west-1":"ami-0d17b334f19846f71",
                     "us-west-2":"ami-01c0f1391ef4b74f9"
                 };
 
-                const serosStarterAmi = serosStarterAmis[getRegion()];
+                const productStarterAmi = productStarterAmis[getRegion()];
 
-                // Adds the default seros-starter Template if it doesn't already exist.
+                // Adds the default starter Template if it doesn't already exist.
                 for(var templateIndex = -1; templateIndex < templates.length; templateIndex++) {
 
                     if(templateIndex == templates.length - 1) {
-                        if(templateIndex != -1 && templates[templateIndex].id == serosStarterAmi) {
+                        if(templateIndex != -1 && templates[templateIndex].id == productStarterAmi) {
                             break;
-                        } else if(!newTemplatesToPull.includes(serosStarterAmi)) {
-                            newTemplatesToPull.push(serosStarterAmi);
+                        } else if(!newTemplatesToPull.includes(productStarterAmi)) {
+                            newTemplatesToPull.push(productStarterAmi);
                         }
                     }
                 }
@@ -178,8 +178,14 @@ function loadTemplates() {
                             addTile(counter);
                         }
                     
-                        updateColors();
                         displayOverlay(false);
+                        updateColors();
+            
+                        var tiles = document.getElementsByClassName("tile");
+                        for(var count = 0; count < tiles.length; count++) {
+                            tiles[count].classList.add("show");
+                        }
+
                         loadingTemplates = false;
                     });
                 } else {
@@ -205,8 +211,14 @@ function loadTemplates() {
                         addTile(counter);
                     }
                 
-                    updateColors();
                     displayOverlay(false);
+                    updateColors();
+            
+                    var tiles = document.getElementsByClassName("tile");
+                    for(var count = 0; count < tiles.length; count++) {
+                        tiles[count].classList.add("show");
+                    }
+
                     loadingTemplates = false;
                 }
             } else {
@@ -232,8 +244,26 @@ function loadTemplates() {
                     addTile(counter);
                 }
             
-                updateColors();
                 displayOverlay(false);
+                updateColors();
+            
+                var tiles = document.getElementsByClassName("tile");
+                for(var count = 0; count < tiles.length; count++) {
+                    tiles[count].classList.add("show");
+                }
+                
+                if (tiles.length == 0) {
+                    var noPullLabel = document.createElement('div');
+                    noPullLabel.textContent = "You have no templates in this region.";
+                    noPullLabel.style.color = Colors.textSecondary();
+                    noPullLabel.style.width = "calc(100vw - 50px)";
+                    noPullLabel.style.marginLeft = "auto";
+                    noPullLabel.style.marginRight = "auto";
+                    noPullLabel.style.marginTop = "calc(50vh - 50px)";
+                    noPullLabel.style.textAlign = "center";
+                    primaryBody.appendChild(noPullLabel);
+                }
+
                 loadingTemplates = false;
             }
         });
@@ -291,6 +321,12 @@ function addTile(index) {
     newTemplateVisibility.textContent = template.plat;
     newTile.appendChild(newTemplateVisibility);
 
+    // The popup area that contains the modification buttons.
+    var newModifyArea = document.createElement('div');
+    newModifyArea.className = "modifyArea";
+    //newModifyArea.hidden = true;
+    newModifyArea.hidden = false;
+
     // The modify Template button.
     var newModifyButton = document.createElement('button');
     newModifyButton.className = "modifyButton";
@@ -304,18 +340,20 @@ function addTile(index) {
     newModifyButton.addEventListener('mouseleave', function() {
         newModifyButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
     });
-    newTile.appendChild(newModifyButton);
-
-    // The popup area that contains the modification buttons.
-    var newModifyArea = document.createElement('div');
-    newModifyArea.className = "modifyArea";
-    newModifyArea.hidden = true;
     newModifyButton.addEventListener('click', function() {
         newModifyArea.focus();
         if(newModifyButton.value == "active") {
-            newModifyArea.hidden = !newModifyArea.hidden;
+            //newModifyArea.hidden = !newModifyArea.hidden;
+            var modAreas = document.getElementsByClassName("modifyArea show");
+            for (var index = 0; index < modAreas.length; index += 1) {
+                if (modAreas[index] != newModifyArea) {
+                    modAreas[index].classList.remove("show");
+                }
+            }
+            newModifyArea.classList.toggle("show");
         }
     });
+    newTile.appendChild(newModifyButton);
 
     // The toggle visibility button.
     var newVisibilityButton = document.createElement('div');
@@ -549,6 +587,12 @@ function updateColors() {
             tiles[count].style.borderColor = Colors.textSecondary();
         }
 
+        tiles = document.getElementsByClassName("tile show");
+        for(var count = 0; count < tiles.length; count++) {
+            tiles[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
+            tiles[count].style.borderColor = Colors.textSecondary();
+        }
+
         var modifyButtons = document.getElementsByClassName("modifyButton");
         for(var count = 0; count < modifyButtons.length; count++) {
             modifyButtons[count].style.backgroundColor = Colors.backgroundPrimaryAccent();
@@ -644,7 +688,7 @@ function updateColors() {
             }
         }
 
-        if(getTheme() == "Seros") {
+        if(getTheme() == productName) {
             newTemplateButton.children[0].src = "../assets/Plus-White.png";
             refreshButton.children[0].src = "../assets/Refresh-White.png";
         } else {

@@ -82,6 +82,7 @@ body {
                 background-color: white;
                 color: white;
                 padding-top: 5px;
+                transition: background-color 0.2s ease-in-out;
             }
             #pemFileLabel {
                 grid-area: fileLabel;
@@ -136,6 +137,7 @@ body {
                 font-weight:300;
                 font-style: normal;
                 font-size: 15px;
+                transition: background-color 0.2s ease-in-out;
             }
             #cancelButton {
                 grid-area: cancel;
@@ -152,4 +154,5 @@ body {
                 font-weight:300;
                 font-style: normal;
                 font-size: 15px;
+                transition: background-color 0.2s ease-in-out;
             }

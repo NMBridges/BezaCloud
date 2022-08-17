@@ -1,8 +1,8 @@
 // Supplemental functions
 const {
     Colors, getTheme, setPopupValues, getRegion,
-    getCacheValue, awsDir, serosExec, updateCache
-} = require('../seros.js');
+    getCacheValue, awsDir, localExec, updateCache
+} = require('../beza.js');
 const {
     Server, Task, ApiCaller
 } = require('../apiCaller.js');
@@ -131,6 +131,7 @@ function updateElements() {
     var newServerButtonSelect = document.createElement('div');
     newServerButtonSelect.className = "serverButtonSelect";
     newServerButtonSelect.id = id;
+    newServerButtonSelect.value = "unselected";
     newServerOption.appendChild(newServerButtonSelect);
 
     var newServerNameLabel = document.createElement('div');
@@ -481,16 +482,15 @@ function parseNewTask() {
                     var serverButtonSelects = document.getElementsByClassName("serverButtonSelect");
                     for(var index = 0; index < serverButtonSelects.length; index++) {
                         if(serverButtonSelects[index].value == "selected") {
-                            console.log(servers);
                             for(var serverIndex = 0; serverIndex < servers.length; serverIndex++) {
-                                if(serverButtonSelects[index].id = servers[serverIndex].id) {
+                                if(serverButtonSelects[index].id == servers[serverIndex].id) {
                                     // Load 'tasks' from cache, add new Task, and recache it.
                                     var tasks = [];
                                     
                                     const cacheTasks = getCacheValue('tasks-' + getRegion());
                                     if(cacheTasks != "ERROR") {
-                                        for(var index = 0; index < cacheTasks.length; index++) {
-                                            tasks.push(convertTask(cacheTasks[index]));
+                                        for(var tIndex = 0; tIndex < cacheTasks.length; tIndex += 1) {
+                                            tasks.push(convertTask(cacheTasks[tIndex]));
                                         }
                                     }
 
