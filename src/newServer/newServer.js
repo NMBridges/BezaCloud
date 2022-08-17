@@ -2,7 +2,7 @@
 const {
     Colors, getTheme, setPopupValues, getRegion,
     getCacheValue
-} = require('../seros.js');
+} = require('../beza.js');
 const {
     Template, ApiCaller
 } = require('../apiCaller.js');
@@ -306,8 +306,8 @@ async function newServer(name, ami, cpu) {
         if(vpcId != "ERROR") {
             ApiCaller.getSecurityGroups().then(function(secGroups) {
                 if(secGroups[0] != "ERROR") {
-                    // Checks if Seros security group exists in the region
-                    var secGroupId = ApiCaller.getSerosSecurityGroupId(secGroups);
+                    // Checks if security group exists in the region
+                    var secGroupId = ApiCaller.getProductSecurityGroupId(secGroups);
                     if(secGroupId != "NONE") {
                         // Continue as is
                         ApiCaller.createKeyPair().then(function(key) {
@@ -329,7 +329,7 @@ async function newServer(name, ami, cpu) {
                         });
                     } else {
                         // If not, creates one
-                        ApiCaller.createSerosSecurityGroup(vpcId).then(function(newId) {
+                        ApiCaller.createProductSecurityGroup(vpcId).then(function(newId) {
                             secGroupId = newId;
                             if(secGroupId != "ERROR") {
                                 // Continue

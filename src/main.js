@@ -115,7 +115,7 @@ function newCreateServerWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
-      devTools: false
+      devTools: true
     },
     icon: __dirname + '/assets/Beza.ico'
   });
