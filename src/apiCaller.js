@@ -278,7 +278,7 @@ class ApiCaller {
             console.log("Successfully generated key pair", data)
             return keyName;
         } catch {
-            console.log("Error creating key pair");
+            console.log("Error creating key pair: ");
             return "ERROR";
         }
     };
@@ -289,7 +289,10 @@ class ApiCaller {
      * @param {string} text
      */ 
     static createPemFile(key, text) {
-        if(!fs.existsSync(awsDir() + "/connections/" + key + ".pem")) {
+        if (!fs.existsSync(awsDir() + "/connections/" + key + ".pem")) {
+            if (!fs.existsSync(awsDir() + "/connections")) {
+                fs.mkdirSync(awsDir() + "/connections");
+            }
             fs.appendFileSync(awsDir() + "/connections/" + key + ".pem", text);
         } else {
             fs.writeFileSync(awsDir() + "/connections/" + key + ".pem", text);

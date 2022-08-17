@@ -277,7 +277,8 @@ function getCpus() {
     const cpuTypes = [
         "t2.micro",
         "c5ad.xlarge",
-        "c4a.xlarge"
+        "c4a.xlarge",
+        "c5d.12xlarge"
     ];
 
     cpuSelect.style.setProperty('--rows', cpuTypes.length);
