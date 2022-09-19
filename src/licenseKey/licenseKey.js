@@ -114,8 +114,8 @@ function updateColors() {
     exitBtn.style.color = Colors.backgroundSecondary();
 
     if(getTheme() == "Dark") {
-        mercorImg.src = "../assets/NiMBLeBannerx100-Orange.png";
+        mercorImg.src = "../assets/Bannerx100-Orange.png";
     } else {
-        mercorImg.src = "../assets/NiMBLeBannerx100-White.png";
+        mercorImg.src = "../assets/Bannerx100-White.png";
     }
 }

@@ -99,7 +99,7 @@ function updateColors() {
     secretAccessKeyField.style.outlineColor = Colors.backgroundSecondary();
 
     if(getTheme() == "Dark") {
-        productImg.src = "../assets/NiMBLeBannerx100-Orange.png";
+        productImg.src = "../assets/Bannerx100-Orange.png";
         bod.style.backgroundColor = Colors.backgroundPrimary();
         wrapper.style.backgroundColor = Colors.textPrimary();
         wrapper.style.color = Colors.backgroundPrimary();
@@ -110,7 +110,7 @@ function updateColors() {
         loginBtn.style.color = Colors.backgroundSecondary();
         exitBtn.style.color = Colors.backgroundSecondary();
     } else {
-        productImg.src = "../assets/NiMBLeBannerx100-White.png";
+        productImg.src = "../assets/Bannerx100-White.png";
         bod.style.backgroundColor = Colors.backgroundSecondary();
         wrapper.style.backgroundColor = Colors.backgroundPrimary();
         wrapper.style.color = Colors.textPrimary();

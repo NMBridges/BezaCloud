@@ -500,7 +500,7 @@ function addTile(index) {
         newRebootButton.value = "active";
         newTerminateButton.value = "active";
         newModifyButton.value = "active";
-        if(server.status == "running") {
+        if(server.status == "running" && server.os != "Linux") {
             newConnButton.value = "active";
         }
     }
