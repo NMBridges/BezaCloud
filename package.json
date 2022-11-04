@@ -24,7 +24,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Seros"
+            "name": "Beza"
           }
         },
         {
@@ -68,8 +68,8 @@
     "electron-builder": "^22.11.7"
   },
   "build": {
-    "appId": "com.serossoftware.seros",
-    "productName": "Seros",
+    "appId": "com.bezacloud.beza",
+    "productName": "Beza Cloud",
     "target": "NSIS",
     "directories": {
       "buildResources": "resources",
