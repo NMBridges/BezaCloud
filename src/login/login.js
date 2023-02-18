@@ -28,6 +28,11 @@ window.onload = function() {
  * Checks if the AWS credentials are valid. Logs in if so.
  */
 function loginClicked() {
+    // Check if fields are not empty
+    if (accessKeyIdField.value == "" || secretAccessKeyField.value == "") {
+        return;
+    }
+
     loginBtn.style.backgroundColor = "#aaaaaa";
     if(loginBtn.value == "selected") { return; }
     loginBtn.value == "selected";
@@ -76,9 +81,14 @@ function loginClicked() {
  */
 function autofillTextboxes() {
     if(accessKeyIdField.value == "" && secretAccessKeyField.value == "") {
-        const credObj = cachedAwsCredentials();
-        accessKeyIdField.value = credObj['akId'];
-        secretAccessKeyField.value = credObj['sak'];
+        try {
+            const credObj = cachedAwsCredentials();
+            accessKeyIdField.value = credObj['akId'];
+            secretAccessKeyField.value = credObj['sak'];
+        } catch {
+            accessKeyIdField.value = "";
+            secretAccessKeyField.value = "";
+        }
     }
 }
 
