@@ -1,4 +1,8 @@
 # BezaCloud
 Application to help manage your AWS EC2 servers
 
-Build using instructions in info.txt file. Then run installer. Email bridges@gatech.edu for license key for use (free).
+Use npm instructions in the info.txt file to build. 
+
+Once built, go to the build folder and run the installer.
+
+Email bridges@gatech.edu for a license key in order to use (free).
