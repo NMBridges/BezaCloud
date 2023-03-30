@@ -179,10 +179,10 @@ function updateAwsCredentialsCache(newCreds) {
  */
 async function checkVersion() {
     const con = mysql.createConnection({
-        host: "license-keys.cbwk6xh9szjx.us-east-1.rds.amazonaws.com",
-        user: "admin",
-        password: "H#XCiFUG%sTzNF",
-        database: "licensekeys"
+        host: "REDACTED",
+        user: "REDACTED",
+        password: "REDACTED",
+        database: "REDACTED"
     });
 
     /** Whether or not the current version is valid. */
