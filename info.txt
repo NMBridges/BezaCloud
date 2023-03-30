@@ -15,5 +15,5 @@ npm run package
 
 OR 
 
-npx electron-packager . --icon=./src/assets/BezaCloud.icns --overwrite
+npx electron-packager . --overwrite
 npm run package
