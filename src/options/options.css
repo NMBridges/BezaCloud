@@ -284,3 +284,63 @@ body {
                         border: 0px solid white;
                         transition: background-color 0.2s ease-in-out;
                     } 
+            #advLabel {
+                position: absolute;
+                top: 497px;
+                left: 20px;
+                font-size: 25px;
+                color: white;
+            }
+            #advButton {
+                position: absolute;
+                top: 542;
+                left: 20px;
+                font-size: 15px;
+                font-family: "Segoe UI", sans-serif;
+                font-weight:300;
+                font-style: normal;
+                border: 1px solid white;
+                color: white;
+                border-radius: 8px;
+                width: 125px;
+                height: 40px;
+                z-index: 1;
+                transition: background-color 0.2s ease-in-out;
+            }
+                #advSelect {
+                    position: absolute;
+                    top: 542;
+                    margin: 0px;
+                    padding: 0px;
+                    width: 250px;
+                    height: 38px;
+                    display: grid;
+                    grid-template-columns: repeat(2, 125px);
+                    border-radius: 8px;
+                    border: 1px solid white;
+                    opacity: 0;
+                    grid-template-columns: repeat(4, 125px);
+                    pointer-events: none;
+                    transition: all 0.3s ease-out;
+                    z-index: 0;
+                    left: 0px;
+                }
+                    #advSelect.show {
+                        opacity: 1;
+                        left: 145px;
+                        pointer-events: all;
+                        transition: all 0.3s ease-out;
+                    }
+                    .advSelectButton {
+                        grid-row: 1;
+                        font-size: 15px;
+                        font-family: "Segoe UI", sans-serif;
+                        font-weight:300;
+                        font-style: normal;
+                        margin: 0px;
+                        width: 125px;
+                        height: 100%;
+                        border-radius: 8px;
+                        border: 0px solid white;
+                        transition: background-color 0.2s ease-in-out;
+                    } 

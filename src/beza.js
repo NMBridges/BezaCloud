@@ -2,7 +2,6 @@ const productName = 'Beza'
 const homeDir = require('os').homedir();
 const fs = require('fs');
 const { machineIdSync } = require("node-machine-id/index.js");
-var mysql = require('mysql-await');
 const { Address } = require('@aws-sdk/client-ec2');
 const { exec, execSync } = require('child_process');
 const promiseExec = require('util').promisify(exec);
@@ -105,22 +104,6 @@ function setPage(newPage) {
 }
 
 /**
- * @returns The cached license key from the user's file system
- */
-function cachedLicenseKey() {
-    var cachedKey = getCacheValue("licenseKey");
-    return cachedKey;
-}
-
-/** 
- * Updates the license key cache.
- */ 
- function updateKeyCache(newKey) {
-    updateCache("licenseKey", newKey);
-    return;
-}
-
-/**
  * @returns The cached AWS credentials, as a tuple.
  */
 function cachedAwsCredentials() {    
@@ -171,125 +154,6 @@ function updateAwsCredentialsCache(newCreds) {
         fs.appendFileSync(credPath, newCreds);
     } else {
         fs.writeFileSync(credPath, newCreds);
-    }
-}
-
-/** 
- * @returns whether or not the version is sufficiently up to date.
- */
-async function checkVersion() {
-    const con = mysql.createConnection({
-        host: "REDACTED",
-        user: "REDACTED",
-        password: "REDACTED",
-        database: "REDACTED"
-    });
-
-    /** Whether or not the current version is valid. */
-    var validVersion = false;
-    var postMessage = true;
-    var returnText = "";
-    
-    console.log("Connected to MySQL server");
-
-    // check if license key is valid
-    try {
-        const major = 0;
-        const minor = 0;
-        const patch = 1;
-
-        const result = await con.awaitQuery("SELECT * FROM versionControl WHERE id=?", 1);
-        
-        if(result.length == 0) {
-            // Version does not exist / could not find it.
-            // Will reject user.
-            console.log("Error checking " + productName + " version.");
-            returnText = "Error checking " + productName + " version.";
-            return [validVersion, postMessage, returnText];
-        } else if(result[0]['major'] == major && result[0]['minor'] == minor) {
-            // User may use software.
-            if(result[0]['patch'] == patch) {
-                // Version is completely up to date.
-                console.log(productName + " is completely up to date.");
-                returnText = productName + " is completely up to date.";
-                postMessage = false;
-            } else {
-                // Version is not up to date but is recent enough.
-                console.log("There is a new version of " + productName + " available. Please consider updating for the newest features.");
-                returnText = "There is a new version of " + productName + " available. Please consider updating for the newest features.";
-            }
-            validVersion = true;
-        } else {
-            // Version is inadequate.
-            console.log("Version is inadequate. Please update to a newer version of " + productName + ".");
-            returnText = "Version is inadequate. Please update to a newer version of " + productName + ".";
-            validVersion = false;
-        }
-    
-        await con.awaitEnd();
-
-        return [validVersion, postMessage, returnText];
-    } catch {
-        console.log("Error checking " + productName + " version.");
-        validVersion = false;
-        postMessage = true;
-        returnText = "Error checking " + productName + " version.";
-        return [validVersion, postMessage, returnText];
-    }
-}
-
-/**
- * Verifies the license key works. If not, returns false.
- * @param {string} inputKey The license key to validate.
- * @returns A boolean hether the license key works.
- */
-async function tryLicenseKey(inputKey) {
-    const con = mysql.createConnection({
-        host: "license-keys.cbwk6xh9szjx.us-east-1.rds.amazonaws.com",
-        user: "admin",
-        password: "H#XCiFUG%sTzNF",
-        database: "licensekeys"
-    });
-
-    var keyIsValid = false;
-    
-    console.log("Connected to MySQL server");
-
-    // Gets unique machine ID
-    var machId = machineIdSync({original: true});
-
-    // check if license key is valid
-    try {
-        const result = await con.awaitQuery("SELECT * FROM activationTable WHERE licenseKey=?", [inputKey]);
-        
-        if(result.length == 0) {
-            // license key does not exist
-            // cannot proceed
-            console.log("Invalid license key.");
-        } else if(result[0]['hardwareId'] != null && result[0]['hardwareId'] != machId) {
-            // license key is registered on another device
-            // cannot proceed
-            console.log("License key is registered on another device.");
-        } else if(result[0]['hardwareId'] == machId) {
-            // license key is registered by the current device
-            // proceed
-            console.log("License key is valid.");
-            keyIsValid = true;
-        } else {
-            // license key is valid and unused
-            // register this license key for this device and proceed
-            const result2 = await con.awaitQuery("UPDATE activationTable SET hardwareId =? WHERE licenseKey =?", [machId, inputKey]);
-            await con.awaitCommit();
-            console.log("License key registered successfully.");
-            keyIsValid = true;
-        }
-    
-        await con.awaitEnd();
-    
-        return keyIsValid;
-    } catch {
-        console.log("Invalid license key.");
-        return false;
     }
 }
 
@@ -706,10 +570,8 @@ class Colors {
 }
 
 module.exports = { 
-    cachedLicenseKey, tryLicenseKey, createAwsDir, updateKeyCache,
-    cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
+    createAwsDir, cachedAwsCredentials, updateAwsCredentialsCache, hex, Colors,
     getTheme, getPage, setTheme, setPage, createRdpFile, openRdpFile,
     installAwsCli, setPopupValues, getPopupValues, awsDir, hasAwsCliInstalled,
-    setRegion, getRegion, updateCache, getCacheValue, localExec,
-    unixToDate, checkVersion
+    setRegion, getRegion, updateCache, getCacheValue, localExec, unixToDate
 };

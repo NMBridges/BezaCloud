@@ -2,17 +2,14 @@ const { app, BrowserWindow, Menu, Tray } = require('electron');
 const EventEmitter = require('events');
 const path = require('path');
 const {
-  tryLicenseKey, cachedLicenseKey, createAwsDir,
+  createAwsDir,
   installAwsCli, hasAwsCliInstalled, awsDir,
   cachedAwsCredentials, checkVersion,
   productName
 } = require("./beza.js");
 
-let licenseKeyWindow;
 let loginWindow;
 let primaryWindow;
-
-var validLicenseKey = false;
 
 const originalInstance = app.requestSingleInstanceLock();
     
@@ -31,17 +28,17 @@ if (process.platform == "win32") {
     tray = new Tray(__dirname + '/assets/Beza.ico');
     const contextMenu = Menu.buildFromTemplate([
       { label: 'Restore', click: function() {
-          if (validLicenseKey) {
-            try {
-              primaryWindow.hide();
-              loginWindow.show();
-            } catch {
-              resetPrimaryWindow();
+          try {
+            if (!primaryWindow.isFocused() || !primaryWindow.hasFocus()) {
+              primaryWindow.focus();
+            } else if (!primaryWindow.isVisible()) {
               primaryWindow.hide();
               loginWindow.show();
             }
-          } else {
-            licenseKeyWindow.show();
+          } catch {
+            resetPrimaryWindow();
+            primaryWindow.hide();
+            loginWindow.show();
           }
         }
       },
@@ -53,17 +50,17 @@ if (process.platform == "win32") {
     tray.setToolTip('Beza Cloud');
     tray.setContextMenu(contextMenu);
     tray.on('click', function() {
-      if (validLicenseKey) {
-        try {
-          primaryWindow.hide();
-          loginWindow.show();
-        } catch {
-          resetPrimaryWindow();
+      try {
+        if (!primaryWindow.isFocused() || !primaryWindow.hasFocus()) {
+          primaryWindow.focus();
+        } else if (!primaryWindow.isVisible()) {
           primaryWindow.hide();
           loginWindow.show();
         }
-      } else {
-        licenseKeyWindow.show();
+      } catch {
+        resetPrimaryWindow();
+        primaryWindow.hide();
+        loginWindow.show();
       }
     });
   });
@@ -407,45 +404,6 @@ function createWindows() {
     }
   });*/
 
-  // ------------------------------      licenseKeyWindow     ----------------------------------------// 
-  
-   licenseKeyWindow = new BrowserWindow({
-    width: 600,
-    height: 300,
-    frame: false,
-    resizable: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true,
-      devTools: false
-    },
-    icon: __dirname + '/assets/Beza.ico'
-  });
-  licenseKeyWindow.loadFile(path.join(__dirname, 'licenseKey/licenseKey.html'));
-  //licenseKeyWindow.webContents.openDevTools();
-
-  // When license key window closes (not hides), it closes the application
-  licenseKeyWindow.on('close', () => {
-    app.quit();
-  });
-
-  // When the license key is input manually, it will validate the key (like above)
-  licenseKeyWindow.on('licenseKeySearched', () => {
-    const validKeyExists = tryLicenseKey(cachedLicenseKey()).then( function(exists) {
-      console.log("License key result for " + cachedLicenseKey() + ":", exists);
-      if(exists) {
-        licenseKeyWindow.hide();
-        loginWindow.show();
-				validLicenseKey = true;
-      } else {
-        licenseKeyWindow.webContents.executeJavaScript("resetSubmitButton();");
-      }
-    });
-  });
-  // ---------------------------------------------------------------------------------------------------//
-
-
   // --------------------------------      loginWindow      --------------------------------------------//
 
   loginWindow = new BrowserWindow({
@@ -497,42 +455,20 @@ function createWindows() {
 
   // Hides all windows
   loginWindow.hide();
-  licenseKeyWindow.hide();
   primaryWindow.hide();
 
   // Creates cache directory if it does not already exist
   createAwsDir();
 
-  checkVersion().then(function(versionInfo) {
-    if(versionInfo[0]) {
-      if(versionInfo[1]) {
-        newPopupWindow("Version Notice", versionInfo[2], "Close");
+  // Autologin with AWS credentials.
+  loginWindow.webContents.executeJavaScript("autofillTextboxes();").then(function() {
+    loginWindow.webContents.executeJavaScript("loginClicked();").then(function(success) {
+      if(!success) {
+        loginWindow.show();
+      } else {
+        primaryWindow.show();
       }
-      // Automatically checks if there is a valid key on the hard drive. If so, it
-      // shows the login window. If not, it shows the license key window and waits
-      // for manual user input.
-      tryLicenseKey(cachedLicenseKey()).then( function(exists) {
-        console.log("License key result for " + cachedLicenseKey() + ":", exists);
-        if(exists) {
-          // Autologin with AWS credentials.
-					validLicenseKey = true;
-          loginWindow.webContents.executeJavaScript("autofillTextboxes();").then(function() {
-            loginWindow.webContents.executeJavaScript("loginClicked();").then(function(success) {
-              if(!success) {
-                licenseKeyWindow.hide();
-                loginWindow.show();
-              } else {
-                primaryWindow.show();
-              }
-            });
-          });
-        } else {
-          licenseKeyWindow.show();
-        }
-      });
-    } else {
-      newPopupWindow("Invalid Version", versionInfo[2], "Exit");
-    }
+    });
   });
 }
 
@@ -557,17 +493,17 @@ app.on('activate', () => {
     createLoginWindow();
   }
   if (process.platform == "darwin") {
-    if (validLicenseKey) {
-      try {
-        primaryWindow.hide();
-        loginWindow.show();
-      } catch {
-        resetPrimaryWindow();
+    try {
+      if (!primaryWindow.isFocused() || !primaryWindow.hasFocus()) {
+        primaryWindow.focus();
+      } else if (!primaryWindow.isVisible()) {
         primaryWindow.hide();
         loginWindow.show();
       }
-    } else {
-      licenseKeyWindow.show();
+    } catch {
+      resetPrimaryWindow();
+      primaryWindow.hide();
+      loginWindow.show();
     }
   }
 });

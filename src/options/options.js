@@ -12,10 +12,12 @@ var regionButton = document.getElementById('regionButton');
 var themeButton = document.getElementById('themeButton');
 var costButton = document.getElementById('costButton');
 var notiButton = document.getElementById('notiButton');
+var advButton = document.getElementById('advButton');
 var regionSelect = document.getElementById('regionSelect');
 var themeSelect = document.getElementById('themeSelect');
 var costSelect = document.getElementById('costSelect');
 var notiSelect = document.getElementById('notiSelect');
+var advSelect = document.getElementById('advSelect');
 
 window.onload = function() {
     initElements();
@@ -38,6 +40,7 @@ function initElements() {
         regionSelect.classList.remove("show");
         costSelect.classList.remove("show");
         notiSelect.classList.remove("show");
+        advSelect.classList.remove("show");
         if(themeSelect.className != "show") {
             themeSelect.classList.add("show");
         } else {
@@ -59,6 +62,7 @@ function initElements() {
         themeSelect.classList.remove("show");
         costSelect.classList.remove("show");
         notiSelect.classList.remove("show");
+        advSelect.classList.remove("show");
         if(regionSelect.className != "show") {
             regionSelect.classList.add("show");
         } else {
@@ -80,6 +84,7 @@ function initElements() {
         themeSelect.classList.remove("show");
         regionSelect.classList.remove("show");
         notiSelect.classList.remove("show");
+        advSelect.classList.remove("show");
         if(costSelect.className != "show") {
             costSelect.classList.add("show");
         } else {
@@ -101,10 +106,33 @@ function initElements() {
         themeSelect.classList.remove("show");
         regionSelect.classList.remove("show");
         costSelect.classList.remove("show");
+        advSelect.classList.remove("show");
         if(notiSelect.className != "show") {
             notiSelect.classList.add("show");
         } else {
             notiSelect.classList.remove("show");
+        }
+    });
+
+    // --------------------------------------------------------------------------- //
+
+    // -------------------------  notiButton functions  -------------------------- //
+
+    advButton.addEventListener('mouseenter', function() {
+        advButton.style.backgroundColor = Colors.backgroundPrimaryAccent();
+    });
+    advButton.addEventListener('mouseleave', function() {
+        advButton.style.backgroundColor = Colors.backgroundPrimary();
+    });
+    advButton.addEventListener('click', function() {
+        themeSelect.classList.remove("show");
+        regionSelect.classList.remove("show");
+        costSelect.classList.remove("show");
+        notiSelect.classList.remove("show");
+        if(advSelect.className != "show") {
+            advSelect.classList.add("show");
+        } else {
+            advSelect.classList.remove("show");
         }
     });
 
@@ -185,6 +213,25 @@ function initElements() {
     }
 
     // --------------------------------------------------------------------------- //
+    
+    // ----------------------  advSelectButton functions  ----------------------- //
+
+    advSelectButtons = document.getElementsByClassName('advSelectButton');
+    for(var index = 0; index < advSelectButtons.length; index++) {
+        const asbi = advSelectButtons[index];
+        asbi.addEventListener('mouseenter', function() {
+            asbi.style.backgroundColor = Colors.backgroundPrimaryAccent();
+        });
+        asbi.addEventListener('mouseleave', function() {
+            asbi.style.backgroundColor = Colors.backgroundPrimary();
+        });
+        asbi.addEventListener('click', function() {
+            // Changes the cache for whether it server creation options are advanced or not
+            updateAdvCreation(asbi.id == "advYes");
+        });
+    }
+
+    // --------------------------------------------------------------------------- //
 
 }
 
@@ -236,6 +283,16 @@ function updateNotiSending(newSetting) {
 }
 
 /**
+ * Updates whether the program should display advanced server creation.
+ * @param {string} newSetting The new boolean value to switch to.
+ */
+function updateAdvCreation(newSetting) {
+    updateCache("advancedCreation", newSetting ? "On" : "Off");
+    advButton.textContent = newSetting ? "On" : "Off";
+    advSelect.classList.remove("show");
+}
+
+/**
  * Resets the buttons' values to be in accordance with the cache.
  */
 function resetElements() {
@@ -265,10 +322,19 @@ function resetElements() {
         notiButton.textContent = notiVal;
     }
 
+    const advVal = getCacheValue("advancedCreation");
+    if(advVal == "ERROR") {
+        advButton.textContent = "On";
+        updateCache("advancedCreation", "On");
+    } else {
+        advButton.textContent = advVal;
+    }
+
     regionSelect.classList.remove("show");
     themeSelect.classList.remove("show");
     costSelect.classList.remove("show");
     notiSelect.classList.remove("show");
+    advSelect.classList.remove("show");
 }
 
 /**
@@ -292,11 +358,15 @@ function updateColors() {
         notiButton.style.backgroundColor = Colors.backgroundPrimary();
         notiButton.style.color = Colors.textPrimary();
         notiButton.style.borderColor = Colors.textPrimary();
+        advButton.style.backgroundColor = Colors.backgroundPrimary();
+        advButton.style.color = Colors.textPrimary();
+        advButton.style.borderColor = Colors.textPrimary();
 
         regionSelect.style.borderColor = Colors.textTertiary();
         themeSelect.style.borderColor = Colors.textTertiary();
         costSelect.style.borderColor = Colors.textTertiary();
         notiSelect.style.borderColor = Colors.textTertiary();
+        advSelect.style.borderColor = Colors.textTertiary();
 
         regionSelectButtons = document.getElementsByClassName('regionSelectButton');
         for(var index = 0; index < regionSelectButtons.length; index++) {
@@ -320,6 +390,12 @@ function updateColors() {
         for(var index = 0; index < notiSelectButtons.length; index++) {
             notiSelectButtons[index].style.color = Colors.textSecondary();
             notiSelectButtons[index].style.backgroundColor = Colors.backgroundPrimary();
+        }
+
+        advSelectButtons = document.getElementsByClassName('advSelectButton');
+        for(var index = 0; index < advSelectButtons.length; index++) {
+            advSelectButtons[index].style.color = Colors.textSecondary();
+            advSelectButtons[index].style.backgroundColor = Colors.backgroundPrimary();
         }
 
         settingLabels = document.getElementsByClassName('settingLabel');

@@ -6,6 +6,8 @@ const {
 const {
     Template, ApiCaller
 } = require('../apiCaller.js');
+const fs = require("fs");
+const readline = require("readline");
 
 // Page element references
 /** The main divider box that divides the page into sections. */
@@ -198,7 +200,7 @@ function addTemplateToList(name, amiId, index) {
  * @param {string} name The name of the CPU.
  * @param {number} index The index of the CPU in the list.
  */
-function addCpuToList(name, index) {
+function addCpuToList(name, index, plat) {
     var newCpuOption = document.createElement('button');
     newCpuOption.className = "cpuOption";
     newCpuOption.id = name;
@@ -207,6 +209,7 @@ function addCpuToList(name, index) {
     var newCpuButtonSelect = document.createElement('div');
     newCpuButtonSelect.className = "cpuButtonSelect";
     newCpuButtonSelect.id = name;
+    newCpuButtonSelect.dataset.platform = plat;
     newCpuButtonSelect.style.backgroundColor = "#989898";
     newCpuOption.appendChild(newCpuButtonSelect);
 
@@ -274,17 +277,46 @@ function loadTemplates() {
  * @returns A list of CPUs that the user can use for that region.
  */
 function getCpus() {
-    const cpuTypes = [
-        "t2.micro",
-        "c5ad.xlarge",
-        "c4a.xlarge",
-        "c5d.12xlarge"
-    ];
-
-    cpuSelect.style.setProperty('--rows', cpuTypes.length);
-
-    for(var index = 0; index < cpuTypes.length; index++) {
-        addCpuToList(cpuTypes[index], index);
+    let cpuTypes = [];
+    if (getCacheValue("advancedCreation") == "Off") {
+        cpuTypes = [
+            "t2.micro",
+            "c5ad.xlarge",
+            "c4a.xlarge",
+            "c5d.12xlarge"
+        ];
+    
+        cpuSelect.style.setProperty('--rows', cpuTypes.length);
+    
+        for(var index = 0; index < cpuTypes.length; index++) {
+            addCpuToList(cpuTypes[index], index, "b");
+        }
+    } else {
+        stream = fs.createReadStream("./src/newServer/vcpus/" + getRegion() + ".csv");
+        const rl = readline.createInterface({input: stream})
+        rl.on("line", (row) => {
+            new_row = row.split(",");
+            if ( new_row[1] == "\"API Name\""
+                || (new_row[9] == "\"unavailable\"" && new_row[10] == "\"unavailable\""
+                    && new_row[7] == "\"unavailable\"" && new_row[8] == "\"unavailable\"") ) {
+                // Ignore
+            } else {
+                cpuTypes.push(new_row);
+            }
+        });
+        rl.on("close", () => {
+            cpuSelect.style.setProperty('--rows', cpuTypes.length);
+    
+            for(var index = 0; index < cpuTypes.length; index++) {
+                if (cpuTypes[index][9] == "\"unavailable\"" && cpuTypes[index][10] == "\"unavailable\"") {
+                    addCpuToList(cpuTypes[index][1].split("\"")[1], index, "l");
+                } else if (cpuTypes[index][7] == "\"unavailable\"" && cpuTypes[index][8] == "\"unavailable\"") {
+                    addCpuToList(cpuTypes[index][1].split("\"")[1], index, "w");
+                } else {
+                    addCpuToList(cpuTypes[index][1].split("\"")[1], index, "b");
+                }
+            }
+        });
     }
 }
 
@@ -419,26 +451,38 @@ createServerButton.addEventListener('click', function() {
 
     // Create server
     var amiId = "";
+    var amiPlat = "";
     var cpuType = "";
+    var cpuPlats = "";
 
     // Checks if a Template option is selected
     var templateButtonSelects = document.getElementsByClassName("templateButtonSelect");
     for(var index = 0; index < templateButtonSelects.length; index++) {
         if(templateButtonSelects[index].value == "selected") {
             amiId = templateButtonSelects[index].id;
+            amiPlat = templates[index].plat;
         }
     }
+
+    console.log("FFF" + amiPlat);
 
     // Checks if a CPU option is selected
     var cpuButtonSelects = document.getElementsByClassName("cpuButtonSelect");
     for(var index = 0; index < cpuButtonSelects.length; index++) {
         if(cpuButtonSelects[index].value == "selected") {
             cpuType = cpuButtonSelects[index].id;
+            cpuPlats = cpuButtonSelects[index].dataset.platform;
         }
     }
+    console.log("GGG" + cpuPlats);
 
-    if(amiId == "" || cpuType == "") {
+    console.log(amiPlat == "Windows");
+    console.log(cpuPlats == "l");
+    if(amiId == "" || cpuType == "" || (amiPlat == "Linux/UNIX" && cpuPlats == "w") || (amiPlat == "Windows" && cpuPlats == "l")) {
         // don't run
+        if (amiId != "" && cpuType != "") {
+            newPopup("Error creating server", "CPU type " + cpuType + " does not support this template's operating system (" + amiPlat + ")", "Close")
+        }
     } else {
         newServer(nameTextBox.value, amiId, cpuType);
     }
