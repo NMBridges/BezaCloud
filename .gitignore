@@ -90,7 +90,6 @@ typings/
 .webpack/
 
 # Electron-Forge
-.vscode
 out/
 build/
 .AWSCLIV2.pkg.icloud
