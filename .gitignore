@@ -89,8 +89,11 @@ typings/
 # Webpack
 .webpack/
 
-# Electron-Forge
+# Other
 .vscode
+todo.txt
+
+# Electron-Forge
 out/
 build/
 .AWSCLIV2.pkg.icloud
