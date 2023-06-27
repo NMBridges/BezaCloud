@@ -1,8 +1,0 @@
-- Don't load costs, servers, etc. before sign in. [all]
-- Renaming server functionality [Servers]
-- Fix bug on monthly spending chart on hover [Dashboard]
-- Fix colors on Seros Color theme [all]
-- Update .ico file
-
-
-Close all the way if no tasks
